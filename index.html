@@ -294,7 +294,7 @@ input[type="number"]{-moz-appearance:textfield;}
     font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif!important;
   }
   .no-print{display:none!important;}
-  html,body{margin:0!important;padding:0!important;width:210mm!important;background:#fff!important;}
+  html,body{margin:0!important;padding:0!important;width:auto!important;background:#fff!important;}
   /* 앱 전체 숨기고 인쇄 타깃만 표시 */
   #root-app>*:not(#a4-print-target){display:none!important;}
   #a4-print-target{display:block!important;}
@@ -316,8 +316,10 @@ input[type="number"]{-moz-appearance:textfield;}
   .a4-igrid .a4-ic{display:block!important;}
   .a4-rbox{break-inside:avoid;page-break-inside:avoid;}
   .a4-sgrid{break-inside:avoid;page-break-inside:avoid;display:grid!important;grid-template-columns:repeat(3,1fr)!important;}
-  .a4-stat-tbl{break-inside:avoid;page-break-inside:avoid;}
-  .a4-cond-tbl{break-inside:avoid;page-break-inside:avoid;}
+  .a4-stat-tbl{break-inside:avoid;page-break-inside:avoid;width:100%!important;}
+  .a4-stat-tbl td{width:33.33%!important;}
+  .a4-cond-tbl{break-inside:avoid;page-break-inside:avoid;width:100%!important;}
+  .a4-cond-tbl td{width:50%!important;}
   .a4-sub{break-after:avoid;page-break-after:avoid;color:#1d4ed8!important;border-left-color:#1d4ed8!important;}
   .a4-tit{break-inside:avoid;page-break-inside:avoid;}
   /* 섹션 제목(.a4-sub) 바로 다음에 테이블이 오면 제목+테이블 같이 이동 */
@@ -829,6 +831,11 @@ function switchTab(id,btn){
   else document.getElementById('tab-'+id).classList.add('active');
   if(id==='a4'){renderA4();setTimeout(scaleA4Preview,50);}
   if(id==='mobile')renderMobile();
+  // 관경산정 탭으로 돌아올 때 기존 결과 유지
+  if(id==='calc'&&S.hasResult){
+    document.getElementById('no-result-card').style.display='none';
+    document.getElementById('result-area').style.display='block';
+  }
 }
 
 /* ═══════ REGION ═══════ */
@@ -1037,17 +1044,17 @@ function doCalc(){
   document.getElementById('result-area').style.display='block';
   // hero
   document.getElementById('res-main-dn').textContent=vp.dn;
-  document.getElementById('res-main-desc').textContent=S.station+' '+S.rainfall+'mm/hr · 드레인 '+S.drains+'개 · 개당 '+de.toFixed(1)+'m²';
-  document.getElementById('res-eff-area').textContent=ea.toFixed(1);
+  document.getElementById('res-main-desc').textContent=S.station+' '+S.rainfall+'mm/hr · 드레인 '+S.drains+'개 · 개당 '+fmtN(de,1)+'m²';
+  document.getElementById('res-eff-area').textContent=fmtN(ea,1);
   document.getElementById('res-rainfall').textContent=S.rainfall;
-  document.getElementById('res-flow').textContent=Math.round(fl);
+  document.getElementById('res-flow').textContent=fmtN(fl,0);
   // calc box
-  document.getElementById('cv-area').textContent=S.area.toFixed(1)+' m²';
-  document.getElementById('cv-wall').textContent=wc>0?'+'+wc.toFixed(1)+' m²':'없음 (0)';
-  document.getElementById('cv-eff').textContent=ea.toFixed(1)+' m²';
+  document.getElementById('cv-area').textContent=fmtN(S.area,1)+' m²';
+  document.getElementById('cv-wall').textContent=wc>0?'+'+fmtN(wc,1)+' m²':'없음 (0)';
+  document.getElementById('cv-eff').textContent=fmtN(ea,1)+' m²';
   document.getElementById('cv-rain').textContent=S.rainfall+' mm/hr';
-  document.getElementById('cv-conv').textContent=ea.toFixed(1)+'×('+S.rainfall+'/100)×'+SF.toFixed(2)+' = '+ct.toFixed(1)+' m²';
-  document.getElementById('cv-zone').textContent=ct.toFixed(1)+'÷'+S.drains+' = '+dc.toFixed(1)+' m²';
+  document.getElementById('cv-conv').textContent=fmtN(ea,1)+'×('+S.rainfall+'/100)×'+SF.toFixed(2)+' = '+fmtN(ct,1)+' m²';
+  document.getElementById('cv-zone').textContent=fmtN(ct,1)+'÷'+S.drains+' = '+fmtN(dc,1)+' m²';
   document.getElementById('cv-result').textContent='DN '+vp.dn+'mm (표 최대 '+vp.maxArea+' m²)';
   // 수평관 기울기 보정 표시
   const slopeEl=document.getElementById('cv-slope-h');
@@ -1110,7 +1117,7 @@ function renderDrainDetail(de,dc,vp,hp,gp,ct,ea){
   document.getElementById('drain-count-badge').textContent='드레인 '+S.drains+'개';
   const ok=vp.maxArea>=dc,mg=((vp.maxArea/dc-1)*100).toFixed(0);
   let rows='';
-  for(let i=1;i<=S.drains;i++)rows+=`<tr><td style="font-weight:800;color:#1d4ed8">No.${i}</td><td>${de.toFixed(1)}</td><td>${dc.toFixed(1)}</td><td style="font-weight:900;color:#1d4ed8">DN ${vp.dn}</td><td style="font-weight:900;color:#3b82f6">DN ${hp.dn}</td><td style="font-weight:800;color:${ok?'#16a34a':'#dc2626'}">${ok?'✓':'✗'}</td></tr>`;
+  for(let i=1;i<=S.drains;i++)rows+=`<tr><td style="font-weight:800;color:#1d4ed8">No.${i}</td><td>${fmtN(de,1)}</td><td>${fmtN(dc,1)}</td><td style="font-weight:900;color:#1d4ed8">DN ${vp.dn}</td><td style="font-weight:900;color:#3b82f6">DN ${hp.dn}</td><td style="font-weight:800;color:${ok?'#16a34a':'#dc2626'}">${ok?'✓':'✗'}</td></tr>`;
   // 구간별 모드: 구간별 권장 드레인 수 안내
   let zoneGuide='';
   if(zoneMode==='multi'&&zones.length>1){
@@ -1125,10 +1132,10 @@ function renderDrainDetail(de,dc,vp,hp,gp,ct,ea){
   }
   document.getElementById('drain-detail').innerHTML=`
     <div style="padding:9px 11px;background:${ok?'#f0fdf4':'#fef2f2'};border:2px solid ${ok?'#bbf7d0':'#fecaca'};border-radius:8px;display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;flex-wrap:wrap;gap:5px">
-      <div><div style="font-size:11px;font-weight:800;color:${ok?'#15803d':'#dc2626'}">${ok?'✅ 드레인 배치 적합':'⚠️ 드레인 추가 필요'}</div><div style="font-size:10px;color:#475569;margin-top:2px">개당 환산면적 <strong>${dc.toFixed(1)}m²</strong> / DN${vp.dn} 허용 <strong>${vp.maxArea}m²</strong> ${ok?'(여유 +'+mg+'%)':'→ 드레인 추가 또는 상위 관경 검토'}</div></div>
+      <div><div style="font-size:11px;font-weight:800;color:${ok?'#15803d':'#dc2626'}">${ok?'✅ 드레인 배치 적합':'⚠️ 드레인 추가 필요'}</div><div style="font-size:10px;color:#475569;margin-top:2px">개당 환산면적 <strong>${fmtN(dc,1)}m²</strong> / DN${vp.dn} 허용 <strong>${fmtN(vp.maxArea,0)}m²</strong> ${ok?'(여유 +'+mg+'%)':'→ 드레인 추가 또는 상위 관경 검토'}</div></div>
       <div style="text-align:center"><div style="font-size:19px;font-weight:900;color:${ok?'#16a34a':'#dc2626'};font-family:'JetBrains Mono',monospace">${S.drains}개</div><div style="font-size:9px;color:#6b7a99;font-weight:700">드레인 수량</div></div>
     </div>
-    <div class="twrap"><table class="rtbl"><thead><tr><th>드레인 No.</th><th>분담면적(m²)</th><th>환산면적(m²)</th><th>수직관</th><th>수평관</th><th>적합</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td>합계</td><td>${ea.toFixed(1)}</td><td>${ct.toFixed(1)}</td><td>DN${vp.dn}×${S.drains}</td><td>DN${hp.dn}</td><td></td></tr></tfoot></table></div>
+    <div class="twrap"><table class="rtbl"><thead><tr><th>드레인 No.</th><th>분담면적(m²)</th><th>환산면적(m²)</th><th>수직관</th><th>수평관</th><th>적합</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td>합계</td><td>${fmtN(ea,1)}</td><td>${fmtN(ct,1)}</td><td>DN${vp.dn}×${S.drains}</td><td>DN${hp.dn}</td><td></td></tr></tfoot></table></div>
     ${zoneGuide}`;
 }
 
@@ -1141,7 +1148,7 @@ function renderCountSummary(vDN,hDN,gDN){
       <div class="sbox"><div class="sico">💧</div><div class="sval" style="font-size:16px">${S.drains}개</div><div class="slbl">드레인 수량</div></div>
       <div class="sbox"><div class="sico">⬆️</div><div class="sval" style="font-size:16px">DN${vDN}</div><div class="slbl">수직관 관경</div></div>
       <div class="sbox"><div class="sico">➡️</div><div class="sval" style="font-size:16px">DN${hDN}</div><div class="slbl">수평관 관경</div></div>
-      <div class="sbox"><div class="sico">📐</div><div class="sval" style="font-size:16px">${(S.area+S.wall*0.5).toFixed(0)}</div><div class="slbl">유효면적(m²)</div></div>
+      <div class="sbox"><div class="sico">📐</div><div class="sval" style="font-size:16px">${fmtN(S.area+S.wall*0.5,0)}</div><div class="slbl">유효면적(m²)</div></div>
     </div>
     <div class="nb grn"><div class="nb-tit">📋 설계 적용 수량 (최종)</div><div class="nb-txt">
       · 루프드레인(집수구) : <strong>${S.drains}개소</strong><br>
