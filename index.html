@@ -6,16 +6,18 @@
 <title>건축물 우수관경 산정 시스템 [MANMIN-Ver2.0]</title>
 <meta name="description" content="건축물 옥상 우수관경 산정 — KDS 31 30 35 : 2021 / 기상청 시간최대강우량 기준"/>
 <meta name="theme-color" content="#1d4ed8"/>
-<meta name="mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
-<meta name="apple-mobile-web-app-title" content="우수관경"/>
-<meta name="msapplication-TileColor" content="#1d4ed8"/>
+<!-- PWA Manifest -->
 <link rel="manifest" href="manifest.json"/>
+<!-- iOS PWA Support -->
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="건물우수"/>
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
-<link rel="icon" href="favicon.ico" sizes="any"/>
-<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png"/>
-<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png"/>
+<link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png"/>
+<link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192x192.png"/>
+<!-- MS Tiles -->
+<meta name="msapplication-TileImage" content="icons/icon-144x144.png"/>
+<meta name="msapplication-TileColor" content="#1d4ed8"/>
 <link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"/>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet"/>
 <style>
@@ -27,6 +29,44 @@ html,body{min-height:100vh;background:#f0f4f9;color:#1a2744;}
 input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 input[type="number"]{-moz-appearance:textfield;}
 .mono{font-family:'JetBrains Mono','Courier New',monospace!important;}
+
+/* PWA INSTALL BUTTON */
+#pwa-install-btn{
+  display:none;
+  background:linear-gradient(135deg,#f97316,#ea580c);
+  color:#fff;border:none;padding:6px 11px;border-radius:8px;
+  font-size:11px;font-weight:800;cursor:pointer;
+  align-items:center;gap:4px;font-family:inherit;
+  transition:all .15s;white-space:nowrap;flex-shrink:0;
+  box-shadow:0 2px 8px rgba(249,115,22,.4);
+  animation:pulse-install 2s infinite;
+}
+#pwa-install-btn.visible{display:flex;}
+#pwa-install-btn:hover{background:linear-gradient(135deg,#ea580c,#c2410c);box-shadow:0 4px 14px rgba(249,115,22,.5);}
+@keyframes pulse-install{
+  0%,100%{box-shadow:0 2px 8px rgba(249,115,22,.4);}
+  50%{box-shadow:0 2px 18px rgba(249,115,22,.7);}
+}
+/* PWA INSTALL BANNER (bottom) */
+#pwa-banner{
+  display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;
+  background:linear-gradient(135deg,#1e3a8a,#1d4ed8);
+  color:#fff;padding:14px 16px;
+  box-shadow:0 -4px 20px rgba(29,78,216,.4);
+  border-radius:16px 16px 0 0;
+  animation:slide-up .3s ease;
+}
+#pwa-banner.visible{display:block;}
+@keyframes slide-up{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.pwa-banner-inner{max-width:500px;margin:0 auto;display:flex;align-items:center;gap:12px;}
+.pwa-banner-icon{width:48px;height:48px;border-radius:12px;overflow:hidden;flex-shrink:0;}
+.pwa-banner-icon img{width:100%;height:100%;object-fit:cover;}
+.pwa-banner-texts{flex:1;min-width:0;}
+.pwa-banner-title{font-size:14px;font-weight:900;margin-bottom:2px;}
+.pwa-banner-desc{font-size:11px;opacity:.75;}
+.pwa-banner-btns{display:flex;gap:6px;flex-shrink:0;}
+.pwa-btn-install{background:#fbbf24;color:#1a1a1a;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.pwa-btn-close{background:rgba(255,255,255,.15);color:#fff;border:none;padding:8px 10px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
 
 /* HEADER */
 .app-header{background:#dbeafe;position:sticky;top:0;z-index:50;box-shadow:0 2px 16px rgba(147,197,253,.45);}
@@ -205,11 +245,11 @@ input[type="number"]{-moz-appearance:textfield;}
 .modal-body{padding:15px 17px;}
 
 /* A4 PREVIEW */
-.a4-wrap{background:#94a3b8;padding:20px;min-height:calc(100vh - 120px);display:flex;justify-content:center;overflow-x:auto;}
-.a4-scale-wrap{transform-origin:top center;display:inline-block;}
-@media(max-width:860px){
-  .a4-wrap{padding:10px;align-items:flex-start;justify-content:flex-start;}
-  .a4-scale-wrap{transform-origin:top left;}
+.a4-wrap{background:#94a3b8;padding:20px;min-height:calc(100vh - 120px);display:flex;justify-content:center;overflow-x:hidden;}
+.a4-scale-wrap{transform-origin:top center;display:block;}
+@media(max-width:1024px){
+  .a4-wrap{padding:8px;align-items:flex-start;justify-content:flex-start;overflow-x:hidden;}
+  .a4-scale-wrap{transform-origin:top left;display:block;}
 }
 .a4-page{background:#fff;width:794px;min-height:1122px;margin:0 auto;padding:19px 23px 28px;box-shadow:0 8px 40px rgba(0,0,0,.25);font-size:11px;color:#1a2744;display:inline-block;}
 .a4-page *{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif!important;}
@@ -324,6 +364,61 @@ input[type="number"]{-moz-appearance:textfield;}
     page-break-inside:avoid;
   }
 }
+
+/* ── FAB: 계산식 안내 플로팅 버튼 ── */
+.fab-calc{
+  position:fixed;
+  right:20px;
+  bottom:28px;
+  z-index:150;
+  width:52px;
+  height:52px;
+  background:linear-gradient(135deg,#1d4ed8,#0c4da2);
+  color:#fff;
+  border:none;
+  border-radius:50%;
+  font-size:22px;
+  cursor:grab;
+  box-shadow:0 4px 18px rgba(29,78,216,.45);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:box-shadow .15s,transform .15s;
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:none;
+}
+.fab-calc:hover{box-shadow:0 6px 24px rgba(29,78,216,.6);transform:scale(1.08);}
+.fab-calc:active{cursor:grabbing;}
+.fab-calc.dragging{box-shadow:0 10px 30px rgba(29,78,216,.55);transform:scale(1.12);transition:box-shadow .1s;}
+.fab-tooltip{
+  position:fixed;
+  background:#1e3a8a;
+  color:#fff;
+  font-size:11px;
+  font-weight:700;
+  padding:5px 10px;
+  border-radius:8px;
+  white-space:nowrap;
+  pointer-events:none;
+  z-index:151;
+  opacity:0;
+  transition:opacity .2s;
+  transform:translateX(-50%);
+}
+.fab-tooltip.show{opacity:1;}
+@media print{.fab-calc,.fab-tooltip{display:none!important;}}
+
+/* ── iOS Safari 폼 입력 자동 줌 방지 (font-size 16px 이상 강제) ── */
+@media screen and (max-width:768px){
+  input[type="text"],
+  input[type="number"],
+  input[type="search"],
+  select,
+  textarea{
+    font-size:16px!important;
+  }
+}
 </style>
 </head>
 <body>
@@ -340,8 +435,8 @@ input[type="number"]{-moz-appearance:textfield;}
       </div>
     </div>
     <div class="hdr-btns">
-      <button class="btn-g" onclick="openCalcGuide()">📐 <span class="btn-txt">계산식 안내</span></button>
-      <button class="btn-g" onclick="resetAll()">🔄 <span class="btn-txt">초기화</span></button>
+<button id="pwa-install-btn" onclick="pwaTriggerInstall()">📲 <span class="btn-txt">설치</span></button>
+<button class="btn-g" onclick="resetAll()">🔄 <span class="btn-txt">초기화</span></button>
       <button class="btn-b" onclick="printA4()">🖨️ <span class="btn-txt">출력</span></button>
     </div>
   </div>
@@ -626,6 +721,10 @@ input[type="number"]{-moz-appearance:textfield;}
 
 <div class="toast no-print" id="toast"></div>
 
+<!-- FAB: 계산식 안내 플로팅 버튼 -->
+<button class="fab-calc no-print" id="fabCalc" title="계산식 안내">📐</button>
+<div class="fab-tooltip" id="fabTooltip">계산식 안내</div>
+
 <!-- ████ MODAL: 계산식 안내 ████ -->
 <div class="modal-ov" id="calcModal" style="display:none" onclick="closeModalOv(event)">
   <div class="modal-box">
@@ -710,21 +809,22 @@ let S={
 function scaleA4Preview(){
   var wrap=document.getElementById('a4ScaleWrap');
   var bg=document.getElementById('a4PreviewBg');
-  if(!wrap||!bg)return;
+  var page=document.getElementById('a4-page');
+  if(!wrap||!bg||!page)return;
   var A4W=794;
-  var pad=20;
-  var availW=bg.clientWidth-pad*2;
-  if(availW<A4W){
-    var scale=availW/A4W;
-    wrap.style.transform='scale('+scale+')';
-    var page=document.getElementById('a4-page');
-    if(page){
-      wrap.style.marginBottom='-'+(page.offsetHeight*(1-scale))+'px';
-    }
-  }else{
-    wrap.style.transform='scale(1)';
-    wrap.style.marginBottom='0';
-  }
+  // bg의 실제 내부 너비 (패딩 제외)
+  var bgStyle=window.getComputedStyle(bg);
+  var bgPad=parseFloat(bgStyle.paddingLeft||0)+parseFloat(bgStyle.paddingRight||0);
+  var availW=bg.clientWidth-bgPad;
+  if(availW<1)availW=bg.clientWidth;
+  var scale=availW>=A4W?1:availW/A4W;
+  wrap.style.transform='scale('+scale+')';
+  wrap.style.transformOrigin='top left';
+  // scale 후 실제 점유 높이로 컨테이너 높이 설정 (스크롤 방지)
+  var scaledH=page.offsetHeight*scale;
+  wrap.style.height=scaledH+'px';
+  wrap.style.width=(A4W*scale)+'px';
+  wrap.style.overflow='hidden';
 }
 window.addEventListener('resize',scaleA4Preview);
 
@@ -1269,12 +1369,18 @@ function closeModalOv(e){if(e.target===document.getElementById('calcModal'))clos
 /* ═══════ PRINT ═══════ */
 function printA4(){
   renderA4();
-  const src=document.getElementById('a4-page').outerHTML;
-  const pt=document.getElementById('a4-print-target');
+  var src=document.getElementById('a4-page').outerHTML;
+  var pt=document.getElementById('a4-print-target');
   pt.innerHTML=src;
   pt.style.display='block';
+  // 인쇄 창 닫힌 후 확실하게 정리 (onafterprint)
+  function cleanup(){
+    pt.innerHTML='';
+    pt.style.display='none';
+    window.removeEventListener('afterprint',cleanup);
+  }
+  window.addEventListener('afterprint',cleanup);
   window.print();
-  setTimeout(function(){pt.innerHTML='';pt.style.display='none';},1200);
 }
 
 /* ═══════ RESET ═══════ */
@@ -1317,43 +1423,197 @@ function showToast(msg){
 document.addEventListener('DOMContentLoaded',()=>{
   initSido();renderStdTables();renderRainTable();
 });
+
+/* ═══════ FAB 드래그 & 클릭 ═══════ */
+(function(){
+  var btn, tip;
+  var isDragging=false, hasMoved=false;
+  var startX=0, startY=0;
+  var startRight=0, startBottom=0;
+
+  function getXY(e){
+    return e.touches && e.touches.length
+      ? {x:e.touches[0].clientX, y:e.touches[0].clientY}
+      : {x:e.clientX, y:e.clientY};
+  }
+
+  function onPointerDown(e){
+    var p=getXY(e);
+    startX=p.x; startY=p.y;
+    hasMoved=false; isDragging=false;
+
+    var rect=btn.getBoundingClientRect();
+    startRight = window.innerWidth  - rect.right;
+    startBottom= window.innerHeight - rect.bottom;
+
+    document.addEventListener('mousemove', onPointerMove);
+    document.addEventListener('mouseup',   onPointerUp);
+    document.addEventListener('touchmove', onPointerMove, {passive:false});
+    document.addEventListener('touchend',  onPointerUp);
+    e.preventDefault();
+  }
+
+  function onPointerMove(e){
+    var p=getXY(e);
+    var dx=p.x-startX, dy=p.y-startY;
+    if(!hasMoved && (Math.abs(dx)>5 || Math.abs(dy)>5)){
+      hasMoved=true; isDragging=true;
+      btn.classList.add('dragging');
+      tip.classList.remove('show');
+    }
+    if(!isDragging) return;
+
+    var newRight = startRight - dx;
+    var newBottom= startBottom- dy;
+    // 화면 경계 처리
+    newRight = Math.max(4, Math.min(newRight, window.innerWidth  - btn.offsetWidth  - 4));
+    newBottom= Math.max(4, Math.min(newBottom,window.innerHeight - btn.offsetHeight - 4));
+
+    btn.style.right = newRight+'px';
+    btn.style.bottom= newBottom+'px';
+    btn.style.left='auto';
+    btn.style.top='auto';
+    e.preventDefault();
+  }
+
+  function onPointerUp(e){
+    document.removeEventListener('mousemove', onPointerMove);
+    document.removeEventListener('mouseup',   onPointerUp);
+    document.removeEventListener('touchmove', onPointerMove);
+    document.removeEventListener('touchend',  onPointerUp);
+    btn.classList.remove('dragging');
+    // 클릭 판정: 이동 없었으면 모달 열기
+    if(!hasMoved) openCalcGuide();
+    isDragging=false;
+  }
+
+  function showTip(){
+    if(isDragging) return;
+    var r=btn.getBoundingClientRect();
+    tip.style.left=(r.left+r.width/2)+'px';
+    tip.style.top =(r.top-36)+'px';
+    tip.classList.add('show');
+  }
+  function hideTip(){ tip.classList.remove('show'); }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    btn=document.getElementById('fabCalc');
+    tip=document.getElementById('fabTooltip');
+    if(!btn) return;
+    btn.addEventListener('mousedown',  onPointerDown);
+    btn.addEventListener('touchstart', onPointerDown, {passive:false});
+    btn.addEventListener('mouseenter', showTip);
+    btn.addEventListener('mouseleave', hideTip);
+  });
+})();
+
 </script>
 </div><!-- /root-app -->
 
 <!-- ════ A4 인쇄 전용 타깃 (root-app 바깥) ════ -->
 <div id="a4-print-target" style="display:none;"></div>
 
+<!-- ════ PWA 설치 배너 ════ -->
+<div id="pwa-banner">
+  <div class="pwa-banner-inner">
+    <div class="pwa-banner-icon">
+      <img src="icons/icon-192x192.png" alt="건물우수 아이콘"/>
+    </div>
+    <div class="pwa-banner-texts">
+      <div class="pwa-banner-title">📲 건물우수 앱 설치</div>
+      <div class="pwa-banner-desc">홈 화면에 추가하면 오프라인에서도 사용 가능합니다</div>
+    </div>
+    <div class="pwa-banner-btns">
+      <button class="pwa-btn-install" onclick="pwaTriggerInstall()">설치</button>
+      <button class="pwa-btn-close" onclick="pwaDismissBanner()">✕</button>
+    </div>
+  </div>
+</div>
 
-<!-- ═══ PWA Service Worker 등록 ═══ -->
+<!-- ════ PWA Service Worker 등록 + 설치 로직 ════ -->
 <script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then(reg => {
-        console.log('[PWA] SW 등록 완료 — scope:', reg.scope);
-        reg.addEventListener('updatefound', () => {
-          const nw = reg.installing;
-          if (!nw) return;
-          nw.addEventListener('statechange', () => {
-            if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-              const b = document.createElement('div');
-              b.id = 'sw-update-banner';
-              b.style.cssText = 'position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:9999;background:#1d4ed8;color:#fff;padding:10px 20px;border-radius:12px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:10px;box-shadow:0 4px 24px rgba(0,0,0,.4);white-space:nowrap';
-              b.innerHTML =
-                '<span>🔄 새 버전이 있습니다</span>' +
-                '<button onclick="(()=>{document.getElementById('sw-update-banner').remove();navigator.serviceWorker.ready.then(r=>{r.waiting&&r.waiting.postMessage({type:'SKIP_WAITING'})})})()" style="background:#fff;color:#1d4ed8;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">업데이트</button>' +
-                '<button onclick="document.getElementById('sw-update-banner').remove()" style="background:rgba(255,255,255,.2);color:#fff;border:none;border-radius:8px;padding:6px 10px;font-size:11px;cursor:pointer;">나중에</button>';
-              document.body.appendChild(b);
-            }
-          });
+(function(){
+  var deferredPrompt = null;
+  var bannerDismissed = false;
+
+  /* ── 1. Service Worker 등록 ── */
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('./sw.js')
+        .then(function(reg){
+          console.log('[PWA] SW registered:', reg.scope);
+        })
+        .catch(function(err){
+          console.warn('[PWA] SW registration failed:', err);
         });
-      })
-      .catch(e => console.warn('[PWA] SW 등록 실패:', e));
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (!window._swReload) { window._swReload = true; location.reload(); }
     });
+  }
+
+  /* ── 2. beforeinstallprompt 이벤트 캡처 ── */
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferredPrompt = e;
+    /* 헤더 설치 버튼 표시 */
+    var hdrBtn = document.getElementById('pwa-install-btn');
+    if(hdrBtn) hdrBtn.classList.add('visible');
+    /* 배너는 2초 뒤 표시 (첫 방문이 아닌 경우 억제) */
+    if(!bannerDismissed && !sessionStorage.getItem('pwa-banner-dismissed')){
+      setTimeout(function(){
+        var banner = document.getElementById('pwa-banner');
+        if(banner) banner.classList.add('visible');
+      }, 2000);
+    }
   });
-}
+
+  /* ── 3. 설치 실행 함수 (전역) ── */
+  window.pwaTriggerInstall = function(){
+    var banner = document.getElementById('pwa-banner');
+    if(banner) banner.classList.remove('visible');
+    if(!deferredPrompt){
+      /* 이미 설치됐거나 지원 안 하는 브라우저 */
+      alert('이미 설치되어 있거나 이 브라우저는 자동 설치를 지원하지 않습니다.\n\n브라우저 메뉴 → "홈 화면에 추가"를 이용해 주세요.');
+      return;
+    }
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function(result){
+      if(result.outcome === 'accepted'){
+        console.log('[PWA] 설치 완료');
+        var hdrBtn = document.getElementById('pwa-install-btn');
+        if(hdrBtn) hdrBtn.classList.remove('visible');
+        showToast && showToast('✅ 건물우수 앱이 설치되었습니다!');
+      }
+      deferredPrompt = null;
+    });
+  };
+
+  /* ── 4. 배너 닫기 ── */
+  window.pwaDismissBanner = function(){
+    var banner = document.getElementById('pwa-banner');
+    if(banner) banner.classList.remove('visible');
+    bannerDismissed = true;
+    try{ sessionStorage.setItem('pwa-banner-dismissed','1'); }catch(e){}
+  };
+
+  /* ── 5. 이미 설치된 경우 버튼 숨기기 ── */
+  window.addEventListener('appinstalled', function(){
+    var hdrBtn = document.getElementById('pwa-install-btn');
+    if(hdrBtn) hdrBtn.classList.remove('visible');
+    var banner = document.getElementById('pwa-banner');
+    if(banner) banner.classList.remove('visible');
+    deferredPrompt = null;
+    console.log('[PWA] appinstalled event fired');
+  });
+
+  /* ── 6. standalone 모드로 실행 중이면 설치 버튼 숨기기 ── */
+  if(window.matchMedia('(display-mode: standalone)').matches ||
+     window.navigator.standalone === true){
+    document.addEventListener('DOMContentLoaded', function(){
+      var hdrBtn = document.getElementById('pwa-install-btn');
+      if(hdrBtn) hdrBtn.style.display='none';
+    });
+  }
+})();
 </script>
+
 </body>
 </html>

@@ -1,88 +1,71 @@
-/* ═══════════════════════════════════════════════════════════════
-   건축물 우수관경 산정 시스템 — Service Worker
-   KDS 31 30 35 : 2021 | ARCHITECT KIM MANMIN · Ver-2.0
-   전략: Cache-First (로컬 자산) + Network-First (외부 CDN)
-   ═══════════════════════════════════════════════════════════════ */
+/* ============================================================
+   Service Worker — 건물우수 PWA
+   Architect KIM MANMIN — MANMIN-Ver2.0
+   ============================================================ */
 
-const CACHE_NAME   = 'rain-pipe-v2.0';
-const CDN_CACHE    = 'rain-pipe-cdn-v2.0';
-const OFFLINE_PAGE = './index.html';
+const CACHE_NAME = '건물우수-v2.0';
+const OFFLINE_URL = './offline.html';
 
-const APP_SHELL = [
-  './index.html', './manifest.json', './favicon.ico',
-  './icons/icon-72.png', './icons/icon-96.png', './icons/icon-128.png',
-  './icons/icon-144.png', './icons/icon-152.png', './icons/icon-192.png',
-  './icons/icon-384.png', './icons/icon-512.png',
-  './icons/apple-touch-icon.png',
-  './icons/favicon-32.png', './icons/favicon-16.png',
+const PRECACHE_URLS = [
+  './',
+  './index.html',
+  './manifest.json',
+  './offline.html',
+  './icons/icon-192x192.png',
+  './icons/icon-512x512.png',
 ];
 
-const CDN_ORIGINS = [
-  'https://fonts.googleapis.com', 'https://fonts.gstatic.com',
-  'https://cdn.jsdelivr.net', 'https://cdnjs.cloudflare.com', 'https://unpkg.com',
-];
-
+/* ── INSTALL: precache shell ── */
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(c => c.addAll(APP_SHELL))
-      .then(() => { console.log('[SW] 프리캐시 완료'); return self.skipWaiting(); })
-      .catch(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(PRECACHE_URLS);
+    }).then(() => self.skipWaiting())
   );
 });
 
+/* ── ACTIVATE: remove old caches ── */
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys => Promise.all(
-      keys.filter(k => ![CACHE_NAME, CDN_CACHE].includes(k)).map(k => caches.delete(k))
-    )).then(() => self.clients.claim())
+    caches.keys().then(keys =>
+      Promise.all(
+        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+      )
+    ).then(() => self.clients.claim())
   );
 });
 
+/* ── FETCH: network-first with cache fallback ── */
 self.addEventListener('fetch', event => {
   const { request } = event;
-  if (request.method !== 'GET' || !request.url.startsWith('http')) return;
-  const url = new URL(request.url);
-  const isCDN = CDN_ORIGINS.some(o => url.origin === new URL(o).origin || request.url.startsWith(o));
-  event.respondWith(isCDN ? networkFirstCDN(request) : cacheFirstLocal(request));
-});
 
-async function cacheFirstLocal(request) {
-  const cached = await caches.match(request);
-  if (cached) return cached;
-  try {
-    const res = await fetch(request);
-    if (res && res.status === 200 && res.type !== 'opaque')
-      (await caches.open(CACHE_NAME)).put(request, res.clone());
-    return res;
-  } catch (_) {
-    if (request.headers.get('accept')?.includes('text/html')) {
-      const offline = await caches.match(OFFLINE_PAGE);
-      if (offline) return offline;
-    }
-    return new Response('오프라인 상태입니다.',
-      { status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+  // Skip non-GET and cross-origin requests
+  if (request.method !== 'GET') return;
+  if (!request.url.startsWith(self.location.origin) &&
+      !request.url.includes('cdn.jsdelivr.net') &&
+      !request.url.includes('fonts.googleapis.com') &&
+      !request.url.includes('fonts.gstatic.com')) return;
+
+  // HTML navigation → network-first
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request).catch(() => caches.match(OFFLINE_URL))
+    );
+    return;
   }
-}
 
-async function networkFirstCDN(request) {
-  try {
-    const res = await fetch(request);
-    if (res && res.status === 200) (await caches.open(CDN_CACHE)).put(request, res.clone());
-    return res;
-  } catch (_) {
-    return (await caches.match(request, { cacheName: CDN_CACHE })) || new Response('', { status: 503 });
-  }
-}
-
-self.addEventListener('message', event => {
-  if (event.data?.type === 'SKIP_WAITING' || event.data?.action === 'SKIP_WAITING') self.skipWaiting();
-  if (event.data?.action === 'CLEAR_CACHE')
-    caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))));
-});
-
-self.addEventListener('push', event => {
-  const data = event.data?.json() ?? { title: '우수관경 산정 시스템', body: '업데이트가 있습니다.' };
-  event.waitUntil(self.registration.showNotification(data.title, {
-    body: data.body, icon: './icons/icon-192.png', badge: './icons/icon-72.png',
-  }));
+  // Assets: stale-while-revalidate
+  event.respondWith(
+    caches.open(CACHE_NAME).then(cache =>
+      cache.match(request).then(cached => {
+        const networkFetch = fetch(request).then(response => {
+          if (response && response.status === 200 && response.type !== 'opaque') {
+            cache.put(request, response.clone());
+          }
+          return response;
+        }).catch(() => cached);
+        return cached || networkFetch;
+      })
+    )
+  );
 });
