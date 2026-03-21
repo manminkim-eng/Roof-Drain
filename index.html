@@ -226,22 +226,22 @@ input[type="number"]{-moz-appearance:textfield;}
 .a4-page{background:#fff;width:794px;min-height:1122px;margin:0 auto;padding:15px 23px 28px;box-shadow:0 8px 40px rgba(0,0,0,.25);font-size:11px;color:#1a2744;display:inline-block;}
 .a4-page *{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif!important;}
 .a4-tit{font-size:20px;font-weight:900;color:#1e3a8a;text-align:center;border-bottom:2.5px solid #1d4ed8;padding-bottom:9px;margin-bottom:12px;letter-spacing:-.02em;}
-.a4-sub{font-size:11.5px;font-weight:800;color:#1d4ed8;margin-bottom:5px;margin-top:12px;padding-left:7px;border-left:3px solid #1d4ed8;text-align:left;}
+.a4-sub{font-size:11.5px;font-weight:800;color:#1d4ed8;margin-bottom:4px;margin-top:9px;padding-left:7px;border-left:3px solid #1d4ed8;text-align:left;}
 .a4-igrid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px;}
 /* 인쇄 안정성용 조건 테이블 */
-.a4-cond-tbl{width:100%;border-collapse:collapse;margin-bottom:10px;}
+.a4-cond-tbl{width:100%;border-collapse:collapse;margin-bottom:7px;}
 .a4-cond-tbl td{padding:0;vertical-align:top;width:50%;}
-.a4-cond-tbl td.a4-ic-cell{padding:2.5px;}
-.a4-ic-inner{background:#f8fafd;border:1px solid #e2e8f0;border-radius:5px;padding:5px 8px;height:100%;text-align:left;}
-.a4-ic{background:#f8fafd;border:1px solid #e2e8f0;border-radius:5px;padding:5px 8px;text-align:left;}
-.a4-ik{font-size:8.5px;font-weight:700;color:#6b7a99;text-transform:uppercase;letter-spacing:.05em;text-align:left;display:block;}
-.a4-iv{font-size:11.5px;font-weight:900;color:#1a2744;margin-top:2px;font-family:'JetBrains Mono',monospace!important;text-align:left;display:block;}
-.a4-tbl{width:100%;border-collapse:collapse;font-size:10px;margin-bottom:10px;}
-.a4-tbl th{background:#dbeafe;padding:5px 7px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;}
-.a4-tbl td{padding:5px 8px;text-align:left;border:1px solid #e2e8f0;font-weight:600;}
+.a4-cond-tbl td.a4-ic-cell{padding:2px;}
+.a4-ic-inner{background:#f8fafd;border:1px solid #e2e8f0;border-radius:5px;padding:4px 7px;height:100%;text-align:left;}
+.a4-ic{background:#f8fafd;border:1px solid #e2e8f0;border-radius:5px;padding:4px 7px;text-align:left;}
+.a4-ik{font-size:8px;font-weight:700;color:#6b7a99;text-transform:uppercase;letter-spacing:.05em;text-align:left;display:block;}
+.a4-iv{font-size:10.5px;font-weight:900;color:#1a2744;margin-top:1px;font-family:'JetBrains Mono',monospace!important;text-align:left;display:block;}
+.a4-tbl{width:100%;border-collapse:collapse;font-size:10px;margin-bottom:7px;}
+.a4-tbl th{background:#dbeafe;padding:4px 6px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;}
+.a4-tbl td{padding:4px 7px;text-align:left;border:1px solid #e2e8f0;font-weight:600;}
 .a4-tbl tr:nth-child(even) td{background:#f8fafd;}
 .a4-tbl tfoot td{background:#dbeafe!important;font-weight:900;}
-.a4-rbox{background:linear-gradient(135deg,#1e3a8a,#1d4ed8);color:#fff;border-radius:9px;padding:13px 13px 10px;text-align:center;margin-bottom:10px;}
+.a4-rbox{background:linear-gradient(135deg,#1e3a8a,#1d4ed8);color:#fff;border-radius:9px;padding:10px 13px 8px;text-align:center;margin-bottom:7px;}
 .a4-rnum{font-size:48px;font-weight:900;color:#fbbf24;font-family:'JetBrains Mono',monospace!important;line-height:1;}
 .a4-sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:10px;}
 .a4-sc{background:#eff6ff;border:1px solid #bfdbfe;border-radius:7px;padding:7px;text-align:center;}
@@ -294,9 +294,9 @@ input[type="number"]{-moz-appearance:textfield;}
     font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif!important;
   }
   .no-print{display:none!important;}
+  /* ❷ fix: html/body/root-app 모두 숨기고 인쇄 타깃만 표시 */
   html,body{margin:0!important;padding:0!important;width:auto!important;background:#fff!important;}
-  /* 앱 전체 숨기고 인쇄 타깃만 표시 */
-  #root-app>*:not(#a4-print-target){display:none!important;}
+  #root-app{display:none!important;}
   #a4-print-target{display:block!important;}
   /* 인쇄용 a4-page: 패딩 제거, 100% 너비 */
   #a4-print-target .a4-page{padding:15px 23px 28px!important;width:100%!important;box-shadow:none!important;min-height:auto!important;box-sizing:border-box!important;}
@@ -337,6 +337,8 @@ input[type="number"]{-moz-appearance:textfield;}
     break-inside:avoid;
     page-break-inside:avoid;
   }
+  /* ❸ fix: 모바일 폰트 강제(16px)가 인쇄 시 A4 레이아웃 깨지는 것 방지 */
+  input,select,textarea{font-size:inherit!important;}
 }
 
 /* ── FAB: 계산식 안내 플로팅 버튼 ── */
@@ -802,23 +804,32 @@ function scaleA4Preview(){
   if(!wrap||!bg||!page)return;
   var A4W=794;
 
-  var style=window.getComputedStyle(bg);
-  var padH=parseFloat(style.paddingLeft||0)+parseFloat(style.paddingRight||0);
-  var availW=Math.max(bg.clientWidth-padH, 1);
+  // ❶ fix: transform 초기화 후 브라우저 레이아웃 재계산 대기 (double rAF)
+  wrap.style.transform='none';
+  wrap.style.height='';
 
-  if(availW>=A4W){
-    // 데스크탑: scale 없이 원본 크기, CSS flex가 중앙 배치
-    wrap.style.transform='none';
-    wrap.style.transformOrigin='top center';
-    wrap.style.height='';
-  }else{
-    // 모바일/태블릿: 화면 너비에 맞게 축소
-    var scale=availW/A4W;
-    wrap.style.transformOrigin='top left';
-    wrap.style.transform='scale('+scale+')';
-    // transform은 레이아웃 공간을 원본 크기로 유지하므로 높이 보정
-    wrap.style.height=(page.offsetHeight*scale)+'px';
-  }
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      var style=window.getComputedStyle(bg);
+      var padH=parseFloat(style.paddingLeft||0)+parseFloat(style.paddingRight||0);
+      var availW=Math.max(bg.clientWidth-padH, 1);
+
+      if(availW>=A4W){
+        // 데스크탑: scale 없이 원본 크기, CSS flex가 중앙 배치
+        wrap.style.transform='none';
+        wrap.style.transformOrigin='top center';
+        wrap.style.height='';
+      }else{
+        // 모바일/태블릿: 화면 너비에 맞게 축소
+        var scale=availW/A4W;
+        wrap.style.transformOrigin='top left';
+        wrap.style.transform='scale('+scale+')';
+        // ❶ fix: transform 해제 후 실제 높이를 읽어 보정
+        var realH=page.offsetHeight;
+        wrap.style.height=(realH*scale)+'px';
+      }
+    });
+  });
 }
 window.addEventListener('resize',scaleA4Preview);
 
@@ -829,7 +840,7 @@ function switchTab(id,btn){
   document.getElementById('panel-'+id).classList.add('active');
   if(btn)btn.classList.add('active');
   else document.getElementById('tab-'+id).classList.add('active');
-  if(id==='a4'){renderA4();setTimeout(scaleA4Preview,50);}
+  if(id==='a4'){renderA4();setTimeout(scaleA4Preview,120);}
   if(id==='mobile')renderMobile();
   // 관경산정 탭으로 돌아올 때 기존 결과 유지
   if(id==='calc'&&S.hasResult){
@@ -1243,17 +1254,73 @@ function renderA4(){
 
   <div class="a4-section" style="break-inside:avoid;page-break-inside:avoid;">
     <div class="a4-sub">2. 산정 결과 요약</div>
-    <div class="a4-rbox">
-      <div style="font-size:9.5px;opacity:.7;margin-bottom:3px;font-weight:700">추천 우수 수직관 관경 (DN)</div>
-      <div class="a4-rnum">${R.vp.dn}</div>
-      <div style="font-size:13px;opacity:.85;margin-top:3px">mm</div>
-      <div style="font-size:9.5px;opacity:.6;margin-top:5px">수평관 DN${R.hp.dn}mm · 드레인 ${S.drains}개 · 개당 분담 ${fmtN(R.de,1)}m²</div>
-    </div>
-    <table class="a4-stat-tbl">
+    <!-- 좌우 2단: 좌=관경 결과 히어로, 우=3개 수치 박스 -->
+    <table style="width:100%;border-collapse:collapse;margin-bottom:8px;">
       <tr>
-        <td><div class="a4-sc-inner"><div style="font-size:9px;color:#6b7a99;font-weight:700">유효면적</div><div style="font-size:14px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace">${fmtN(R.ea,1)} m²</div></div></td>
-        <td><div class="a4-sc-inner"><div style="font-size:9px;color:#6b7a99;font-weight:700">전체 환산면적</div><div style="font-size:14px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace">${fmtN(R.ct,1)} m²</div></div></td>
-        <td><div class="a4-sc-inner"><div style="font-size:9px;color:#6b7a99;font-weight:700">설계유량</div><div style="font-size:14px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace">${fmtN(R.fl,0)} ℓ/min</div></div></td>
+        <!-- 좌: 수직관·수평관 결과 -->
+        <td style="width:52%;padding:3px 4px 3px 0;vertical-align:top;">
+          <div class="a4-rbox" style="padding:9px 12px;margin-bottom:0;display:flex;align-items:center;gap:14px;">
+            <!-- 수직관 -->
+            <div style="text-align:center;flex:1;">
+              <div style="font-size:8px;opacity:.65;font-weight:700;margin-bottom:1px;">수직관 관경 (DN)</div>
+              <div class="a4-rnum" style="font-size:36px;line-height:1;">${R.vp.dn}</div>
+              <div style="font-size:10px;opacity:.8;font-weight:700;">mm</div>
+            </div>
+            <!-- 구분선 -->
+            <div style="width:1px;background:rgba(255,255,255,.25);align-self:stretch;flex-shrink:0;"></div>
+            <!-- 수평관 -->
+            <div style="text-align:center;flex:1;">
+              <div style="font-size:8px;opacity:.65;font-weight:700;margin-bottom:1px;">수평관 관경 (DN)</div>
+              <div style="font-size:28px;font-weight:900;color:#93c5fd;font-family:'JetBrains Mono',monospace;line-height:1;">${R.hp.dn}</div>
+              <div style="font-size:10px;opacity:.8;font-weight:700;">mm</div>
+            </div>
+            <!-- 구분선 -->
+            <div style="width:1px;background:rgba(255,255,255,.25);align-self:stretch;flex-shrink:0;"></div>
+            <!-- 드레인 수 -->
+            <div style="text-align:center;flex:1;">
+              <div style="font-size:8px;opacity:.65;font-weight:700;margin-bottom:1px;">드레인 수량</div>
+              <div style="font-size:28px;font-weight:900;color:#fde68a;font-family:'JetBrains Mono',monospace;line-height:1;">${S.drains}</div>
+              <div style="font-size:10px;opacity:.8;font-weight:700;">개소</div>
+            </div>
+          </div>
+        </td>
+        <!-- 우: 3개 수치 박스 세로 배치 -->
+        <td style="width:48%;padding:3px 0 3px 4px;vertical-align:top;">
+          <table style="width:100%;border-collapse:collapse;height:100%;">
+            <tr>
+              <td style="padding:2px;">
+                <div class="a4-sc-inner" style="display:flex;justify-content:space-between;align-items:center;padding:5px 9px;">
+                  <div style="font-size:9px;color:#475569;font-weight:700;">유효 지붕면적</div>
+                  <div style="font-size:13px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;">${fmtN(R.ea,1)} <span style="font-size:9px;font-weight:700;color:#64748b;">m²</span></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:2px;">
+                <div class="a4-sc-inner" style="display:flex;justify-content:space-between;align-items:center;padding:5px 9px;">
+                  <div style="font-size:9px;color:#475569;font-weight:700;">전체 환산면적</div>
+                  <div style="font-size:13px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;">${fmtN(R.ct,1)} <span style="font-size:9px;font-weight:700;color:#64748b;">m²</span></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:2px;">
+                <div class="a4-sc-inner" style="display:flex;justify-content:space-between;align-items:center;padding:5px 9px;">
+                  <div style="font-size:9px;color:#475569;font-weight:700;">설계유량</div>
+                  <div style="font-size:13px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;">${fmtN(R.fl,0)} <span style="font-size:9px;font-weight:700;color:#64748b;">ℓ/min</span></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:2px;">
+                <div class="a4-sc-inner" style="display:flex;justify-content:space-between;align-items:center;padding:5px 9px;">
+                  <div style="font-size:9px;color:#475569;font-weight:700;">개당 분담면적</div>
+                  <div style="font-size:13px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;">${fmtN(R.de,1)} <span style="font-size:9px;font-weight:700;color:#64748b;">m²</span></div>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </td>
       </tr>
     </table>
   </div>
