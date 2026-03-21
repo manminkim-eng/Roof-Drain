@@ -1264,14 +1264,7 @@ function renderA4(){
   </div>
 
   <div class="a4-section allow-break page-aware">
-    <div class="a4-sub" style="break-after:avoid;page-break-after:avoid;">4. 드레인별 분담면적 및 관경</div>
-    <table class="a4-tbl"><thead style="display:table-header-group;"><tr><th>드레인 No.</th><th>분담 유효면적 (m²)</th><th>분담 환산면적 (m²)</th><th>수직관 관경</th><th>수평관 관경</th><th>적합 여부</th></tr></thead>
-    <tbody>${dRows}</tbody>
-    <tfoot><tr><td style="font-weight:900">합계</td><td>${R.ea.toFixed(1)}</td><td>${R.ct.toFixed(1)}</td><td>DN${R.vp.dn}×${S.drains}개</td><td>DN${R.hp.dn}</td><td>—</td></tr></tfoot></table>
-  </div>
-
-  <div class="a4-section allow-break page-aware">
-    <div class="a4-sub" style="break-after:avoid;page-break-after:avoid;">5. 설계 수량 적용 요약</div>
+    <div class="a4-sub" style="break-after:avoid;page-break-after:avoid;">4. 설계 수량 적용 요약</div>
     <table class="a4-tbl"><thead style="display:table-header-group;"><tr><th>항목</th><th>규격</th><th>수량</th><th>비고</th></tr></thead><tbody>
       <tr style="break-inside:avoid;"><td>루프드레인 (집수구)</td><td>—</td><td style="text-align:center;font-weight:800">${S.drains} 개소</td><td>옥상 균등 배치</td></tr>
       <tr style="break-inside:avoid;"><td>우수 수직관</td><td style="font-weight:800;color:#1d4ed8">DN ${R.vp.dn}mm · ${mat}</td><td style="text-align:center;font-weight:800">${S.drains} 개소</td><td>KDS 표 4.4-1 기준</td></tr>
@@ -1280,7 +1273,7 @@ function renderA4(){
   </div>
 
   <div class="a4-section allow-break page-aware">
-    <div class="a4-sub" style="break-after:avoid;page-break-after:avoid;">6. 적용 법적 근거</div>
+    <div class="a4-sub" style="break-after:avoid;page-break-after:avoid;">5. 적용 법적 근거</div>
     <table class="a4-tbl"><thead style="display:table-header-group;"><tr><th>기준</th><th>조항</th><th>내용</th></tr></thead><tbody>
       <tr style="break-inside:avoid;"><td style="font-weight:800;color:#1e40af">KDS 31 30 35 : 2021</td><td style="text-align:center">4.4.2 ~ 4.4.4</td><td>수직관·수평관·반원형 빗물받이 관경 기준</td></tr>
       <tr style="break-inside:avoid;"><td style="font-weight:800;color:#1e40af">KDS 31 30 35 : 2021</td><td style="text-align:center">4.4.1</td><td>시간최대강우량 기준 관 지름 결정</td></tr>
