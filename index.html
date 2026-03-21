@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"/>
+<title>건축물 우수관경 산정 시스템 [MANMIN-Ver2.0]</title>
+<meta name="description" content="건축물 옥상 우수관경 산정 — KDS 31 30 35 : 2021 / 기상청 시간최대강우량 기준"/>
+<meta name="theme-color" content="#1d4ed8"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="우수관경"/>
+<meta name="msapplication-TileColor" content="#1d4ed8"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
+<link rel="icon" href="favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png"/>
+<link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif!important;}
+html,body{min-height:100vh;background:#f0f4f9;color:#1a2744;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:#f0f4f9;}
+::-webkit-scrollbar-thumb{background:#bfdbfe;border-radius:10px;}
+input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+input[type="number"]{-moz-appearance:textfield;}
+.mono{font-family:'JetBrains Mono','Courier New',monospace!important;}
+
+/* HEADER */
+.app-header{background:#dbeafe;position:sticky;top:0;z-index:50;box-shadow:0 2px 16px rgba(147,197,253,.45);}
+.header-inner{max-width:1300px;margin:0 auto;padding:0 14px;height:58px;display:flex;align-items:center;gap:10px;}
+.brand-logo{display:flex;align-items:center;gap:9px;flex:1;min-width:0;}
+.brand-icon{width:36px;height:36px;background:#1d4ed8;border-radius:9px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(29,78,216,.35);flex-shrink:0;font-size:17px;}
+.brand-texts{min-width:0;}
+.brand-title{font-size:13px;font-weight:900;color:#1e3a8a;letter-spacing:-.02em;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.brand-sub{font-size:9px;color:#3b82f6;margin-top:1px;font-weight:700;white-space:nowrap;}
+.hdr-btns{display:flex;gap:5px;flex-shrink:0;}
+.btn-g{background:#fff;color:#374151;border:1.5px solid #d1d5db;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit;transition:all .15s;white-space:nowrap;}
+.btn-g:hover{border-color:#1d4ed8;color:#1d4ed8;background:#eff6ff;}
+.btn-b{background:#1d4ed8;color:#fff;border:none;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit;transition:all .15s;white-space:nowrap;}
+.btn-b:hover{background:#1e40af;}
+@media(max-width:600px){
+  .brand-title{font-size:11px;}
+  .btn-g .btn-txt,.btn-b .btn-txt{display:none;}
+  .hdr-btns{gap:3px;}
+  .btn-g,.btn-b{padding:6px 8px;}
+}
+@media(max-width:380px){.brand-title{font-size:10px;}}
+
+/* TAB BAR */
+.tab-bar{background:#bfdbfe;border-top:1px solid rgba(147,197,253,.3);overflow-x:auto;scrollbar-width:none;}
+.tab-bar::-webkit-scrollbar{display:none;}
+.tab-bar-inner{max-width:1300px;margin:0 auto;padding:0 5px;display:flex;}
+.tb{background:none;border:none;cursor:pointer;color:#1e40af;font-family:inherit;padding:8px 12px;font-size:11px;font-weight:700;position:relative;transition:color .15s,background .15s;display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;}
+.tb:hover{color:#1e3a8a;background:rgba(30,58,138,.07);}
+.tb.active{color:#1e3a8a;}
+.tb.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:#f97316;border-radius:2px 2px 0 0;}
+
+/* LAYOUT */
+.main-wrap{max-width:1300px;margin:0 auto;padding:13px 13px 80px;}
+.tab-panel{display:none;}.tab-panel.active{display:block;}
+.two-col{display:grid;grid-template-columns:430px 1fr;gap:13px;align-items:start;}
+@media(max-width:1100px){.two-col{grid-template-columns:1fr 1fr;}}
+@media(max-width:760px){.two-col{grid-template-columns:1fr;}}
+
+/* CARD */
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 1px 4px rgba(15,23,42,.06);overflow:hidden;margin-bottom:12px;}
+.card-head{display:flex;align-items:center;gap:8px;padding:10px 13px;border-bottom:1px solid #eef1f6;}
+.card-ico{width:25px;height:25px;border-radius:6px;background:#eff6ff;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;}
+.card-tit{font-size:11px;font-weight:800;color:#1a2744;letter-spacing:.04em;flex:1;}
+.cbadge{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:20px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;white-space:nowrap;}
+.cbadge.org{background:#fff7ed;color:#c2410c;border-color:#fed7aa;}
+.cbadge.grn{background:#f0fdf4;color:#15803d;border-color:#bbf7d0;}
+.card-body{padding:12px 13px;}
+
+/* FORM */
+.flbl{font-size:9.5px;font-weight:700;color:#6b7a99;letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px;display:block;}
+.finput{width:100%;padding:7px 10px;background:#f8fafd;border:1.5px solid #dde3ed;border-radius:7px;color:#1a2744;font-size:12.5px;font-weight:600;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s;}
+.finput:focus{border-color:#1d4ed8;box-shadow:0 0 0 3px rgba(29,78,216,.1);background:#fff;}
+.fselect{width:100%;padding:7px 24px 7px 9px;background:#f8fafd;border:1.5px solid #dde3ed;border-radius:7px;color:#1a2744;font-size:11.5px;font-weight:700;font-family:inherit;outline:none;cursor:pointer;transition:border-color .15s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%231d4ed8' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;}
+.fselect:focus{border-color:#1d4ed8;box-shadow:0 0 0 3px rgba(29,78,216,.1);}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+@media(max-width:360px){.frow{grid-template-columns:1fr;}}
+.fgrp{display:flex;flex-direction:column;gap:3px;}
+.fgrp.full{grid-column:1/-1;}
+.input-sfx{display:flex;}
+.input-sfx .finput{border-radius:7px 0 0 7px;}
+.sfx{padding:7px 10px;background:#eff6ff;border:1.5px solid #dde3ed;border-left:none;border-radius:0 7px 7px 0;font-size:11.5px;font-weight:700;color:#3b82f6;white-space:nowrap;display:flex;align-items:center;}
+
+/* STEP BAR */
+.step-bar{display:flex;align-items:center;margin-bottom:13px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:8px 12px;overflow-x:auto;gap:0;scrollbar-width:none;}
+.step-bar::-webkit-scrollbar{display:none;}
+.step-item{display:flex;align-items:center;gap:5px;flex-shrink:0;}
+.sc{width:22px;height:22px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#94a3b8;flex-shrink:0;transition:all .2s;}
+.sc.done{background:#22c55e;color:#fff;}
+.sc.active{background:#1d4ed8;color:#fff;box-shadow:0 0 0 3px rgba(29,78,216,.2);}
+.sl{font-size:10.5px;font-weight:700;color:#94a3b8;white-space:nowrap;}
+.sl.active{color:#1d4ed8;}.sl.done{color:#16a34a;}
+.sdiv{width:16px;height:2px;background:#e2e8f0;margin:0 3px;flex-shrink:0;transition:background .2s;}
+.sdiv.done{background:#22c55e;}
+
+/* REGION */
+.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:5px;}
+.rcard{border:1.5px solid #e2e8f0;border-radius:8px;padding:7px 5px;cursor:pointer;transition:all .15s;text-align:center;background:#f8fafd;}
+.rcard:hover{border-color:#bfdbfe;background:#f0f9ff;}
+.rcard.sel{border-color:#1d4ed8;background:#eff6ff;box-shadow:0 0 0 2px rgba(29,78,216,.12);}
+.rcard-nm{font-size:11.5px;font-weight:800;color:#1a2744;}
+.rcard-rn{font-size:9.5px;color:#3b82f6;font-weight:700;font-family:'JetBrains Mono',monospace!important;}
+
+/* RAIN INFO */
+.rain-info{background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1.5px solid #bfdbfe;border-radius:10px;padding:11px;margin-top:9px;}
+.rain-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(147,197,253,.3);}
+.rain-row:last-child{border-bottom:none;}
+.rain-key{font-size:10.5px;color:#475569;font-weight:700;}
+.rain-val{font-size:11.5px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace!important;}
+
+/* NOTICE */
+.nb{border-radius:9px;padding:9px 11px;margin-bottom:9px;}
+.nb.blue{background:#eff6ff;border:1.5px solid #bfdbfe;}
+.nb.org{background:#fff7ed;border:1.5px solid #fed7aa;}
+.nb.grn{background:#f0fdf4;border:1.5px solid #bbf7d0;}
+.nb-tit{font-size:10.5px;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:4px;}
+.nb.blue .nb-tit{color:#1e40af;}.nb.org .nb-tit{color:#c2410c;}.nb.grn .nb-tit{color:#15803d;}
+.nb-txt{font-size:10.5px;line-height:1.75;}
+.nb.blue .nb-txt{color:#1e3a8a;}.nb.org .nb-txt{color:#78350f;}.nb.grn .nb-txt{color:#14532d;}
+
+/* DRAIN BOX */
+.drain-box{background:linear-gradient(135deg,#eff6ff,#dbeafe);border:2px solid #bfdbfe;border-radius:11px;padding:11px;margin-bottom:9px;}
+.drain-box-tit{font-size:10.5px;font-weight:800;color:#1e40af;margin-bottom:8px;}
+.dstp{display:flex;align-items:center;gap:6px;}
+.dbtn{width:34px;height:34px;background:#fff;border:1.5px solid #bfdbfe;border-radius:8px;font-size:18px;cursor:pointer;color:#1d4ed8;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+.dbtn:hover{background:#1d4ed8;color:#fff;border-color:#1d4ed8;}
+.drain-prev{margin-top:8px;padding:7px 10px;background:#fff;border-radius:7px;border:1px solid #bfdbfe;display:flex;justify-content:space-between;align-items:center;}
+.dpk{font-size:10.5px;font-weight:700;color:#475569;}
+.dpv{font-size:14px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace!important;}
+
+/* RESULT HERO */
+.result-hero{background:linear-gradient(135deg,#1e3a8a,#1d4ed8);padding:17px;border-radius:12px;color:#fff;text-align:center;margin-bottom:12px;}
+.rh-sub{font-size:10px;opacity:.65;margin-bottom:3px;font-weight:600;}
+.rh-num{font-size:54px;font-weight:900;color:#fbbf24;line-height:1;font-family:'JetBrains Mono',monospace!important;}
+.rh-unit{font-size:14px;font-weight:700;opacity:.85;margin-top:2px;}
+.rh-desc{font-size:10px;opacity:.7;margin-top:6px;line-height:1.5;}
+
+/* STAT GRID */
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+@media(max-width:360px){.stat-grid{grid-template-columns:repeat(2,1fr);}}
+.sbox{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px;text-align:center;}
+.sico{font-size:16px;margin-bottom:3px;}
+.sval{font-size:19px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace!important;line-height:1.1;}
+.slbl{font-size:9.5px;color:#6b7a99;font-weight:700;margin-top:2px;}
+
+/* TABLE */
+.twrap{overflow-x:auto;border-radius:9px;border:1px solid #e2e8f0;}
+.rtbl{width:100%;border-collapse:collapse;font-size:11px;}
+.rtbl th{background:#eff6ff;padding:7px 8px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;font-size:10px;}
+.rtbl td{padding:7px 8px;text-align:center;border:1px solid #e2e8f0;color:#1a2744;font-weight:600;}
+.rtbl tr:nth-child(even) td{background:#f8fafd;}
+.rtbl tfoot td{background:#eff6ff!important;font-weight:900;}
+
+/* PIPE COMPACT TABLE */
+.pc-tbl{width:100%;border-collapse:collapse;font-size:11.5px;}
+.pc-tbl th{background:#eff6ff;padding:6px 8px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;font-size:10px;white-space:nowrap;}
+.pc-tbl td{padding:5px 8px;text-align:center;border:1px solid #e2e8f0;color:#1a2744;font-weight:600;white-space:nowrap;}
+.pc-tbl .pc-rec td{background:#fff7ed!important;border-color:#fed7aa;}
+.pc-tbl .pc-dim td{opacity:.35;}
+.pc-dn-cell{font-size:13px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace!important;}
+.pc-tag-inline{font-size:9px;font-weight:800;padding:1px 5px;border-radius:6px;background:#fff7ed;color:#c2410c;margin-left:4px;}
+/* ZONE MODE */
+.zone-mode-btn{padding:5px 11px;border-radius:7px;border:1.5px solid #dde3ed;background:#f8fafd;color:#475569;font-size:10.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;}
+.zone-mode-btn.active{background:#1d4ed8;color:#fff;border-color:#1d4ed8;}
+.zone-add-btn{padding:4px 10px;border-radius:7px;border:1.5px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;font-size:10.5px;font-weight:800;cursor:pointer;font-family:inherit;}
+.zone-add-btn:hover{background:#1d4ed8;color:#fff;}
+.zone-row{display:grid;grid-template-columns:auto 1fr 1fr 1fr 28px;gap:6px;align-items:center;padding:7px 9px;background:#f8fafd;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:6px;}
+.zone-lbl{font-size:10px;font-weight:800;color:#1d4ed8;white-space:nowrap;}
+.zone-del{width:24px;height:24px;border:none;background:#fef2f2;border-radius:6px;color:#dc2626;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:900;}
+.zone-del:hover{background:#dc2626;color:#fff;}
+
+/* CALC BOX */
+.cbox{background:#f8fafd;border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin-top:9px;}
+.cbox-tit{font-size:9.5px;font-weight:800;color:#6b7a99;letter-spacing:.06em;margin-bottom:7px;}
+.crow{display:flex;justify-content:space-between;font-size:10.5px;padding:3px 0;border-bottom:1px dashed #e2e8f0;}
+.crow:last-child{border-bottom:none;font-weight:800;color:#1d4ed8;}
+.ck{color:#475569;font-weight:600;}
+.cv{font-weight:700;font-family:'JetBrains Mono',monospace!important;}
+
+/* REF BOX */
+.ref-box{background:#f8fafd;border:1px solid #e2e8f0;border-radius:8px;padding:11px;margin-top:12px;}
+.ref-tit{font-size:10.5px;font-weight:800;color:#475569;margin-bottom:6px;}
+.ref-item{font-size:10px;color:#64748b;line-height:1.8;display:flex;gap:5px;}
+.ref-item::before{content:'•';color:#94a3b8;flex-shrink:0;}
+
+/* TOAST */
+.toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(14px);background:#1e3a8a;color:#fff;padding:8px 16px;border-radius:16px;font-size:12px;font-weight:700;opacity:0;transition:all .28s;z-index:999;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:200;display:flex;align-items:center;justify-content:center;padding:14px;}
+.modal-box{background:#fff;border-radius:15px;max-width:620px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(15,23,42,.25);}
+.modal-head{padding:15px 17px 13px;border-bottom:1px solid #eef1f6;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1;border-radius:15px 15px 0 0;}
+.modal-tit{font-size:14px;font-weight:900;color:#1e3a8a;}
+.modal-cls{width:29px;height:29px;border:none;background:#f0f4f9;border-radius:7px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;}
+.modal-cls:hover{background:#e2e8f0;}
+.modal-body{padding:15px 17px;}
+
+/* A4 PREVIEW */
+.a4-wrap{background:#94a3b8;padding:20px;min-height:calc(100vh - 120px);display:flex;justify-content:center;overflow-x:auto;}
+.a4-scale-wrap{transform-origin:top center;display:inline-block;}
+@media(max-width:860px){
+  .a4-wrap{padding:10px;align-items:flex-start;justify-content:flex-start;}
+  .a4-scale-wrap{transform-origin:top left;}
+}
+.a4-page{background:#fff;width:794px;min-height:1122px;margin:0 auto;padding:19px 23px 28px;box-shadow:0 8px 40px rgba(0,0,0,.25);font-size:11px;color:#1a2744;display:inline-block;}
+.a4-page *{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif!important;}
+.a4-tit{font-size:20px;font-weight:900;color:#1e3a8a;text-align:center;border-bottom:2.5px solid #1d4ed8;padding-bottom:9px;margin-bottom:12px;letter-spacing:-.02em;}
+.a4-sub{font-size:11.5px;font-weight:800;color:#1d4ed8;margin-bottom:5px;margin-top:12px;padding-left:7px;border-left:3px solid #1d4ed8;text-align:left;}
+.a4-igrid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px;}
+/* 인쇄 안정성용 조건 테이블 */
+.a4-cond-tbl{width:100%;border-collapse:collapse;margin-bottom:10px;}
+.a4-cond-tbl td{padding:0;vertical-align:top;width:50%;}
+.a4-cond-tbl td.a4-ic-cell{padding:2.5px;}
+.a4-ic-inner{background:#f8fafd;border:1px solid #e2e8f0;border-radius:5px;padding:5px 8px;height:100%;text-align:left;}
+.a4-ic{background:#f8fafd;border:1px solid #e2e8f0;border-radius:5px;padding:5px 8px;text-align:left;}
+.a4-ik{font-size:8.5px;font-weight:700;color:#6b7a99;text-transform:uppercase;letter-spacing:.05em;text-align:left;display:block;}
+.a4-iv{font-size:11.5px;font-weight:900;color:#1a2744;margin-top:2px;font-family:'JetBrains Mono',monospace!important;text-align:left;display:block;}
+.a4-tbl{width:100%;border-collapse:collapse;font-size:10px;margin-bottom:10px;}
+.a4-tbl th{background:#dbeafe;padding:5px 7px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;}
+.a4-tbl td{padding:5px 8px;text-align:left;border:1px solid #e2e8f0;font-weight:600;}
+.a4-tbl tr:nth-child(even) td{background:#f8fafd;}
+.a4-tbl tfoot td{background:#dbeafe!important;font-weight:900;}
+.a4-rbox{background:linear-gradient(135deg,#1e3a8a,#1d4ed8);color:#fff;border-radius:9px;padding:13px 13px 10px;text-align:center;margin-bottom:10px;}
+.a4-rnum{font-size:48px;font-weight:900;color:#fbbf24;font-family:'JetBrains Mono',monospace!important;line-height:1;}
+.a4-sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:10px;}
+.a4-sc{background:#eff6ff;border:1px solid #bfdbfe;border-radius:7px;padding:7px;text-align:center;}
+/* 인쇄 안정 3열 */
+.a4-stat-tbl{width:100%;border-collapse:collapse;margin-bottom:10px;}
+.a4-stat-tbl td{width:33.33%;padding:3px;vertical-align:top;}
+.a4-sc-inner{background:#eff6ff;border:1px solid #bfdbfe;border-radius:7px;padding:7px;text-align:center;}
+.a4-footer{border-top:1px solid #e2e8f0;padding-top:8px;font-size:8.5px;color:#94a3b8;margin-top:16px;line-height:1.6;display:flex;justify-content:space-between;font-weight:600;}
+@media(max-width:840px){.a4-wrap{padding:8px;}.a4-page{width:100%;min-height:auto;padding:14px 16px;}.a4-igrid{grid-template-columns:1fr;}}
+
+/* MOBILE PREVIEW */
+.mob-wrap{background:#1f2937;padding:22px 14px;min-height:calc(100vh - 120px);display:flex;justify-content:center;align-items:flex-start;}
+.mob-device{background:#0f172a;border-radius:34px;width:390px;padding:9px;box-shadow:0 20px 60px rgba(0,0,0,.6);}
+.mob-screen{background:#fff;border-radius:26px;overflow:hidden;min-height:680px;}
+.mob-hdr{background:#dbeafe;padding:13px 15px 9px;display:flex;align-items:center;gap:7px;}
+.mob-ico{width:27px;height:27px;background:#1d4ed8;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.mob-hdr-tit{font-size:10.5px;font-weight:900;color:#1e3a8a;line-height:1.2;}
+.mob-hdr-sub{font-size:8px;color:#3b82f6;font-weight:700;}
+.mob-body{padding:11px;}
+.mob-sec{font-size:10px;font-weight:800;color:#1e40af;margin-bottom:6px;display:flex;align-items:center;gap:4px;}
+.mob-list{background:#f8fafd;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:9px;}
+.mob-row{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-bottom:1px solid #eef1f6;}
+.mob-row:last-child{border-bottom:none;}
+.mob-rk{font-size:10px;font-weight:700;color:#475569;}
+.mob-rv{font-size:10.5px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace!important;}
+.mob-hero{background:linear-gradient(135deg,#1e3a8a,#1d4ed8);border-radius:10px;padding:13px;text-align:center;margin-bottom:9px;color:#fff;}
+.mob-rnum{font-size:40px;font-weight:900;color:#fbbf24;font-family:'JetBrains Mono',monospace!important;line-height:1;}
+.mob-sgrid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:9px;}
+.mob-sc{background:#eff6ff;border:1px solid #bfdbfe;border-radius:7px;padding:8px;text-align:center;}
+.mob-sv{font-size:13px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace!important;}
+.mob-sl{font-size:8.5px;color:#6b7a99;font-weight:700;margin-top:2px;}
+.mob-tbl{width:100%;border-collapse:collapse;font-size:9px;}
+.mob-tbl th{background:#dbeafe;padding:5px 6px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;}
+.mob-tbl td{padding:5px 6px;text-align:center;border:1px solid #e2e8f0;font-weight:600;}
+.mob-tbl tfoot td{background:#dbeafe!important;font-weight:900;}
+.mob-footer{font-size:8px;color:#94a3b8;text-align:center;padding:7px;}
+@media(max-width:430px){.mob-device{width:100%;}}
+
+/* ── PRINT (ISO A4 기준 — 참조: MANMIN-Ver3.0) ── */
+@page{size:A4 portrait;margin:10mm 8mm 19mm;}
+@media print{
+  *,*::before,*::after{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  /* 배경색/테두리 강제 출력 */
+  .a4-ic-inner,.a4-sc-inner,.a4-rbox,.a4-tbl th,.a4-tbl tfoot td{
+    -webkit-print-color-adjust:exact!important;
+    print-color-adjust:exact!important;
+  }
+  /* 폰트 강제 */
+  .a4-iv,.a4-rnum,.a4-stat-tbl td div{
+    font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif!important;
+  }
+  .no-print{display:none!important;}
+  html,body{margin:0!important;padding:0!important;width:210mm!important;background:#fff!important;}
+  /* 앱 전체 숨기고 인쇄 타깃만 표시 */
+  #root-app>*:not(#a4-print-target){display:none!important;}
+  #a4-print-target{display:block!important;}
+  /* 인쇄용 a4-page: 패딩 제거, 100% 너비 */
+  #a4-print-target .a4-page{padding:19px 23px 28px!important;width:100%!important;box-shadow:none!important;min-height:auto!important;box-sizing:border-box!important;}
+  /* ── 섹션 페이지 나눔 제어 ── */
+  /* 기본 섹션: 내부 분리 방지 */
+  .a4-section{break-inside:avoid;page-break-inside:avoid;}
+  /* 긴 테이블 포함 섹션: 분리 허용 (테이블 행 단위 제어) */
+  .a4-section.allow-break{break-inside:auto!important;page-break-inside:auto!important;}
+  /* 테이블 자체: 행 단위 나눔 허용, 헤더 반복 */
+  .a4-tbl{break-inside:auto;page-break-inside:auto;width:100%;}
+  .a4-tbl thead{display:table-header-group;}
+  .a4-tbl tr{break-inside:avoid;page-break-inside:avoid;}
+  /* 테이블 포함 섹션이 페이지 경계 걸리면 → 다음 페이지 시작 */
+  .a4-section.page-aware{break-before:auto;page-break-before:auto;}
+  /* 나머지 블록 */
+  .a4-igrid{break-inside:avoid;page-break-inside:avoid;display:grid!important;grid-template-columns:1fr 1fr!important;}
+  .a4-igrid .a4-ic{display:block!important;}
+  .a4-rbox{break-inside:avoid;page-break-inside:avoid;}
+  .a4-sgrid{break-inside:avoid;page-break-inside:avoid;display:grid!important;grid-template-columns:repeat(3,1fr)!important;}
+  .a4-stat-tbl{break-inside:avoid;page-break-inside:avoid;}
+  .a4-cond-tbl{break-inside:avoid;page-break-inside:avoid;}
+  .a4-sub{break-after:avoid;page-break-after:avoid;color:#1d4ed8!important;border-left-color:#1d4ed8!important;}
+  .a4-tit{break-inside:avoid;page-break-inside:avoid;}
+  /* 섹션 제목(.a4-sub) 바로 다음에 테이블이 오면 제목+테이블 같이 이동 */
+  .a4-sub+table,.a4-sub+.a4-tbl{break-before:avoid;page-break-before:avoid;}
+  /* 바닥글 문서흐름 내 처리 */
+  .a4-footer{
+    margin-top:16px;
+    border-top:1px solid #e2e8f0;
+    padding-top:6px;
+    display:flex;
+    justify-content:space-between;
+    font-size:8px;
+    color:#94a3b8;
+    font-weight:600;
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+}
+</style>
+</head>
+<body>
+<div id="root-app">
+
+<!-- HEADER -->
+<header class="app-header no-print">
+  <div class="header-inner">
+    <div class="brand-logo">
+      <div class="brand-icon">🌧️</div>
+      <div class="brand-texts">
+        <div class="brand-title">건축물 우수관경 산정 시스템 [MANMIN-Ver2.0]</div>
+        <div class="brand-sub">KDS 31 30 35 : 2021 · 기상청 시간최대강우량 기준</div>
+      </div>
+    </div>
+    <div class="hdr-btns">
+      <button class="btn-g" onclick="openCalcGuide()">📐 <span class="btn-txt">계산식 안내</span></button>
+      <button class="btn-g" onclick="resetAll()">🔄 <span class="btn-txt">초기화</span></button>
+      <button class="btn-b" onclick="printA4()">🖨️ <span class="btn-txt">출력</span></button>
+    </div>
+  </div>
+</header>
+
+<!-- TAB BAR -->
+<nav class="tab-bar no-print">
+  <div class="tab-bar-inner">
+    <button class="tb active" onclick="switchTab('calc',this)" id="tab-calc">🏗️ 관경 산정</button>
+    <button class="tb" onclick="switchTab('stdtable',this)" id="tab-stdtable">📋 관경 표준표</button>
+    <button class="tb" onclick="switchTab('rain',this)" id="tab-rain">🌧️ 지역 강우량</button>
+    <button class="tb" onclick="switchTab('guide',this)" id="tab-guide">📖 설계 기준</button>
+    <button class="tb" onclick="switchTab('a4',this)" id="tab-a4">📄 A4 미리보기</button>
+    <button class="tb" onclick="switchTab('mobile',this)" id="tab-mobile">📱 모바일 미리보기</button>
+  </div>
+</nav>
+
+<div class="main-wrap">
+
+<!-- ████ TAB: 관경 산정 ████ -->
+<div class="tab-panel active" id="panel-calc">
+  <div class="step-bar">
+    <div class="step-item"><div class="sc active" id="sc1">1</div><span class="sl active" id="sl1">지역 선택</span></div>
+    <div class="sdiv" id="sd1"></div>
+    <div class="step-item"><div class="sc" id="sc2">2</div><span class="sl" id="sl2">지붕 정보</span></div>
+    <div class="sdiv" id="sd2"></div>
+    <div class="step-item"><div class="sc" id="sc3">3</div><span class="sl" id="sl3">드레인/관 조건</span></div>
+    <div class="sdiv" id="sd3"></div>
+    <div class="step-item"><div class="sc" id="sc4">4</div><span class="sl" id="sl4">산정 결과</span></div>
+  </div>
+
+  <div class="two-col">
+    <!-- LEFT -->
+    <div>
+      <!-- STEP 1 -->
+      <div class="card">
+        <div class="card-head"><div class="card-ico">📍</div><span class="card-tit">STEP 1 — 지역 선택</span><span class="cbadge grn" id="region-badge">미선택</span></div>
+        <div class="card-body">
+          <div class="frow" style="margin-bottom:8px">
+            <div class="fgrp"><label class="flbl">광역시/도</label><select class="fselect" id="sel-sido" onchange="filterCities()"><option value="">-- 선택 --</option></select></div>
+            <div class="fgrp"><label class="flbl">시/군/구</label><select class="fselect" id="sel-sigun" onchange="selectRegionBySelect()"><option value="">-- 선택 --</option></select></div>
+          </div>
+          <div class="rgrid" id="regionGrid"></div>
+          <div class="rain-info" id="rain-info-box" style="display:none">
+            <div class="rain-row"><span class="rain-key">📡 관측지점</span><span class="rain-val" id="ri-station">-</span></div>
+            <div class="rain-row"><span class="rain-key">🌧️ 시간최대강우량</span><span class="rain-val" id="ri-rain">-</span></div>
+            <div class="rain-row"><span class="rain-key">📅 관측기간</span><span class="rain-val" id="ri-period">-</span></div>
+            <div class="rain-row"><span class="rain-key">📌 자료출처</span><span class="rain-val">기상청</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="card">
+        <div class="card-head"><div class="card-ico">🏠</div><span class="card-tit">STEP 2 — 지붕 면적 및 구간 설계</span><span class="cbadge org">KDS 4.4.2</span></div>
+        <div class="card-body">
+          <!-- 단일/구간 모드 토글 -->
+          <div style="display:flex;gap:6px;margin-bottom:9px;">
+            <button id="mode-single-btn" class="zone-mode-btn active" onclick="setZoneMode('single')">📐 단일 구간</button>
+            <button id="mode-multi-btn" class="zone-mode-btn" onclick="setZoneMode('multi')">🔀 구간별 설계</button>
+          </div>
+
+          <!-- 단일 구간 입력 -->
+          <div id="zone-single">
+            <div class="frow">
+              <div class="fgrp"><label class="flbl">수평투영 지붕면적</label><div class="input-sfx"><input type="number" class="finput" id="inp-area" placeholder="예: 200" min="1" oninput="liveCalc()"><span class="sfx">m²</span></div></div>
+              <div class="fgrp"><label class="flbl">수직벽 면적 (선택)</label><div class="input-sfx"><input type="number" class="finput" id="inp-wall" placeholder="없으면 0" min="0" oninput="liveCalc()"><span class="sfx">m²</span></div></div>
+            </div>
+            <div class="frow" style="margin-bottom:0">
+              <div class="fgrp"><label class="flbl">지붕 유형</label><select class="fselect" id="sel-rooftype" onchange="liveCalc()"><option value="flat">평지붕 (옥상)</option><option value="slope">경사지붕</option><option value="valley">밸리형 복합</option></select></div>
+            </div>
+          </div>
+
+          <!-- 구간별 설계 입력 -->
+          <div id="zone-multi" style="display:none">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">
+              <span style="font-size:10.5px;font-weight:800;color:#1e40af;">📌 구간별 독립 산정</span>
+              <button class="zone-add-btn" onclick="addZone()">+ 구간 추가</button>
+            </div>
+            <div id="zone-list"></div>
+            <div style="margin-top:7px;padding:7px 10px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:7px;display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:10.5px;font-weight:700;color:#475569;">전체 유효면적 합계</span>
+              <span style="font-size:14px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace" id="zone-total-area">— m²</span>
+            </div>
+          </div>
+
+          <div class="nb blue" style="margin-top:8px;margin-bottom:0"><div class="nb-tit">ℹ️ 수직벽 보정</div><div class="nb-txt">루프드레인 설치 시 수직벽 면적의 ½을 수평투영 면적에 가산합니다. (KDS 31 30 35 : 2021)</div></div>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="card">
+        <div class="card-head"><div class="card-ico">🔧</div><span class="card-tit">STEP 3 — 드레인 개수 및 관 조건</span></div>
+        <div class="card-body">
+          <!-- DRAIN BOX -->
+          <div class="drain-box">
+            <div class="drain-box-tit">💧 우수 드레인(루프드레인) 설치 개수</div>
+            <div class="frow" style="margin-bottom:7px">
+              <div class="fgrp"><label class="flbl">설치 방식</label><select class="fselect" id="sel-drain-mode" onchange="onDrainModeChange()"><option value="manual">직접 입력</option><option value="auto">자동 산정 (면적 기준)</option></select></div>
+              <div class="fgrp" id="drain-count-group"><label class="flbl">드레인 개수</label><div class="dstp"><button class="dbtn" onclick="changeDrain(-1)">−</button><input type="number" class="finput" id="inp-drains" value="1" min="1" max="50" style="text-align:center;font-size:16px;font-weight:900;color:#1d4ed8;" oninput="liveCalc()"><button class="dbtn" onclick="changeDrain(+1)">+</button></div></div>
+            </div>
+            <div id="drain-auto-group" style="display:none">
+              <div class="frow" style="margin-bottom:7px">
+                <div class="fgrp"><label class="flbl">드레인 1개당 권장면적</label><select class="fselect" id="sel-drain-area" onchange="calcAutoDrains()"><option value="150">150 m² (소규모)</option><option value="200" selected>200 m² (일반)</option><option value="250">250 m² (대형)</option><option value="300">300 m² (최대)</option></select></div>
+                <div class="fgrp"><label class="flbl">자동 산정 결과</label><div style="padding:7px 10px;background:#fff;border:2px solid #1d4ed8;border-radius:7px;font-size:15px;font-weight:900;color:#1d4ed8;text-align:center;" id="auto-drain-display">-</div></div>
+              </div>
+            </div>
+            <div class="drain-prev"><span class="dpk">드레인 1개당 분담면적</span><span class="dpv" id="drain-unit-area">— m²</span></div>
+          </div>
+          <div class="frow">
+            <div class="fgrp"><label class="flbl">드레인/수직관 형태</label><select class="fselect" id="sel-pipetype" onchange="liveCalc()"><option value="circular">원형관 (루프드레인)</option><option value="semi">반원형 빗물받이</option></select></div>
+            <div class="fgrp"><label class="flbl">관 재질</label><select class="fselect" id="sel-material" onchange="liveCalc()"><option value="pvc">PVC / PE</option><option value="cast">주철관</option><option value="stainless">스테인리스</option><option value="galv">아연도금강관</option></select></div>
+          </div>
+          <div class="frow" style="margin-bottom:0">
+            <div class="fgrp"><label class="flbl">수평관 기울기</label><select class="fselect" id="sel-slope" onchange="liveCalc()"><option value="100">1/100</option><option value="50">1/50</option><option value="25">1/25 (최소)</option></select></div>
+            <div class="fgrp"><label class="flbl">안전 여유율</label><select class="fselect" id="sel-safety" onchange="liveCalc()"><option value="0">0%</option><option value="10">+10%</option><option value="20" selected>+20% (권장)</option><option value="30">+30%</option></select></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: 결과 -->
+    <div>
+      <div class="card" id="no-result-card">
+        <div class="card-body" style="padding:30px;text-align:center">
+          <div style="font-size:44px;margin-bottom:11px">🌧️</div>
+          <div style="font-size:13.5px;font-weight:800;color:#1e3a8a;margin-bottom:8px">우수관경 산정 시스템</div>
+          <div style="font-size:11px;color:#6b7a99;line-height:1.9">① 지역 선택<br>② 지붕 면적 입력<br>③ 드레인 개수 설정<br>→ 결과 자동 산출</div>
+          <div style="margin-top:13px;font-size:10px;color:#94a3b8">KDS 31 30 35 : 2021 · MANMIN-Ver2.0</div>
+        </div>
+      </div>
+
+      <div id="result-area" style="display:none">
+        <div class="result-hero">
+          <div class="rh-sub">추천 우수 수직관 관경 (DN)</div>
+          <div class="rh-num" id="res-main-dn">—</div>
+          <div class="rh-unit">mm</div>
+          <div class="rh-desc" id="res-main-desc">—</div>
+        </div>
+        <div class="stat-grid">
+          <div class="sbox"><div class="sico">📐</div><div class="sval" id="res-eff-area">—</div><div class="slbl">유효면적 (m²)</div></div>
+          <div class="sbox"><div class="sico">🌧️</div><div class="sval" id="res-rainfall">—</div><div class="slbl">시간최대강우량 (mm/hr)</div></div>
+          <div class="sbox"><div class="sico">💧</div><div class="sval" id="res-flow">—</div><div class="slbl">설계유량 (ℓ/min)</div></div>
+        </div>
+
+        <!-- 수직관 -->
+        <div class="card">
+          <div class="card-head"><div class="card-ico">⬆️</div><span class="card-tit">우수 수직관 관경 산정</span><span class="cbadge">KDS 표 4.4-1</span></div>
+          <div class="card-body">
+            <div id="vresults"></div>
+            <div class="cbox">
+              <div class="cbox-tit">▶ 수직관 산정 과정</div>
+              <div class="crow"><span class="ck">수평투영 면적</span><span class="cv" id="cv-area">—</span></div>
+              <div class="crow"><span class="ck">수직벽 보정 (+½)</span><span class="cv" id="cv-wall">—</span></div>
+              <div class="crow"><span class="ck">유효면적 합계</span><span class="cv" id="cv-eff">—</span></div>
+              <div class="crow"><span class="ck">시간최대강우량</span><span class="cv" id="cv-rain">—</span></div>
+              <div class="crow"><span class="ck">100mm환산×안전율</span><span class="cv" id="cv-conv">—</span></div>
+              <div class="crow"><span class="ck">드레인당 환산면적(수직관)</span><span class="cv" id="cv-zone">—</span></div>
+              <div class="crow"><span class="ck">적용 관경(수직관)</span><span class="cv" id="cv-result">—</span></div>
+            </div>
+            <div class="cbox" style="margin-top:6px">
+              <div class="cbox-tit">▶ 수평관 기울기 보정</div>
+              <div class="crow"><span class="ck">수평관 기울기 선택</span><span class="cv" id="cv-slope-h">—</span></div>
+              <div class="crow"><span class="ck" style="color:#1d4ed8;font-weight:800">수평관 보정 환산면적</span><span class="cv" id="cv-slope-h-dc" style="color:#1d4ed8">—</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 수평관 -->
+        <div class="card">
+          <div class="card-head"><div class="card-ico">➡️</div><span class="card-tit">우수 수평관 관경 산정</span><span class="cbadge">KDS 표 4.4-2</span></div>
+          <div class="card-body"><div id="hresults"></div></div>
+        </div>
+
+        <!-- 반원형 -->
+        <div class="card" id="gutter-card" style="display:none">
+          <div class="card-head"><div class="card-ico">🌊</div><span class="card-tit">반원형 빗물받이</span><span class="cbadge">KDS 표 4.4-3</span></div>
+          <div class="card-body"><div id="gresults"></div></div>
+        </div>
+
+        <!-- 드레인 상세 -->
+        <div class="card">
+          <div class="card-head"><div class="card-ico">💧</div><span class="card-tit">드레인별 분담면적 및 관경 상세</span><span class="cbadge org" id="drain-count-badge">—</span></div>
+          <div class="card-body"><div id="drain-detail"></div></div>
+        </div>
+
+        <!-- 수량 종합 -->
+        <div class="card">
+          <div class="card-head"><div class="card-ico">🔢</div><span class="card-tit">설계 수량 종합</span></div>
+          <div class="card-body"><div id="count-summary"></div></div>
+        </div>
+
+        <div class="ref-box">
+          <div class="ref-tit">📌 산정 근거</div>
+          <div class="ref-item">KDS 31 30 35 : 2021 (국토교통부고시 제2021-203호)</div>
+          <div class="ref-item">기상청 기후통계분석 포털 시간최대강우량 (1991~2020 평년값)</div>
+          <div class="ref-item">환산면적 = 유효면적 × (강우량 ÷ 100) × 안전율 ÷ 드레인수</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ████ TAB: 표준표 ████ -->
+<div class="tab-panel" id="panel-stdtable">
+  <div class="card"><div class="card-head"><div class="card-ico">📋</div><span class="card-tit">표 4.4-1 원형 옥내외 우수 수직관</span><span class="cbadge">KDS 31 30 35 : 2021</span></div><div class="card-body"><div class="nb blue" style="margin-bottom:9px"><div class="nb-tit">ℹ️ 기준</div><div class="nb-txt">강우량 100mm/hr 기준. 환산면적 = 실제면적 × (강우량 ÷ 100)</div></div><div class="twrap"><table class="rtbl"><thead><tr><th rowspan="2">DN (mm)</th><th colspan="6">강우량별 최대 수평투영 지붕면적 (m²)</th></tr><tr><th>50</th><th>75</th><th>100</th><th>125</th><th>150</th><th>200</th></tr></thead><tbody id="std-v-body"></tbody></table></div></div></div>
+  <div class="card"><div class="card-head"><div class="card-ico">📋</div><span class="card-tit">표 4.4-2 우수 수평관 (1/100 기울기)</span><span class="cbadge">KDS 31 30 35 : 2021</span></div><div class="card-body"><div class="twrap"><table class="rtbl"><thead><tr><th rowspan="2">DN (mm)</th><th colspan="6">강우량별 최대 수평투영 지붕면적 (m²)</th></tr><tr><th>50</th><th>75</th><th>100</th><th>125</th><th>150</th><th>200</th></tr></thead><tbody id="std-h-body"></tbody></table></div></div></div>
+  <div class="card"><div class="card-head"><div class="card-ico">📋</div><span class="card-tit">표 4.4-3 반원형 빗물받이</span><span class="cbadge">KDS 31 30 35 : 2021</span></div><div class="card-body"><div class="twrap"><table class="rtbl"><thead><tr><th rowspan="2">폭 (mm)</th><th colspan="6">강우량별 최대 수평투영 지붕면적 (m²)</th></tr><tr><th>50</th><th>75</th><th>100</th><th>125</th><th>150</th><th>200</th></tr></thead><tbody id="std-g-body"></tbody></table></div></div></div>
+</div>
+
+<!-- ████ TAB: 지역 강우량 ████ -->
+<div class="tab-panel" id="panel-rain">
+  <div class="card"><div class="card-head"><div class="card-ico">🌧️</div><span class="card-tit">전국 지점별 시간최대강우량</span><span class="cbadge">기상청</span></div><div class="card-body">
+    <div class="nb org" style="margin-bottom:9px"><div class="nb-tit">⚠️ 자료 안내</div><div class="nb-txt">기상청 기후통계분석 포털 1991~2020 평년값 기준. 설계 시 최신 자료(data.kma.go.kr) 확인 필요.</div></div>
+    <div class="frow" style="margin-bottom:9px"><div class="fgrp"><label class="flbl">지역 검색</label><input type="text" class="finput" id="rain-search" placeholder="지역명 검색..." oninput="filterRainTable()"></div><div class="fgrp"><label class="flbl">강우량 범위</label><select class="fselect" id="rain-filter" onchange="filterRainTable()"><option value="">전체</option><option value="0-80">80mm/hr 미만</option><option value="80-100">80~100mm/hr</option><option value="100-120">100~120mm/hr</option><option value="120-999">120mm/hr 초과</option></select></div></div>
+    <div class="twrap"><table class="rtbl"><thead><tr><th>시/도</th><th>지점명</th><th>관측소 번호</th><th>시간최대강우량 (mm/hr)</th><th>관측기간</th></tr></thead><tbody id="rain-table-body"></tbody></table></div>
+  </div></div>
+</div>
+
+<!-- ████ TAB: 설계 기준 ████ -->
+<div class="tab-panel" id="panel-guide">
+  <div class="two-col">
+    <div>
+      <div class="card"><div class="card-head"><div class="card-ico">📖</div><span class="card-tit">KDS 31 30 35 : 2021 주요 조문</span></div><div class="card-body">
+        <div class="nb blue" style="margin-bottom:8px"><div class="nb-tit">4.4.1 관 지름 기준</div><div class="nb-txt">옥내·옥외 우수 수직관 및 모든 수평 지관의 크기는 해당 지역의 기상자료에 의한 <strong>시간최대강우량</strong>을 기준으로 한다.</div></div>
+        <div class="nb blue" style="margin-bottom:8px"><div class="nb-tit">4.4.2 우수 수직관 지름</div><div class="nb-txt">옥내외 우수 수직관의 관 지름은 <strong>표 4.4-1</strong>의 최대 수평투영 지붕 면적으로 선정한다.</div></div>
+        <div class="nb blue" style="margin-bottom:8px"><div class="nb-tit">4.4.3 우수 수평관</div><div class="nb-txt">수평 기울기 1/25 이하인 우수배관은 <strong>표 4.4-2</strong>로 선정. 수평지관 기울기는 1/100 이상.</div></div>
+        <div class="nb blue" style="margin-bottom:8px"><div class="nb-tit">루프드레인 수직벽 보정</div><div class="nb-txt">루프드레인 사용 시 수직벽 면적의 <strong>½</strong>을 수평투영 지붕 면적에 가산한다.</div></div>
+        <div class="nb blue"><div class="nb-tit">4.4.4 반원형 빗물받이</div><div class="nb-txt">반원형 빗물받이 크기는 <strong>표 4.4-3</strong>의 최대 수평투영 지붕 면적 기준으로 선정.</div></div>
+      </div></div>
+    </div>
+    <div>
+      <div class="card"><div class="card-head"><div class="card-ico">🔢</div><span class="card-tit">계산식 및 설계 절차</span></div><div class="card-body">
+        <div style="background:#f8fafd;border:1px solid #e2e8f0;border-radius:9px;padding:13px;margin-bottom:10px;text-align:center">
+          <div style="font-size:9.5px;font-weight:700;color:#6b7a99;margin-bottom:8px">강우량 보정 환산면적 공식</div>
+          <div style="font-size:14px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace">A_eff = A_roof + A_wall × 0.5</div>
+          <div style="font-size:13px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;margin-top:6px">A_conv = A_eff × (R ÷ 100) × SF</div>
+          <div style="font-size:13px;font-weight:900;color:#f97316;font-family:'JetBrains Mono',monospace;margin-top:6px">A_drain = A_conv ÷ N</div>
+          <div style="font-size:10px;color:#94a3b8;margin-top:8px;line-height:1.7">R: 시간최대강우량(mm/hr) · SF: 안전율 · N: 드레인 수</div>
+        </div>
+        <div class="nb grn" style="margin-bottom:9px"><div class="nb-tit">✅ 산정 절차</div><div class="nb-txt">1. 시간최대강우량(R) 확인 (기상청)<br>2. A_eff = 수평투영면적 + 수직벽×½<br>3. A_conv = A_eff × R÷100 × 안전율<br>4. A_drain = A_conv ÷ 드레인 수<br>5. KDS 표 4.4-1에서 관경 선정</div></div>
+        <div class="nb org"><div class="nb-tit">⚠️ 주의사항</div><div class="nb-txt">· 산정된 관경은 최소값<br>· 연결부 등 마찰손실 고려<br>· 옥내 배관 내식성 재질 권장</div></div>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ████ TAB: A4 미리보기 ████ -->
+<div class="tab-panel" id="panel-a4">
+  <div class="no-print" style="display:flex;gap:7px;margin-bottom:11px;flex-wrap:wrap;align-items:center;">
+    <button class="btn-b" onclick="printA4()">🖨️ A4 인쇄 / PDF저장</button>
+    <button class="btn-g" onclick="switchTab('calc',document.getElementById('tab-calc'))">← 산정으로 돌아가기</button>
+    <span style="font-size:10.5px;color:#6b7a99;">ISO A4 (210×297mm) · 상15mm 좌우18mm 하20mm</span>
+  </div>
+  <div class="a4-wrap" id="a4PreviewBg">
+    <div class="a4-scale-wrap" id="a4ScaleWrap">
+      <div style="box-shadow:0 8px 40px rgba(0,0,0,.3);display:inline-block;">
+        <div class="a4-page" id="a4-page">
+          <div id="a4-content" style="text-align:center;padding:40px;color:#94a3b8;font-size:13px;">산정 결과가 없습니다.<br>관경 산정 탭에서 조건을 입력하면 자동으로 생성됩니다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ████ TAB: 모바일 미리보기 ████ -->
+<div class="tab-panel" id="panel-mobile">
+  <div style="display:flex;gap:7px;margin-bottom:11px;flex-wrap:wrap;align-items:center;">
+    <button class="btn-g" onclick="switchTab('calc',document.getElementById('tab-calc'))">← 산정으로 돌아가기</button>
+    <span style="font-size:10.5px;color:#6b7a99;">안드로이드폰 기준 (390px)</span>
+  </div>
+  <div class="mob-wrap">
+    <div class="mob-device">
+      <div class="mob-screen" id="mobile-screen">
+        <div style="text-align:center;padding:40px 18px;color:#94a3b8;font-size:12px;">산정 결과가 없습니다.<br>관경 산정 탭에서 조건을 입력하면<br>자동으로 생성됩니다.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main-wrap -->
+
+<div class="toast no-print" id="toast"></div>
+
+<!-- ████ MODAL: 계산식 안내 ████ -->
+<div class="modal-ov" id="calcModal" style="display:none" onclick="closeModalOv(event)">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span class="modal-tit">📐 계산식 안내</span>
+      <button class="modal-cls" onclick="closeCalcGuide()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:#f8fafd;border:1.5px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:13px;text-align:center">
+        <div style="font-size:10px;font-weight:700;color:#6b7a99;margin-bottom:10px">▶ 단계별 계산식</div>
+        <div style="font-size:14px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;margin-bottom:5px">A_eff = A_roof + A_wall × 0.5</div>
+        <div style="font-size:11px;color:#64748b;margin-bottom:11px">유효면적 = 수평투영면적 + 수직벽면적 × ½</div>
+        <div style="font-size:14px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;margin-bottom:5px">A_conv = A_eff × (R ÷ 100) × SF</div>
+        <div style="font-size:11px;color:#64748b;margin-bottom:11px">환산면적 = 유효면적 × (강우량 ÷ 100) × 안전율</div>
+        <div style="font-size:14px;font-weight:900;color:#f97316;font-family:'JetBrains Mono',monospace;margin-bottom:5px">A_drain = A_conv ÷ N</div>
+        <div style="font-size:11px;color:#64748b">드레인당 분담면적 = 환산면적 ÷ 드레인 개수</div>
+      </div>
+      <div class="nb blue" style="margin-bottom:10px"><div class="nb-tit">📊 변수 설명</div><div class="nb-txt"><strong>A_eff</strong> : 유효 수평투영 지붕면적 (m²)<br><strong>A_roof</strong> : 수평투영 지붕면적 (m²)<br><strong>A_wall</strong> : 수직벽 면적 (m²) — 루프드레인 시 ½ 가산<br><strong>R</strong> : 해당 지점 시간최대강우량 (mm/hr) — 기상청<br><strong>SF</strong> : 안전 여유율 (예: 1.20 = +20%)<br><strong>N</strong> : 우수 드레인 설치 개수<br><strong>A_drain</strong> : 드레인 1개당 분담 환산면적 → KDS 표 조회</div></div>
+      <div class="nb grn" style="margin-bottom:10px"><div class="nb-tit">📋 KDS 표 조회 방법</div><div class="nb-txt">A_drain 값을 KDS 31 30 35 : 2021 <strong>표 4.4-1</strong> (100mm/hr 열)에서 해당 값 이상인 최소 관경(DN)을 선택합니다.<br>수평관은 <strong>표 4.4-2</strong>, 반원형 빗물받이는 <strong>표 4.4-3</strong> 동일 적용.</div></div>
+      <div class="nb org"><div class="nb-tit">💡 적용 예시</div><div class="nb-txt">지역: 서울 (98.5mm/hr) / 면적: 500m² / 드레인: 4개 / 안전율: +20%<br>→ A_eff = 500m²<br>→ A_conv = 500 × (98.5÷100) × 1.20 = <strong>591m²</strong><br>→ A_drain = 591 ÷ 4 = <strong>147.75m²</strong><br>→ 표 4.4-1 → DN125 (215m²) 선정 ✓</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SCRIPT -->
+<script>
+/* ═══════ KDS 표 데이터 ═══════ */
+const VT=[[50,33,22,16,13,11,8],[65,67,45,34,27,22,17],[80,114,76,57,46,38,29],[100,226,151,113,91,76,57],[125,430,287,215,172,143,108],[150,710,474,355,284,237,178],[200,1486,991,743,594,495,372]];
+const HT=[[50,67,45,34,27,22,17],[65,135,90,67,54,45,34],[80,228,152,114,91,76,57],[100,452,301,226,181,151,113],[125,860,573,430,344,287,215],[150,1419,946,710,568,474,355],[200,2972,1981,1486,1189,991,743]];
+const GT=[[76,33,22,16,13,11,8],[102,72,48,36,29,24,18],[127,129,86,64,51,43,32],[152,202,135,101,81,67,51],[203,414,276,207,165,138,103],[254,737,491,368,295,246,184],[305,1182,788,591,473,394,296]];
+
+/* ═══════ 기상청 지역 데이터 [sido, sigun, stationNo, rainfall, period] ═══════ */
+const RD=[
+  ["서울특별시","서울",108,98.5,"1973~2020"],["부산광역시","부산",159,91.0,"1973~2020"],
+  ["대구광역시","대구",143,88.0,"1973~2020"],["인천광역시","인천",112,85.5,"1973~2020"],
+  ["광주광역시","광주",156,80.0,"1973~2020"],["대전광역시","대전",133,87.5,"1973~2020"],
+  ["울산광역시","울산",152,92.0,"1973~2020"],["세종특별자치시","세종",239,85.0,"2012~2020"],
+  ["경기도","수원",119,88.0,"1964~2020"],["경기도","파주",203,80.5,"2000~2020"],
+  ["경기도","이천",203,85.0,"2000~2020"],["경기도","양평",202,90.0,"2000~2020"],
+  ["경기도","광주",247,88.0,"2013~2020"],["경기도","화성",487,82.0,"2011~2020"],
+  ["경기도","동두천",211,85.5,"2001~2020"],["경기도","안성",273,83.5,"2013~2020"],
+  ["강원특별자치도","춘천",101,80.0,"1973~2020"],["강원특별자치도","강릉",105,100.0,"1973~2020"],
+  ["강원특별자치도","원주",114,85.0,"1973~2020"],["강원특별자치도","속초",90,110.5,"1973~2020"],
+  ["강원특별자치도","태백",216,70.0,"1988~2020"],["강원특별자치도","삼척",217,100.5,"1988~2020"],
+  ["강원특별자치도","홍천",212,83.5,"1988~2020"],["충청북도","청주",131,91.8,"1973~2020"],
+  ["충청북도","충주",127,89.5,"1973~2020"],["충청북도","제천",221,92.5,"1988~2020"],
+  ["충청북도","보은",226,95.0,"1988~2020"],["충청남도","서산",129,77.0,"1973~2020"],
+  ["충청남도","천안",232,84.5,"2000~2020"],["충청남도","공주",235,82.0,"2000~2020"],
+  ["충청남도","보령",235,79.0,"2000~2020"],["충청남도","부여",236,80.0,"2000~2020"],
+  ["충청남도","금산",238,84.5,"2000~2020"],["충청남도","홍성",177,77.5,"1985~2020"],
+  ["전북특별자치도","전주",146,84.5,"1973~2020"],["전북특별자치도","군산",140,80.0,"1973~2020"],
+  ["전북특별자치도","남원",243,87.5,"2002~2020"],["전북특별자치도","익산",140,82.0,"1973~2020"],
+  ["전북특별자치도","정읍",146,85.0,"1973~2020"],["전북특별자치도","장수",248,75.0,"2002~2020"],
+  ["전라남도","목포",168,78.5,"1973~2020"],["전라남도","여수",168,90.0,"1973~2020"],
+  ["전라남도","순천",244,89.0,"2002~2020"],["전라남도","나주",245,82.0,"2002~2020"],
+  ["전라남도","장흥",260,82.0,"2012~2020"],["전라남도","강진",260,83.5,"2012~2020"],
+  ["전라남도","해남",261,79.0,"2012~2020"],["전라남도","고흥",262,80.5,"2012~2020"],
+  ["전라남도","광양",245,90.0,"2002~2020"],["경상북도","포항",138,100.0,"1973~2020"],
+  ["경상북도","안동",136,84.5,"1973~2020"],["경상북도","경주",136,87.5,"1973~2020"],
+  ["경상북도","구미",279,85.5,"2013~2020"],["경상북도","영주",271,82.0,"2013~2020"],
+  ["경상북도","울진",130,108.0,"1973~2020"],["경상북도","영천",281,86.0,"2013~2020"],
+  ["경상북도","상주",137,85.0,"1973~2020"],["경상남도","창원",155,93.5,"1973~2020"],
+  ["경상남도","진주",192,90.0,"1985~2020"],["경상남도","통영",162,92.5,"1973~2020"],
+  ["경상남도","밀양",288,89.0,"2013~2020"],["경상남도","거창",284,82.5,"2013~2020"],
+  ["경상남도","합천",285,86.0,"2013~2020"],["경상남도","거제",289,95.0,"2013~2020"],
+  ["경상남도","함양",286,85.0,"2013~2020"],["제주특별자치도","제주",184,107.5,"1973~2020"],
+  ["제주특별자치도","서귀포",189,110.0,"1973~2020"],["제주특별자치도","성산",188,112.5,"1973~2020"],
+  ["제주특별자치도","고산",185,88.5,"1988~2020"]
+];
+
+/* ═══════ STATE ═══════ */
+let S={
+  sido:'',sigun:'',rainfall:null,station:'',period:'',stationNo:0,
+  area:0,wall:0,rooftype:'flat',
+  drains:1,drainMode:'manual',
+  pipetype:'circular',material:'pvc',slope:100,safety:20,
+  hasResult:false,result:null
+};
+
+
+/* ═══════ A4 SCALE PREVIEW ═══════ */
+function scaleA4Preview(){
+  var wrap=document.getElementById('a4ScaleWrap');
+  var bg=document.getElementById('a4PreviewBg');
+  if(!wrap||!bg)return;
+  var A4W=794;
+  var pad=20;
+  var availW=bg.clientWidth-pad*2;
+  if(availW<A4W){
+    var scale=availW/A4W;
+    wrap.style.transform='scale('+scale+')';
+    var page=document.getElementById('a4-page');
+    if(page){
+      wrap.style.marginBottom='-'+(page.offsetHeight*(1-scale))+'px';
+    }
+  }else{
+    wrap.style.transform='scale(1)';
+    wrap.style.marginBottom='0';
+  }
+}
+window.addEventListener('resize',scaleA4Preview);
+
+/* ═══════ TAB ═══════ */
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  if(btn)btn.classList.add('active');
+  else document.getElementById('tab-'+id).classList.add('active');
+  if(id==='a4'){renderA4();setTimeout(scaleA4Preview,50);}
+  if(id==='mobile')renderMobile();
+}
+
+/* ═══════ REGION ═══════ */
+function initSido(){
+  const sidos=[...new Set(RD.map(r=>r[0]))];
+  const sel=document.getElementById('sel-sido');
+  sidos.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;sel.appendChild(o);});
+}
+function filterCities(){
+  const sido=document.getElementById('sel-sido').value;
+  S.sido=sido;
+  const sel=document.getElementById('sel-sigun');
+  sel.innerHTML='<option value="">-- 선택 --</option>';
+  [...new Set(RD.filter(r=>r[0]===sido).map(r=>r[1]))].forEach(c=>{
+    const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);
+  });
+  renderRegionGrid(sido);
+}
+function renderRegionGrid(sido){
+  const g=document.getElementById('regionGrid');
+  g.innerHTML='';
+  RD.filter(r=>r[0]===sido).forEach(r=>{
+    const d=document.createElement('div');
+    d.className='rcard';
+    d.innerHTML=`<div class="rcard-nm">${r[1]}</div><div class="rcard-rn">${r[3]}mm/hr</div>`;
+    d.onclick=()=>selectRegionData(r);
+    g.appendChild(d);
+  });
+}
+function selectRegionBySelect(){
+  const sido=document.getElementById('sel-sido').value,sigun=document.getElementById('sel-sigun').value;
+  if(!sigun)return;
+  const r=RD.find(r=>r[0]===sido&&r[1]===sigun);
+  if(r)selectRegionData(r);
+}
+function selectRegionData(r){
+  S.sido=r[0];S.sigun=r[1];S.stationNo=r[2];S.rainfall=r[3];S.period=r[4];S.station=r[1];
+  document.getElementById('sel-sido').value=r[0];
+  filterCities();
+  document.getElementById('sel-sigun').value=r[1];
+  document.querySelectorAll('.rcard').forEach(c=>{
+    c.classList.toggle('sel',c.querySelector('.rcard-nm').textContent===r[1]);
+  });
+  document.getElementById('ri-station').textContent=r[1]+' (No.'+r[2]+')';
+  document.getElementById('ri-rain').textContent=r[3]+' mm/hr';
+  document.getElementById('ri-period').textContent=r[4];
+  document.getElementById('rain-info-box').style.display='block';
+  document.getElementById('region-badge').textContent=r[1];
+  updateSteps();
+  liveCalc();
+  showToast('📍 '+r[1]+' — '+r[3]+'mm/hr');
+}
+
+/* ═══════ DRAIN ═══════ */
+function changeDrain(d){
+  const inp=document.getElementById('inp-drains');
+  inp.value=Math.max(1,Math.min(50,(parseInt(inp.value)||1)+d));
+  liveCalc();
+}
+function onDrainModeChange(){
+  const m=document.getElementById('sel-drain-mode').value;
+  S.drainMode=m;
+  document.getElementById('drain-count-group').style.display=m==='manual'?'block':'none';
+  document.getElementById('drain-auto-group').style.display=m==='auto'?'block':'none';
+  if(m==='auto')calcAutoDrains();else liveCalc();
+}
+function calcAutoDrains(){
+  // 구간모드 포함 최신 면적 읽기
+  const aw=getEffAreaAndWall();
+  const ea=aw.area+aw.wall*0.5;
+  const pa=parseInt(document.getElementById('sel-drain-area').value)||200;
+  const n=Math.max(1,Math.ceil(ea/pa));
+  document.getElementById('auto-drain-display').textContent=n+'개';
+  S.drains=n;
+  // liveCalc 전체 호출로 모든 상태(pipetype/material/slope 등) 동기화
+  liveCalc();
+}
+function updDrainPreview(){
+  const ea=S.area+S.wall*0.5;
+  document.getElementById('drain-unit-area').textContent=(S.drains>0&&ea>0)?(ea/S.drains).toFixed(1)+' m²':'— m²';
+}
+
+/* ═══════ STEPS ═══════ */
+function updateSteps(){
+  const s1=!!S.rainfall,s2=s1&&S.area>0,s4=S.hasResult;
+  function set(n,st){
+    const c=document.getElementById('sc'+n),l=document.getElementById('sl'+n);
+    c.className='sc'+(st?' '+st:'');l.className='sl'+(st?' '+st:'');
+    c.textContent=st==='done'?'✓':n;
+  }
+  set(1,'active');set(2,s1?(s2?'done':'active'):'');set(3,s2?'active':'');set(4,s4?'active':'');
+  ['sd1','sd2','sd3'].forEach((id,i)=>document.getElementById(id).className='sdiv'+([s1,s2,s2][i]?' done':''));
+}
+
+/* ═══════ ZONE MODE (구간별 설계) ═══════ */
+let zoneMode='single';
+let zones=[{id:1,name:'A구간',area:0,wall:0,roof:'flat'}];
+let zoneCounter=1;
+
+function setZoneMode(mode){
+  zoneMode=mode;
+  document.getElementById('mode-single-btn').classList.toggle('active',mode==='single');
+  document.getElementById('mode-multi-btn').classList.toggle('active',mode==='multi');
+  document.getElementById('zone-single').style.display=mode==='single'?'block':'none';
+  document.getElementById('zone-multi').style.display=mode==='multi'?'block':'none';
+  if(mode==='multi'&&zones.length===0)addZone();
+  if(mode==='multi'&&document.getElementById('zone-list').children.length===0)renderZoneList();
+  liveCalc();
+}
+
+function addZone(){
+  zoneCounter++;
+  const names=['A','B','C','D','E','F','G','H'];
+  const nm=names[zones.length]||('구간'+zoneCounter);
+  zones.push({id:zoneCounter,name:nm+'구간',area:0,wall:0,roof:'flat'});
+  renderZoneList();
+  liveCalc();
+}
+
+function removeZone(id){
+  if(zones.length<=1){showToast('⚠️ 최소 1개 구간이 필요합니다');return;}
+  zones=zones.filter(z=>z.id!==id);
+  renderZoneList();liveCalc();
+}
+
+function updateZone(id,field,val){
+  const z=zones.find(z=>z.id===id);
+  if(z){z[field]=field==='roof'?val:(parseFloat(val)||0);}
+  calcZoneTotal();liveCalc();
+}
+
+function renderZoneList(){
+  const el=document.getElementById('zone-list');
+  if(!el)return;
+  el.innerHTML=zones.map(z=>`
+    <div class="zone-row" id="zone-row-${z.id}">
+      <span class="zone-lbl">${z.name}</span>
+      <div class="fgrp"><label class="flbl" style="font-size:8.5px">지붕면적(m²)</label>
+        <input type="number" class="finput" style="padding:5px 7px;font-size:11.5px" placeholder="면적" min="0" value="${z.area||''}" oninput="updateZone(${z.id},'area',this.value)">
+      </div>
+      <div class="fgrp"><label class="flbl" style="font-size:8.5px">수직벽(m²)</label>
+        <input type="number" class="finput" style="padding:5px 7px;font-size:11.5px" placeholder="0" min="0" value="${z.wall||''}" oninput="updateZone(${z.id},'wall',this.value)">
+      </div>
+      <div class="fgrp"><label class="flbl" style="font-size:8.5px">지붕유형</label>
+        <select class="fselect" style="padding:5px 18px 5px 7px;font-size:10.5px" onchange="updateZone(${z.id},'roof',this.value)">
+          <option value="flat" ${z.roof==='flat'?'selected':''}>평지붕</option>
+          <option value="slope" ${z.roof==='slope'?'selected':''}>경사</option>
+          <option value="valley" ${z.roof==='valley'?'selected':''}>밸리형</option>
+        </select>
+      </div>
+      <button class="zone-del" onclick="removeZone(${z.id})">×</button>
+    </div>`).join('');
+  calcZoneTotal();
+}
+
+function calcZoneTotal(){
+  const total=zones.reduce((s,z)=>s+z.area+z.wall*0.5,0);
+  const el=document.getElementById('zone-total-area');
+  if(el)el.textContent=total>0?total.toFixed(1)+' m²':'— m²';
+}
+
+function getEffAreaAndWall(){
+  if(zoneMode==='multi'){
+    const totalArea=zones.reduce((s,z)=>s+z.area,0);
+    const totalWall=zones.reduce((s,z)=>s+z.wall,0);
+    return{area:totalArea,wall:totalWall};
+  }
+  return{
+    area:parseFloat(document.getElementById('inp-area').value)||0,
+    wall:parseFloat(document.getElementById('inp-wall').value)||0
+  };
+}
+
+/* ═══════ LIVE CALC ═══════ */
+function liveCalc(){
+  const aw=getEffAreaAndWall();
+  S.area=aw.area; S.wall=aw.wall;
+  S.rooftype=zoneMode==='single'?(document.getElementById('sel-rooftype').value):'flat';
+  S.pipetype=document.getElementById('sel-pipetype').value;
+  S.material=document.getElementById('sel-material').value;
+  S.slope=parseInt(document.getElementById('sel-slope').value);
+  S.safety=parseInt(document.getElementById('sel-safety').value);
+  if(S.drainMode==='manual')S.drains=parseInt(document.getElementById('inp-drains').value)||1;
+  updDrainPreview();updateSteps();
+  if(S.rainfall&&S.area>0)doCalc();
+}
+
+/* ═══════ CORE CALC ═══════ */
+function doCalc(){
+  if(!S.rainfall||S.area<=0)return;
+  const wc=S.wall*0.5,ea=S.area+wc,SF=1+S.safety/100;
+  const ct=ea*(S.rainfall/100)*SF,dc=ct/S.drains,de=ea/S.drains;
+  const fl=ea*S.rainfall/60;
+  // 수평관 기울기 보정: KDS 표 4.4-2는 1/100 기준
+  // 기울기 1/n → 허용유량 ∝ √(1/n), 환산면적 보정계수 = √(100/n)
+  const slopeN=S.slope; // 100, 50, 25
+  const slopeFactor=Math.sqrt(100/slopeN); // 1.0, 1.414, 2.0
+  const dc_h=dc/slopeFactor; // 수평관용 보정 환산면적 (더 작아져 작은 관경 선택 가능)
+  const vp=findPipe(VT,dc),hp=findPipe(HT,dc_h),gp=findPipe(GT,dc);
+  S.hasResult=true;
+  S.result={ea,wc,ct,dc,dc_h,de,fl,vp,hp,gp,SF,slopeN,slopeFactor,zoneMode,zonesSnap:JSON.parse(JSON.stringify(zones))};
+  // show result area
+  document.getElementById('no-result-card').style.display='none';
+  document.getElementById('result-area').style.display='block';
+  // hero
+  document.getElementById('res-main-dn').textContent=vp.dn;
+  document.getElementById('res-main-desc').textContent=S.station+' '+S.rainfall+'mm/hr · 드레인 '+S.drains+'개 · 개당 '+de.toFixed(1)+'m²';
+  document.getElementById('res-eff-area').textContent=ea.toFixed(1);
+  document.getElementById('res-rainfall').textContent=S.rainfall;
+  document.getElementById('res-flow').textContent=Math.round(fl);
+  // calc box
+  document.getElementById('cv-area').textContent=S.area.toFixed(1)+' m²';
+  document.getElementById('cv-wall').textContent=wc>0?'+'+wc.toFixed(1)+' m²':'없음 (0)';
+  document.getElementById('cv-eff').textContent=ea.toFixed(1)+' m²';
+  document.getElementById('cv-rain').textContent=S.rainfall+' mm/hr';
+  document.getElementById('cv-conv').textContent=ea.toFixed(1)+'×('+S.rainfall+'/100)×'+SF.toFixed(2)+' = '+ct.toFixed(1)+' m²';
+  document.getElementById('cv-zone').textContent=ct.toFixed(1)+'÷'+S.drains+' = '+dc.toFixed(1)+' m²';
+  document.getElementById('cv-result').textContent='DN '+vp.dn+'mm (표 최대 '+vp.maxArea+' m²)';
+  // 수평관 기울기 보정 표시
+  const slopeEl=document.getElementById('cv-slope-h');
+  if(slopeEl){
+    if(slopeN===100){slopeEl.textContent='1/100 (보정 없음, dc_h = dc)';}
+    else{slopeEl.textContent='1/'+slopeN+' → 배율 √(100/'+slopeN+')='+slopeFactor.toFixed(3);}
+  }
+  const slopeElDc=document.getElementById('cv-slope-h-dc');
+  if(slopeElDc){
+    if(slopeN===100){slopeElDc.textContent=dc.toFixed(1)+' m² (보정 없음)';}
+    else{slopeElDc.textContent=dc.toFixed(1)+' ÷ '+slopeFactor.toFixed(3)+' = '+dc_h.toFixed(1)+' m²';}
+  }
+  // pipe candidates
+  renderCandidates('vresults',VT,dc);
+  renderCandidates('hresults',HT,dc_h);
+  if(S.pipetype==='semi'){document.getElementById('gutter-card').style.display='block';renderCandidates('gresults',GT,dc);}
+  else document.getElementById('gutter-card').style.display='none';
+  // drain detail
+  renderDrainDetail(de,dc,vp,hp,gp,ct,ea);
+  // count
+  renderCountSummary(vp.dn,hp.dn,gp.dn);
+  updateSteps();
+  // auto-update previews if tabs already open
+  if(document.getElementById('panel-a4').classList.contains('active'))renderA4();
+  if(document.getElementById('panel-mobile').classList.contains('active'))renderMobile();
+}
+
+function findPipe(t,target){
+  for(let i=0;i<t.length;i++)if(t[i][3]>=target)return{dn:t[i][0],maxArea:t[i][3],row:t[i]};
+  const l=t[t.length-1];return{dn:l[0],maxArea:l[3],row:l,over:true};
+}
+
+/* ═══════ PIPE CANDIDATES (컴팩트 테이블) ═══════ */
+function renderCandidates(id,t,target){
+  const found=findPipe(t,target);
+  const rows=t.map(row=>{
+    const dn=row[0],m100=row[3],isRec=dn===found.dn,ok=m100>=target;
+    const tag=isRec?`<span class="pc-tag-inline">✅ 추천</span>`:'';
+    const margin=ok?(m100-target>0?'+':'')+(m100-target).toFixed(0):''+(m100-target).toFixed(0);
+    const cls=isRec?'pc-rec':(!ok?'pc-dim':'');
+    return`<tr class="${cls}">
+      <td><span class="pc-dn-cell">DN ${dn}</span>${tag}</td>
+      <td>${m100}</td>
+      <td>${target.toFixed(0)}</td>
+      <td style="color:${ok?'#16a34a':'#dc2626'};font-weight:800">${margin}</td>
+      <td style="font-weight:800;color:${ok?'#16a34a':'#dc2626'}">${ok?'✓':'✗'}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById(id).innerHTML=`
+    <div class="twrap">
+      <table class="pc-tbl">
+        <thead><tr><th>관경 DN</th><th>표기준(m²)</th><th>필요(m²)</th><th>여유(m²)</th><th>적합</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+/* ═══════ DRAIN DETAIL ═══════ */
+function renderDrainDetail(de,dc,vp,hp,gp,ct,ea){
+  document.getElementById('drain-count-badge').textContent='드레인 '+S.drains+'개';
+  const ok=vp.maxArea>=dc,mg=((vp.maxArea/dc-1)*100).toFixed(0);
+  let rows='';
+  for(let i=1;i<=S.drains;i++)rows+=`<tr><td style="font-weight:800;color:#1d4ed8">No.${i}</td><td>${de.toFixed(1)}</td><td>${dc.toFixed(1)}</td><td style="font-weight:900;color:#1d4ed8">DN ${vp.dn}</td><td style="font-weight:900;color:#3b82f6">DN ${hp.dn}</td><td style="font-weight:800;color:${ok?'#16a34a':'#dc2626'}">${ok?'✓':'✗'}</td></tr>`;
+  // 구간별 모드: 구간별 권장 드레인 수 안내
+  let zoneGuide='';
+  if(zoneMode==='multi'&&zones.length>1){
+    const zgRows=zones.map(z=>{
+      const zEff=z.area+z.wall*0.5;
+      const zConv=zEff*(S.rainfall/100)*(1+S.safety/100);
+      const zRec=Math.max(1,Math.ceil(zConv/vp.maxArea));
+      return`<tr><td style="font-weight:800;color:#1d4ed8">${z.name}</td><td>${zEff.toFixed(1)}</td><td>${zConv.toFixed(1)}</td><td style="font-weight:900;color:#1d4ed8">${zRec}개</td><td>DN${vp.dn}</td></tr>`;
+    }).join('');
+    zoneGuide=`<div style="margin-top:10px;font-size:10px;font-weight:800;color:#1e40af;margin-bottom:5px">📌 구간별 권장 드레인 배분</div>
+    <div class="twrap"><table class="rtbl"><thead><tr><th>구간명</th><th>유효면적(m²)</th><th>환산면적(m²)</th><th>권장 드레인 수</th><th>적용 관경</th></tr></thead><tbody>${zgRows}</tbody></table></div>`;
+  }
+  document.getElementById('drain-detail').innerHTML=`
+    <div style="padding:9px 11px;background:${ok?'#f0fdf4':'#fef2f2'};border:2px solid ${ok?'#bbf7d0':'#fecaca'};border-radius:8px;display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;flex-wrap:wrap;gap:5px">
+      <div><div style="font-size:11px;font-weight:800;color:${ok?'#15803d':'#dc2626'}">${ok?'✅ 드레인 배치 적합':'⚠️ 드레인 추가 필요'}</div><div style="font-size:10px;color:#475569;margin-top:2px">개당 환산면적 <strong>${dc.toFixed(1)}m²</strong> / DN${vp.dn} 허용 <strong>${vp.maxArea}m²</strong> ${ok?'(여유 +'+mg+'%)':'→ 드레인 추가 또는 상위 관경 검토'}</div></div>
+      <div style="text-align:center"><div style="font-size:19px;font-weight:900;color:${ok?'#16a34a':'#dc2626'};font-family:'JetBrains Mono',monospace">${S.drains}개</div><div style="font-size:9px;color:#6b7a99;font-weight:700">드레인 수량</div></div>
+    </div>
+    <div class="twrap"><table class="rtbl"><thead><tr><th>드레인 No.</th><th>분담면적(m²)</th><th>환산면적(m²)</th><th>수직관</th><th>수평관</th><th>적합</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td>합계</td><td>${ea.toFixed(1)}</td><td>${ct.toFixed(1)}</td><td>DN${vp.dn}×${S.drains}</td><td>DN${hp.dn}</td><td></td></tr></tfoot></table></div>
+    ${zoneGuide}`;
+}
+
+/* ═══════ COUNT SUMMARY ═══════ */
+function renderCountSummary(vDN,hDN,gDN){
+  const isSemi=S.pipetype==='semi';
+  const mat={pvc:'PVC/PE관',cast:'주철관',stainless:'스테인리스강관',galv:'아연도금강관'}[S.material]||S.material;
+  document.getElementById('count-summary').innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:11px">
+      <div class="sbox"><div class="sico">💧</div><div class="sval" style="font-size:16px">${S.drains}개</div><div class="slbl">드레인 수량</div></div>
+      <div class="sbox"><div class="sico">⬆️</div><div class="sval" style="font-size:16px">DN${vDN}</div><div class="slbl">수직관 관경</div></div>
+      <div class="sbox"><div class="sico">➡️</div><div class="sval" style="font-size:16px">DN${hDN}</div><div class="slbl">수평관 관경</div></div>
+      <div class="sbox"><div class="sico">📐</div><div class="sval" style="font-size:16px">${(S.area+S.wall*0.5).toFixed(0)}</div><div class="slbl">유효면적(m²)</div></div>
+    </div>
+    <div class="nb grn"><div class="nb-tit">📋 설계 적용 수량 (최종)</div><div class="nb-txt">
+      · 루프드레인(집수구) : <strong>${S.drains}개소</strong><br>
+      · 우수 수직관 : DN ${vDN}mm × <strong>${S.drains}개소</strong><br>
+      · 우수 수평관 : DN ${hDN}mm (구배 1/${S.slope} 이상)<br>
+      ${isSemi?'· 반원형 빗물받이 : 폭 '+gDN+'mm × '+S.drains+'개소<br>':''}
+      · 관 재질 : ${mat} · 안전여유율 : +${S.safety}%<br>
+      · 적용기준 : KDS 31 30 35 : 2021 / ${S.station} ${S.rainfall}mm/hr
+    </div></div>`;
+}
+
+/* ═══════ A4 RENDER ═══════ */
+function renderA4(){
+  const el=document.getElementById('a4-content');
+  if(!S.hasResult||!S.result){
+    el.innerHTML='<div style="text-align:center;padding:40px;color:#94a3b8;font-size:13px;">산정 결과가 없습니다.<br>관경 산정 탭에서 조건을 입력하면 자동으로 생성됩니다.</div>';
+    return;
+  }
+  const R=S.result,mat={pvc:'PVC/PE관',cast:'주철관',stainless:'스테인리스강관',galv:'아연도금강관'}[S.material]||S.material;
+  const now=new Date(),ds=now.getFullYear()+'년 '+(now.getMonth()+1)+'월 '+now.getDate()+'일';
+  const roofNm={flat:'평지붕(옥상)',slope:'경사지붕',valley:'밸리형 복합'}[S.rooftype]||S.rooftype;
+  let dRows='';
+  for(let i=1;i<=S.drains;i++)dRows+=`<tr><td style="text-align:center;font-weight:800;color:#1d4ed8">No.${i}</td><td style="text-align:center">${R.de.toFixed(1)}</td><td style="text-align:center">${R.dc.toFixed(1)}</td><td style="text-align:center;font-weight:900;color:#1d4ed8">DN ${R.vp.dn}</td><td style="text-align:center;font-weight:900;color:#3b82f6">DN ${R.hp.dn}</td><td style="text-align:center;font-weight:800;color:${R.vp.maxArea>=R.dc?'#16a34a':'#dc2626'}">${R.vp.maxArea>=R.dc?'✓ 적합':'✗ 부족'}</td></tr>`;
+  el.innerHTML=`
+  <div class="a4-section" style="break-inside:avoid;page-break-inside:avoid;">
+    <div class="a4-tit">건축물 우수관경 산정 결과서</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div style="font-size:9px;color:#6b7a99;">KDS 31 30 35 : 2021 (국토교통부고시 제2021-203호) · MANMIN-Ver2.0</div>
+      <div style="font-size:9px;color:#6b7a99;">산정일: ${ds}</div>
+    </div>
+  </div>
+
+  <div class="a4-section" style="break-inside:avoid;page-break-inside:avoid;">
+    <div class="a4-sub">1. 적용 조건</div>
+    <table class="a4-cond-tbl">
+      <tr>
+        <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">적용 지역</div><div class="a4-iv">${S.sido} ${S.sigun}</div></div></td>
+        <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">관측지점 (기상청)</div><div class="a4-iv">${S.station} (No.${S.stationNo})</div></div></td>
+      </tr>
+      <tr>
+        <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">시간최대강우량</div><div class="a4-iv">${S.rainfall} mm/hr</div></div></td>
+        <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">관측기간</div><div class="a4-iv">${S.period}</div></div></td>
+      </tr>
+      <tr>
+        <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">수평투영 지붕면적</div><div class="a4-iv">${S.area} m²</div></div></td>
+        <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">수직벽 면적 (KDS 보정)</div><div class="a4-iv">${S.wall} m² (+${R.wc.toFixed(1)} m²)</div></div></td>
+      </tr>
+      <tr>
+        <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">유효 지붕면적 합계</div><div class="a4-iv">${R.ea.toFixed(1)} m²</div></div></td>
+        <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">드레인 설치 개수</div><div class="a4-iv">${S.drains} 개소</div></div></td>
+      </tr>
+      <tr>
+        <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">관 재질</div><div class="a4-iv">${mat}</div></div></td>
+        <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">수평관 기울기</div><div class="a4-iv">1 / ${S.slope} 이상</div></div></td>
+      </tr>
+      <tr>
+        <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">안전 여유율</div><div class="a4-iv">+${S.safety}% (×${R.SF.toFixed(2)})</div></div></td>
+        <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">지붕 유형</div><div class="a4-iv">${roofNm}</div></div></td>
+      </tr>
+    </table>
+  </div>
+
+  ${(()=>{
+    if(R.zoneMode!=='multi'||!R.zonesSnap||R.zonesSnap.length<=1)return'';
+    const zRows=R.zonesSnap.map(z=>{
+      const eff=z.area+z.wall*0.5;
+      const rn=({flat:'평지붕',slope:'경사지붕',valley:'밸리형'})[z.roof]||z.roof;
+      return '<tr><td style="font-weight:800">'+z.name+'</td><td>'+z.area.toFixed(1)+'</td><td>'+z.wall.toFixed(1)+'</td><td>+'+(z.wall*0.5).toFixed(1)+'</td><td style="font-weight:800">'+eff.toFixed(1)+'</td><td>'+rn+'</td></tr>';
+    }).join('');
+    const sumA=R.zonesSnap.reduce((s,z)=>s+z.area,0);
+    const sumW=R.zonesSnap.reduce((s,z)=>s+z.wall,0);
+    return '<div class="a4-section allow-break page-aware">'
+      +'<div class="a4-sub" style="break-after:avoid;page-break-after:avoid;">1-1. 구간별 면적 내역</div>'
+      +'<table class="a4-tbl"><thead style="display:table-header-group;"><tr><th>구간명</th><th>수평투영면적(m²)</th><th>수직벽(m²)</th><th>수직벽보정(m²)</th><th>유효면적(m²)</th><th>지붕유형</th></tr></thead>'
+      +'<tbody>'+zRows+'</tbody>'
+      +'<tfoot><tr><td style="font-weight:900">합계</td><td>'+sumA.toFixed(1)+'</td><td>'+sumW.toFixed(1)+'</td><td>+'+R.wc.toFixed(1)+'</td><td style="font-weight:900">'+R.ea.toFixed(1)+'</td><td>—</td></tr></tfoot>'
+      +'</table></div>';
+  })()}
+
+  <div class="a4-section" style="break-inside:avoid;page-break-inside:avoid;">
+    <div class="a4-sub">2. 산정 결과 요약</div>
+    <div class="a4-rbox">
+      <div style="font-size:9.5px;opacity:.7;margin-bottom:3px;font-weight:700">추천 우수 수직관 관경 (DN)</div>
+      <div class="a4-rnum">${R.vp.dn}</div>
+      <div style="font-size:13px;opacity:.85;margin-top:3px">mm</div>
+      <div style="font-size:9.5px;opacity:.6;margin-top:5px">수평관 DN${R.hp.dn}mm · 드레인 ${S.drains}개 · 개당 분담 ${R.de.toFixed(1)}m²</div>
+    </div>
+    <table class="a4-stat-tbl">
+      <tr>
+        <td><div class="a4-sc-inner"><div style="font-size:9px;color:#6b7a99;font-weight:700">유효면적</div><div style="font-size:14px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace">${R.ea.toFixed(1)} m²</div></div></td>
+        <td><div class="a4-sc-inner"><div style="font-size:9px;color:#6b7a99;font-weight:700">전체 환산면적</div><div style="font-size:14px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace">${R.ct.toFixed(1)} m²</div></div></td>
+        <td><div class="a4-sc-inner"><div style="font-size:9px;color:#6b7a99;font-weight:700">설계유량</div><div style="font-size:14px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace">${Math.round(R.fl)} ℓ/min</div></div></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="a4-section allow-break page-aware">
+    <div class="a4-sub" style="break-after:avoid;page-break-after:avoid;">3. 계산 과정</div>
+    <table class="a4-tbl"><thead style="display:table-header-group;"><tr><th>단계</th><th>계산식</th><th>결과</th></tr></thead><tbody>
+      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>① 수직벽 면적 보정</td><td>${S.wall} m² × 0.5</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">+${R.wc.toFixed(1)} m²</td></tr>
+      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>② 유효 지붕면적</td><td>${S.area} + ${R.wc.toFixed(1)}</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">${R.ea.toFixed(1)} m²</td></tr>
+      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>③ 강우량 보정 환산면적</td><td>${R.ea.toFixed(1)} × (${S.rainfall} ÷ 100) × ${R.SF.toFixed(2)}</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">${R.ct.toFixed(1)} m²</td></tr>
+      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>④ 드레인당 환산면적</td><td>${R.ct.toFixed(1)} ÷ ${S.drains}개</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">${R.dc.toFixed(1)} m²</td></tr>
+      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>⑤ 수직관 관경 선정</td><td>표 4.4-1 조회 (≥ ${R.dc.toFixed(1)} m²)</td><td style="text-align:right;font-weight:900;color:#1d4ed8">DN ${R.vp.dn}mm <span style="color:#6b7a99;font-weight:600">(허용 ${R.vp.maxArea}m²)</span></td></tr>
+      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>⑥ 수평관 관경 선정</td><td>표 4.4-2 조회, 기울기 1/${S.slope} 보정</td><td style="text-align:right;font-weight:900;color:#1d4ed8">DN ${R.hp.dn}mm <span style="color:#6b7a99;font-weight:600">(허용 ${R.hp.maxArea}m²)</span></td></tr>
+    </tbody></table>
+  </div>
+
+  <div class="a4-section allow-break page-aware">
+    <div class="a4-sub" style="break-after:avoid;page-break-after:avoid;">4. 드레인별 분담면적 및 관경</div>
+    <table class="a4-tbl"><thead style="display:table-header-group;"><tr><th>드레인 No.</th><th>분담 유효면적 (m²)</th><th>분담 환산면적 (m²)</th><th>수직관 관경</th><th>수평관 관경</th><th>적합 여부</th></tr></thead>
+    <tbody>${dRows}</tbody>
+    <tfoot><tr><td style="font-weight:900">합계</td><td>${R.ea.toFixed(1)}</td><td>${R.ct.toFixed(1)}</td><td>DN${R.vp.dn}×${S.drains}개</td><td>DN${R.hp.dn}</td><td>—</td></tr></tfoot></table>
+  </div>
+
+  <div class="a4-section allow-break page-aware">
+    <div class="a4-sub" style="break-after:avoid;page-break-after:avoid;">5. 설계 수량 적용 요약</div>
+    <table class="a4-tbl"><thead style="display:table-header-group;"><tr><th>항목</th><th>규격</th><th>수량</th><th>비고</th></tr></thead><tbody>
+      <tr style="break-inside:avoid;"><td>루프드레인 (집수구)</td><td>—</td><td style="text-align:center;font-weight:800">${S.drains} 개소</td><td>옥상 균등 배치</td></tr>
+      <tr style="break-inside:avoid;"><td>우수 수직관</td><td style="font-weight:800;color:#1d4ed8">DN ${R.vp.dn}mm · ${mat}</td><td style="text-align:center;font-weight:800">${S.drains} 개소</td><td>KDS 표 4.4-1 기준</td></tr>
+      <tr style="break-inside:avoid;"><td>우수 수평관</td><td style="font-weight:800;color:#1d4ed8">DN ${R.hp.dn}mm · ${mat}</td><td style="text-align:center;font-weight:800">1식</td><td>구배 1/${S.slope} 이상</td></tr>
+    </tbody></table>
+  </div>
+
+  <div class="a4-section allow-break page-aware">
+    <div class="a4-sub" style="break-after:avoid;page-break-after:avoid;">6. 적용 법적 근거</div>
+    <table class="a4-tbl"><thead style="display:table-header-group;"><tr><th>기준</th><th>조항</th><th>내용</th></tr></thead><tbody>
+      <tr style="break-inside:avoid;"><td style="font-weight:800;color:#1e40af">KDS 31 30 35 : 2021</td><td style="text-align:center">4.4.2 ~ 4.4.4</td><td>수직관·수평관·반원형 빗물받이 관경 기준</td></tr>
+      <tr style="break-inside:avoid;"><td style="font-weight:800;color:#1e40af">KDS 31 30 35 : 2021</td><td style="text-align:center">4.4.1</td><td>시간최대강우량 기준 관 지름 결정</td></tr>
+      <tr style="break-inside:avoid;"><td style="font-weight:800;color:#1e40af">기상청 기후통계분석</td><td style="text-align:center">1991~2020 평년값</td><td>지점별 시간최대강우량 적용 (${S.station} : ${S.rainfall}mm/hr)</td></tr>
+    </tbody></table>
+  </div>
+
+  <div class="a4-footer" style="break-inside:avoid;page-break-inside:avoid;">
+    <span style="display:flex;justify-content:space-between;width:100%;font-size:8.5px;color:#94a3b8;">
+      <span>건축물 우수관경 산정 시스템 [MANMIN-Ver2.0]</span>
+      <span>KDS 31 30 35 : 2021 · 기상청 시간최대강우량 기준</span>
+      <span>작성일: ${ds}</span>
+    </span>
+  </div>`;
+  requestAnimationFrame(scaleA4Preview);
+}
+
+/* ═══════ MOBILE RENDER ═══════ */
+function renderMobile(){
+  const el=document.getElementById('mobile-screen');
+  if(!S.hasResult||!S.result){
+    el.innerHTML='<div style="text-align:center;padding:38px 16px;color:#94a3b8;font-size:11.5px;">산정 결과가 없습니다.<br>관경 산정 탭에서 조건을<br>입력하면 자동으로 생성됩니다.</div>';
+    return;
+  }
+  const R=S.result;
+  const sido_short=S.sido.replace('특별자치도','').replace('특별자치시','').replace('광역시','').replace('특별시','');
+  let rows='';
+  for(let i=1;i<=Math.min(S.drains,8);i++)rows+=`<tr><td style="font-weight:800;color:#1d4ed8">No.${i}</td><td>${R.de.toFixed(1)}</td><td style="font-weight:900;color:#1d4ed8">DN${R.vp.dn}</td><td style="font-weight:900;color:#3b82f6">DN${R.hp.dn}</td></tr>`;
+  if(S.drains>8)rows+=`<tr><td colspan="4" style="color:#94a3b8;font-size:8.5px">... 외 ${S.drains-8}개소</td></tr>`;
+  el.innerHTML=`
+    <div class="mob-hdr"><div class="mob-ico">🌧️</div><div><div class="mob-hdr-tit">우수관경 산정 결과</div><div class="mob-hdr-sub">KDS 31 30 35:2021 · MANMIN-Ver2.0</div></div></div>
+    <div class="mob-body">
+      <div class="mob-hero">
+        <div style="font-size:9px;opacity:.65;margin-bottom:3px">추천 수직관 관경 (DN)</div>
+        <div class="mob-rnum">${R.vp.dn}</div>
+        <div style="font-size:11px;opacity:.85;margin-top:2px">mm</div>
+        <div style="font-size:9px;opacity:.6;margin-top:5px">${S.station} ${S.rainfall}mm/hr · 드레인 ${S.drains}개</div>
+      </div>
+      <div class="mob-sgrid">
+        <div class="mob-sc"><div class="mob-sv">${R.ea.toFixed(1)}</div><div class="mob-sl">유효면적(m²)</div></div>
+        <div class="mob-sc"><div class="mob-sv">${Math.round(R.fl)}</div><div class="mob-sl">설계유량(ℓ/min)</div></div>
+        <div class="mob-sc"><div class="mob-sv">DN${R.hp.dn}</div><div class="mob-sl">수평관 관경</div></div>
+        <div class="mob-sc"><div class="mob-sv">${S.drains}개</div><div class="mob-sl">드레인 수량</div></div>
+      </div>
+      <div class="mob-sec">📐 적용 조건</div>
+      <div class="mob-list">
+        <div class="mob-row"><span class="mob-rk">지역</span><span class="mob-rv">${sido_short} ${S.sigun}</span></div>
+        <div class="mob-row"><span class="mob-rk">시간최대강우량</span><span class="mob-rv">${S.rainfall} mm/hr</span></div>
+        <div class="mob-row"><span class="mob-rk">수평투영면적</span><span class="mob-rv">${S.area} m²</span></div>
+        <div class="mob-row"><span class="mob-rk">전체 환산면적</span><span class="mob-rv">${R.ct.toFixed(1)} m²</span></div>
+        <div class="mob-row"><span class="mob-rk">드레인 1개당</span><span class="mob-rv">${R.dc.toFixed(1)} m²</span></div>
+      </div>
+      <div class="mob-sec">💧 드레인별 관경</div>
+      <div style="overflow-x:auto;border-radius:7px;border:1px solid #e2e8f0;margin-bottom:9px">
+        <table class="mob-tbl"><thead><tr><th>No.</th><th>분담(m²)</th><th>수직관</th><th>수평관</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td>합계</td><td>${R.ea.toFixed(1)}</td><td>DN${R.vp.dn}×${S.drains}</td><td>DN${R.hp.dn}</td></tr></tfoot></table>
+      </div>
+      <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:8px;padding:9px;margin-bottom:7px">
+        <div style="font-size:10px;font-weight:800;color:#15803d;margin-bottom:4px">📋 설계 수량 요약</div>
+        <div style="font-size:9.5px;color:#14532d;line-height:1.85">
+          · 루프드레인 : <strong>${S.drains}개소</strong><br>
+          · 수직관 : DN${R.vp.dn}mm × ${S.drains}개소<br>
+          · 수평관 : DN${R.hp.dn}mm (1/${S.slope} 이상)<br>
+          · 안전율 +${S.safety}%
+        </div>
+      </div>
+      <div class="mob-footer">KDS 31 30 35 : 2021 · 기상청(${S.period})</div>
+    </div>`;
+}
+
+/* ═══════ STANDARD TABLES ═══════ */
+function renderStdTables(){
+  const fill=(id,t)=>document.getElementById(id).innerHTML=t.map(r=>`<tr><td><strong>${r[0]}</strong></td>${r.slice(1).map(v=>`<td>${v}</td>`).join('')}</tr>`).join('');
+  fill('std-v-body',VT);fill('std-h-body',HT);fill('std-g-body',GT);
+}
+
+/* ═══════ RAIN TABLE ═══════ */
+function renderRainTable(q='',range=''){
+  let d=RD;
+  if(q)d=d.filter(r=>r[0].includes(q)||r[1].includes(q));
+  if(range){const[mn,mx]=range.split('-').map(Number);d=d.filter(r=>r[3]>=mn&&r[3]<mx);}
+  document.getElementById('rain-table-body').innerHTML=d.map(r=>{
+    const c=r[3]>=120?'#dc2626':r[3]>=100?'#c2410c':r[3]>=85?'#1d4ed8':'#1a2744';
+    return`<tr><td>${r[0]}</td><td><strong>${r[1]}</strong></td><td class="mono">${r[2]}</td><td style="font-weight:900;color:${c}" class="mono">${r[3]}</td><td>${r[4]}</td></tr>`;
+  }).join('');
+}
+function filterRainTable(){renderRainTable(document.getElementById('rain-search').value,document.getElementById('rain-filter').value);}
+
+/* ═══════ MODAL ═══════ */
+function openCalcGuide(){document.getElementById('calcModal').style.display='flex';}
+function closeCalcGuide(){document.getElementById('calcModal').style.display='none';}
+function closeModalOv(e){if(e.target===document.getElementById('calcModal'))closeCalcGuide();}
+
+/* ═══════ PRINT ═══════ */
+function printA4(){
+  renderA4();
+  const src=document.getElementById('a4-page').outerHTML;
+  const pt=document.getElementById('a4-print-target');
+  pt.innerHTML=src;
+  pt.style.display='block';
+  window.print();
+  setTimeout(function(){pt.innerHTML='';pt.style.display='none';},1200);
+}
+
+/* ═══════ RESET ═══════ */
+function resetAll(){
+  S={sido:'',sigun:'',rainfall:null,station:'',period:'',stationNo:0,area:0,wall:0,rooftype:'flat',drains:1,drainMode:'manual',pipetype:'circular',material:'pvc',slope:100,safety:20,hasResult:false,result:null};
+  document.getElementById('sel-sido').value='';
+  document.getElementById('sel-sigun').innerHTML='<option value="">-- 선택 --</option>';
+  document.getElementById('regionGrid').innerHTML='';
+  document.getElementById('rain-info-box').style.display='none';
+  document.getElementById('region-badge').textContent='미선택';
+  ['inp-area','inp-wall'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('inp-drains').value='1';
+  document.getElementById('drain-unit-area').textContent='— m²';
+  document.getElementById('sel-drain-mode').value='manual';
+  document.getElementById('drain-count-group').style.display='block';
+  document.getElementById('drain-auto-group').style.display='none';
+  document.getElementById('no-result-card').style.display='block';
+  document.getElementById('result-area').style.display='none';
+  // 구간 초기화
+  zoneMode='single'; zoneCounter=1;
+  zones=[{id:1,name:'A구간',area:0,wall:0,roof:'flat'}];
+  document.getElementById('mode-single-btn').classList.add('active');
+  document.getElementById('mode-multi-btn').classList.remove('active');
+  document.getElementById('zone-single').style.display='block';
+  document.getElementById('zone-multi').style.display='none';
+  document.getElementById('zone-list').innerHTML='';
+  if(document.getElementById('zone-total-area'))document.getElementById('zone-total-area').textContent='— m²';
+  updateSteps();renderA4();renderMobile();
+  showToast('🔄 초기화 완료');
+}
+
+/* ═══════ TOAST ═══════ */
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+/* ═══════ INIT ═══════ */
+document.addEventListener('DOMContentLoaded',()=>{
+  initSido();renderStdTables();renderRainTable();
+});
+</script>
+</div><!-- /root-app -->
+
+<!-- ════ A4 인쇄 전용 타깃 (root-app 바깥) ════ -->
+<div id="a4-print-target" style="display:none;"></div>
+
+
+<!-- ═══ PWA Service Worker 등록 ═══ -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => {
+        console.log('[PWA] SW 등록 완료 — scope:', reg.scope);
+        reg.addEventListener('updatefound', () => {
+          const nw = reg.installing;
+          if (!nw) return;
+          nw.addEventListener('statechange', () => {
+            if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+              const b = document.createElement('div');
+              b.id = 'sw-update-banner';
+              b.style.cssText = 'position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:9999;background:#1d4ed8;color:#fff;padding:10px 20px;border-radius:12px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:10px;box-shadow:0 4px 24px rgba(0,0,0,.4);white-space:nowrap';
+              b.innerHTML =
+                '<span>🔄 새 버전이 있습니다</span>' +
+                '<button onclick="(()=>{document.getElementById('sw-update-banner').remove();navigator.serviceWorker.ready.then(r=>{r.waiting&&r.waiting.postMessage({type:'SKIP_WAITING'})})})()" style="background:#fff;color:#1d4ed8;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">업데이트</button>' +
+                '<button onclick="document.getElementById('sw-update-banner').remove()" style="background:rgba(255,255,255,.2);color:#fff;border:none;border-radius:8px;padding:6px 10px;font-size:11px;cursor:pointer;">나중에</button>';
+              document.body.appendChild(b);
+            }
+          });
+        });
+      })
+      .catch(e => console.warn('[PWA] SW 등록 실패:', e));
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!window._swReload) { window._swReload = true; location.reload(); }
+    });
+  });
+}
+</script>
+</body>
+</html>
