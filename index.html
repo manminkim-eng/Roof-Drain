@@ -7,6 +7,7 @@
 <meta name="description" content="건축물 옥상 우수관경 산정 — KDS 31 30 35 : 2021 / 기상청 시간최대강우량 기준"/>
 <meta name="theme-color" content="#1d4ed8"/>
 <link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif!important;}
@@ -197,18 +198,30 @@ input[type="number"]{-moz-appearance:textfield;}
 /* A4 PREVIEW */
 .a4-wrap{
   background:#94a3b8;
-  padding:16px;
+  padding:20px;
   min-height:calc(100vh - 120px);
   overflow:hidden;
   position:relative;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
 }
 .a4-scale-wrap{
   display:block;
-  transform-origin:top left;
+  transform-origin:top center;
   width:794px;
+  flex-shrink:0;
 }
+/* 모바일/태블릿: 좌측 정렬로 전환 */
 @media(max-width:860px){
-  .a4-wrap{padding:8px;}
+  .a4-wrap{
+    padding:8px;
+    justify-content:flex-start;
+    align-items:flex-start;
+  }
+  .a4-scale-wrap{
+    transform-origin:top left;
+  }
 }
 .a4-page{background:#fff;width:794px;min-height:1122px;margin:0 auto;padding:19px 23px 28px;box-shadow:0 8px 40px rgba(0,0,0,.25);font-size:11px;color:#1a2744;display:inline-block;}
 .a4-page *{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif!important;}
@@ -237,7 +250,7 @@ input[type="number"]{-moz-appearance:textfield;}
 .a4-stat-tbl td{width:33.33%;padding:3px;vertical-align:top;}
 .a4-sc-inner{background:#eff6ff;border:1px solid #bfdbfe;border-radius:7px;padding:7px;text-align:center;}
 .a4-footer{border-top:1px solid #e2e8f0;padding-top:8px;font-size:8.5px;color:#94a3b8;margin-top:16px;line-height:1.6;display:flex;justify-content:space-between;font-weight:600;}
-@media(max-width:840px){.a4-wrap{padding:8px;}.a4-page{width:100%;min-height:auto;padding:14px 16px;}.a4-igrid{grid-template-columns:1fr;}}
+@media(max-width:840px){.a4-igrid{grid-template-columns:1fr;}}
 
 /* MOBILE PREVIEW */
 .mob-wrap{background:#1f2937;padding:22px 14px;min-height:calc(100vh - 120px);display:flex;justify-content:center;align-items:flex-start;}
@@ -443,6 +456,21 @@ input[type="number"]{-moz-appearance:textfield;}
             <div class="rain-row"><span class="rain-key">🌧️ 시간최대강우량</span><span class="rain-val" id="ri-rain">-</span></div>
             <div class="rain-row"><span class="rain-key">📅 관측기간</span><span class="rain-val" id="ri-period">-</span></div>
             <div class="rain-row"><span class="rain-key">📌 자료출처</span><span class="rain-val">기상청</span></div>
+          </div>
+          <!-- 공사명 + 작성일 -->
+          <div class="frow" style="margin-top:10px;margin-bottom:0">
+            <div class="fgrp">
+              <label class="flbl">🏗️ 공사명</label>
+              <input type="text" class="finput" id="inp-projname"
+                placeholder="예: 만민 건축사 신사옥 신축공사"
+                value="만민 건축사 신사옥 신축공사"
+                oninput="liveCalc()" style="font-size:12px;">
+            </div>
+            <div class="fgrp">
+              <label class="flbl">📅 작성일</label>
+              <input type="date" class="finput" id="inp-projdate"
+                oninput="liveCalc()" style="font-size:12px;">
+            </div>
           </div>
         </div>
       </div>
@@ -662,10 +690,12 @@ input[type="number"]{-moz-appearance:textfield;}
 <div class="tab-panel" id="panel-mobile">
   <div style="display:flex;gap:7px;margin-bottom:11px;flex-wrap:wrap;align-items:center;">
     <button class="btn-g" onclick="switchTab('calc',document.getElementById('tab-calc'))">← 산정으로 돌아가기</button>
-    <span style="font-size:10.5px;color:#6b7a99;">안드로이드폰 기준 (390px)</span>
+    <button class="btn-b" id="btnSaveJPG" onclick="exportMobileJPG()">📷 JPG 저장</button>
+    <button class="btn-g" id="btnShareMob" onclick="shareMobile()" style="display:none">📤 공유</button>
+    <span style="font-size:10.5px;color:#6b7a99;" id="mob-save-status"></span>
   </div>
   <div class="mob-wrap">
-    <div class="mob-device">
+    <div class="mob-device" id="mob-device">
       <div class="mob-screen" id="mobile-screen">
         <div style="text-align:center;padding:40px 18px;color:#94a3b8;font-size:12px;">산정 결과가 없습니다.<br>관경 산정 탭에서 조건을 입력하면<br>자동으로 생성됩니다.</div>
       </div>
@@ -754,6 +784,7 @@ const RD=[
 /* ═══════ STATE ═══════ */
 let S={
   sido:'',sigun:'',rainfall:null,station:'',period:'',stationNo:0,
+  projName:'만민 건축사 신사옥 신축공사',projDate:'',
   area:0,wall:0,rooftype:'flat',
   drains:1,drainMode:'manual',
   pipetype:'circular',material:'pvc',slope:100,safety:20,
@@ -769,20 +800,23 @@ function scaleA4Preview(){
   if(!wrap||!bg||!page)return;
   var A4W=794;
 
-  // 패딩 제외한 실제 가용 너비
   var style=window.getComputedStyle(bg);
   var padH=parseFloat(style.paddingLeft||0)+parseFloat(style.paddingRight||0);
   var availW=Math.max(bg.clientWidth-padH, 1);
 
-  var scale=availW>=A4W ? 1 : availW/A4W;
-
-  // transform-origin: top left 고정, scale 적용
-  wrap.style.transformOrigin='top left';
-  wrap.style.transform='scale('+scale+')';
-
-  // transform은 레이아웃 공간을 원본 크기로 유지하므로
-  // wrap의 height를 축소된 실제 시각 높이로 직접 지정
-  wrap.style.height=(page.offsetHeight*scale)+'px';
+  if(availW>=A4W){
+    // 데스크탑: scale 없이 원본 크기, CSS flex가 중앙 배치
+    wrap.style.transform='none';
+    wrap.style.transformOrigin='top center';
+    wrap.style.height='';
+  }else{
+    // 모바일/태블릿: 화면 너비에 맞게 축소
+    var scale=availW/A4W;
+    wrap.style.transformOrigin='top left';
+    wrap.style.transform='scale('+scale+')';
+    // transform은 레이아웃 공간을 원본 크기로 유지하므로 높이 보정
+    wrap.style.height=(page.offsetHeight*scale)+'px';
+  }
 }
 window.addEventListener('resize',scaleA4Preview);
 
@@ -972,6 +1006,8 @@ function getEffAreaAndWall(){
 function liveCalc(){
   const aw=getEffAreaAndWall();
   S.area=aw.area; S.wall=aw.wall;
+  S.projName=(document.getElementById('inp-projname').value||'').trim();
+  S.projDate=document.getElementById('inp-projdate').value||'';
   S.rooftype=zoneMode==='single'?(document.getElementById('sel-rooftype').value):'flat';
   S.pipetype=document.getElementById('sel-pipetype').value;
   S.material=document.getElementById('sel-material').value;
@@ -1125,16 +1161,29 @@ function renderA4(){
     return;
   }
   const R=S.result,mat={pvc:'PVC/PE관',cast:'주철관',stainless:'스테인리스강관',galv:'아연도금강관'}[S.material]||S.material;
-  const now=new Date(),ds=now.getFullYear()+'년 '+(now.getMonth()+1)+'월 '+now.getDate()+'일';
+  // 작성일: 입력값 우선, 없으면 오늘
+  var _pd=S.projDate||'';
+  var ds;
+  if(_pd){
+    var _parts=_pd.split('-');
+    ds=_parts[0]+'년 '+parseInt(_parts[1])+'월 '+parseInt(_parts[2])+'일';
+  }else{
+    var _now=new Date();
+    ds=_now.getFullYear()+'년 '+(_now.getMonth()+1)+'월 '+_now.getDate()+'일';
+  }
+  const projName=S.projName||'(공사명 미입력)';
   const roofNm={flat:'평지붕(옥상)',slope:'경사지붕',valley:'밸리형 복합'}[S.rooftype]||S.rooftype;
   let dRows='';
   for(let i=1;i<=S.drains;i++)dRows+=`<tr><td style="text-align:center;font-weight:800;color:#1d4ed8">No.${i}</td><td style="text-align:center">${R.de.toFixed(1)}</td><td style="text-align:center">${R.dc.toFixed(1)}</td><td style="text-align:center;font-weight:900;color:#1d4ed8">DN ${R.vp.dn}</td><td style="text-align:center;font-weight:900;color:#3b82f6">DN ${R.hp.dn}</td><td style="text-align:center;font-weight:800;color:${R.vp.maxArea>=R.dc?'#16a34a':'#dc2626'}">${R.vp.maxArea>=R.dc?'✓ 적합':'✗ 부족'}</td></tr>`;
   el.innerHTML=`
   <div class="a4-section" style="break-inside:avoid;page-break-inside:avoid;">
     <div class="a4-tit">건축물 우수관경 산정 결과서</div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-      <div style="font-size:9px;color:#6b7a99;">KDS 31 30 35 : 2021 (국토교통부고시 제2021-203호) · MANMIN-Ver2.0</div>
-      <div style="font-size:9px;color:#6b7a99;">산정일: ${ds}</div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:12px;">
+      <div style="font-size:12px;font-weight:800;color:#1a2744;flex:1;">${projName}</div>
+      <div style="text-align:right;white-space:nowrap;flex-shrink:0;">
+        <div style="font-size:8px;color:#94a3b8;margin-bottom:2px;">KDS 31 30 35 : 2021 (국토교통부고시 제2021-203호) · MANMIN-Ver2.0</div>
+        <div style="font-size:9px;color:#6b7a99;">작성일: ${ds}</div>
+      </div>
     </div>
   </div>
 
@@ -1265,6 +1314,7 @@ function renderMobile(){
     <div class="mob-hdr"><div class="mob-ico">🌧️</div><div><div class="mob-hdr-tit">우수관경 산정 결과</div><div class="mob-hdr-sub">KDS 31 30 35:2021 · MANMIN-Ver2.0</div></div></div>
     <div class="mob-body">
       <div class="mob-hero">
+        <div style="font-size:8.5px;opacity:.75;margin-bottom:2px;font-weight:700">${S.projName||'우수관경 산정 결과'}</div>
         <div style="font-size:9px;opacity:.65;margin-bottom:3px">추천 수직관 관경 (DN)</div>
         <div class="mob-rnum">${R.vp.dn}</div>
         <div style="font-size:11px;opacity:.85;margin-top:2px">mm</div>
@@ -1350,6 +1400,12 @@ function resetAll(){
   document.getElementById('rain-info-box').style.display='none';
   document.getElementById('region-badge').textContent='미선택';
   ['inp-area','inp-wall'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('inp-projname').value='만민 건축사 신사옥 신축공사';
+  S.projName='만민 건축사 신사옥 신축공사';
+  var tdy=new Date();
+  var rinit=tdy.getFullYear()+'-'+('0'+(tdy.getMonth()+1)).slice(-2)+'-'+('0'+tdy.getDate()).slice(-2);
+  document.getElementById('inp-projdate').value=rinit;
+  S.projDate=rinit;
   document.getElementById('inp-drains').value='1';
   document.getElementById('drain-unit-area').textContent='— m²';
   document.getElementById('sel-drain-mode').value='manual';
@@ -1380,6 +1436,13 @@ function showToast(msg){
 /* ═══════ INIT ═══════ */
 document.addEventListener('DOMContentLoaded',()=>{
   initSido();renderStdTables();renderRainTable();
+  // 작성일 기본값: 오늘
+  var today=new Date();
+  var yyyy=today.getFullYear();
+  var mm=('0'+(today.getMonth()+1)).slice(-2);
+  var dd=('0'+today.getDate()).slice(-2);
+  var el=document.getElementById('inp-projdate');
+  if(el){el.value=yyyy+'-'+mm+'-'+dd; S.projDate=el.value;}
 });
 
 /* ═══════ FAB 드래그 & 클릭 ═══════ */
@@ -1464,6 +1527,81 @@ document.addEventListener('DOMContentLoaded',()=>{
     btn.addEventListener('mouseleave', hideTip);
   });
 })();
+
+
+/* ═══════ 모바일 미리보기 JPG 저장 & 공유 ═══════ */
+function exportMobileJPG(){
+  renderMobile();
+  var target=document.getElementById('mob-device');
+  var btn=document.getElementById('btnSaveJPG');
+  var status=document.getElementById('mob-save-status');
+  if(!target){showToast('⚠️ 모바일 미리보기를 먼저 확인해주세요.');return;}
+  if(typeof html2canvas==='undefined'){showToast('⚠️ 라이브러리 로딩 중 — 잠시 후 재시도해주세요.');return;}
+
+  btn.textContent='⏳ 생성 중...';
+  btn.disabled=true;
+  status.textContent='이미지 생성 중...';
+
+  html2canvas(target,{
+    scale:2,
+    useCORS:true,
+    allowTaint:true,
+    backgroundColor:'#1a1a1a',
+    logging:false
+  }).then(function(canvas){
+    var dataUrl=canvas.toDataURL('image/jpeg',0.95);
+    var now=new Date();
+    var fname='우수관경_모바일_'
+      +now.getFullYear()+('0'+(now.getMonth()+1)).slice(-2)+('0'+now.getDate()).slice(-2)
+      +'.jpg';
+
+    // 다운로드
+    var a=document.createElement('a');
+    a.href=dataUrl; a.download=fname; a.click();
+
+    // Web Share API 지원 여부 확인 후 공유 버튼 표시
+    if(navigator.share && navigator.canShare){
+      document.getElementById('btnShareMob').style.display='flex';
+      window._mobJpgDataUrl=dataUrl;
+      window._mobJpgFname=fname;
+    }
+
+    btn.textContent='📷 JPG 저장';
+    btn.disabled=false;
+    status.textContent='✅ 저장 완료';
+    setTimeout(function(){status.textContent='';},3000);
+    showToast('✅ JPG 저장 완료');
+  }).catch(function(err){
+    console.error(err);
+    btn.textContent='📷 JPG 저장';
+    btn.disabled=false;
+    status.textContent='';
+    showToast('⚠️ 이미지 생성 오류 — 다시 시도해주세요.');
+  });
+}
+
+function shareMobile(){
+  if(!window._mobJpgDataUrl||!navigator.share){return;}
+  // dataURL → Blob → File
+  var arr=window._mobJpgDataUrl.split(',');
+  var mime=arr[0].match(/:(.*?);/)[1];
+  var bstr=atob(arr[1]); var n=bstr.length;
+  var u8arr=new Uint8Array(n);
+  while(n--){u8arr[n]=bstr.charCodeAt(n);}
+  var file=new File([u8arr],window._mobJpgFname||'우수관경_모바일.jpg',{type:mime});
+  navigator.share({
+    title:'건축물 우수관경 산정 결과',
+    text:'MANMIN-Ver2.0 우수관경 산정 결과서',
+    files:[file]
+  }).catch(function(e){if(e.name!=='AbortError')showToast('공유 오류: '+e.message);});
+}
+
+// 페이지 로드 후 Web Share 지원 여부 체크
+document.addEventListener('DOMContentLoaded',function(){
+  if(navigator.share){
+    // 지원 기기: 공유 버튼은 JPG 저장 후 표시
+  }
+});
 
 </script>
 </div><!-- /root-app -->
