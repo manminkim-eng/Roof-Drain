@@ -496,8 +496,39 @@ input[type="number"]{-moz-appearance:textfield;}
               <div class="fgrp"><label class="flbl">수직벽 면적 (선택)</label><div class="input-sfx"><input type="number" class="finput" id="inp-wall" placeholder="없으면 0" min="0" oninput="liveCalc()"><span class="sfx">m²</span></div></div>
             </div>
             <div class="frow" style="margin-bottom:0">
-              <div class="fgrp"><label class="flbl">지붕 유형</label><select class="fselect" id="sel-rooftype" onchange="liveCalc()"><option value="flat">평지붕 (옥상)</option><option value="slope">경사지붕</option><option value="valley">밸리형 복합</option></select></div>
+              <div class="fgrp"><label class="flbl">지붕 유형</label><select class="fselect" id="sel-rooftype" onchange="onRoofTypeChange()"><option value="flat">평지붕 (옥상)</option><option value="slope">경사지붕</option><option value="valley">밸리형 복합</option></select></div>
             </div>
+            <!-- 경사지붕 전용: 경사각 입력 -->
+            <div id="slope-angle-group" style="display:none;margin-top:8px;">
+              <div class="frow" style="margin-bottom:0">
+                <div class="fgrp">
+                  <label class="flbl">경사각 θ (°) — 수평 기준</label>
+                  <div class="input-sfx">
+                    <input type="number" class="finput" id="inp-slope-angle" placeholder="예: 30" min="1" max="75" value="30" oninput="liveCalc()">
+                    <span class="sfx">°</span>
+                  </div>
+                </div>
+                <div class="fgrp">
+                  <label class="flbl">경사 보정계수 (secθ)</label>
+                  <div style="padding:7px 10px;background:#fff;border:2px solid #1d4ed8;border-radius:7px;font-size:15px;font-weight:900;color:#1d4ed8;text-align:center;font-family:'JetBrains Mono',monospace;" id="slope-sec-display">1.155</div>
+                </div>
+              </div>
+            </div>
+            <!-- 밸리형 전용: 집수집중계수 선택 -->
+            <div id="valley-group" style="display:none;margin-top:8px;">
+              <div class="frow" style="margin-bottom:0">
+                <div class="fgrp">
+                  <label class="flbl">밸리 집수 집중계수</label>
+                  <select class="fselect" id="sel-valley-factor" onchange="liveCalc()">
+                    <option value="1.10">1.10 — 완만한 밸리 (경사 낮음)</option>
+                    <option value="1.20" selected>1.20 — 일반 밸리 (표준)</option>
+                    <option value="1.30">1.30 — 급경사 밸리</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <!-- 지붕유형 안내 카드 -->
+            <div id="roof-info-card" style="margin-top:8px;"></div>
           </div>
 
           <!-- 구간별 설계 입력 -->
@@ -581,6 +612,7 @@ input[type="number"]{-moz-appearance:textfield;}
               <div class="cbox-tit">▶ 수직관 산정 과정</div>
               <div class="crow"><span class="ck">수평투영 면적</span><span class="cv" id="cv-area">—</span></div>
               <div class="crow"><span class="ck">수직벽 보정 (+½)</span><span class="cv" id="cv-wall">—</span></div>
+              <div class="crow" id="crow-roof-factor" style="display:none"><span class="ck" style="color:#c2410c;font-weight:800">🏠 지붕형태 보정</span><span class="cv" id="cv-roof-factor" style="color:#c2410c">—</span></div>
               <div class="crow"><span class="ck">유효면적 합계</span><span class="cv" id="cv-eff">—</span></div>
               <div class="crow"><span class="ck">시간최대강우량</span><span class="cv" id="cv-rain">—</span></div>
               <div class="crow"><span class="ck">100mm환산×안전율</span><span class="cv" id="cv-conv">—</span></div>
@@ -648,28 +680,274 @@ input[type="number"]{-moz-appearance:textfield;}
 
 <!-- ████ TAB: 설계 기준 ████ -->
 <div class="tab-panel" id="panel-guide">
-  <div class="two-col">
-    <div>
-      <div class="card"><div class="card-head"><div class="card-ico">📖</div><span class="card-tit">KDS 31 30 35 : 2021 주요 조문</span></div><div class="card-body">
-        <div class="nb blue" style="margin-bottom:8px"><div class="nb-tit">4.4.1 관 지름 기준</div><div class="nb-txt">옥내·옥외 우수 수직관 및 모든 수평 지관의 크기는 해당 지역의 기상자료에 의한 <strong>시간최대강우량</strong>을 기준으로 한다.</div></div>
-        <div class="nb blue" style="margin-bottom:8px"><div class="nb-tit">4.4.2 우수 수직관 지름</div><div class="nb-txt">옥내외 우수 수직관의 관 지름은 <strong>표 4.4-1</strong>의 최대 수평투영 지붕 면적으로 선정한다.</div></div>
-        <div class="nb blue" style="margin-bottom:8px"><div class="nb-tit">4.4.3 우수 수평관</div><div class="nb-txt">수평 기울기 1/25 이하인 우수배관은 <strong>표 4.4-2</strong>로 선정. 수평지관 기울기는 1/100 이상.</div></div>
-        <div class="nb blue" style="margin-bottom:8px"><div class="nb-tit">루프드레인 수직벽 보정</div><div class="nb-txt">루프드레인 사용 시 수직벽 면적의 <strong>½</strong>을 수평투영 지붕 면적에 가산한다.</div></div>
-        <div class="nb blue"><div class="nb-tit">4.4.4 반원형 빗물받이</div><div class="nb-txt">반원형 빗물받이 크기는 <strong>표 4.4-3</strong>의 최대 수평투영 지붕 면적 기준으로 선정.</div></div>
-      </div></div>
-    </div>
-    <div>
-      <div class="card"><div class="card-head"><div class="card-ico">🔢</div><span class="card-tit">계산식 및 설계 절차</span></div><div class="card-body">
-        <div style="background:#f8fafd;border:1px solid #e2e8f0;border-radius:9px;padding:13px;margin-bottom:10px;text-align:center">
-          <div style="font-size:9.5px;font-weight:700;color:#6b7a99;margin-bottom:8px">강우량 보정 환산면적 공식</div>
-          <div style="font-size:14px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace">A_eff = A_roof + A_wall × 0.5</div>
-          <div style="font-size:13px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;margin-top:6px">A_conv = A_eff × (R ÷ 100) × SF</div>
-          <div style="font-size:13px;font-weight:900;color:#f97316;font-family:'JetBrains Mono',monospace;margin-top:6px">A_drain = A_conv ÷ N</div>
-          <div style="font-size:10px;color:#94a3b8;margin-top:8px;line-height:1.7">R: 시간최대강우량(mm/hr) · SF: 안전율 · N: 드레인 수</div>
+
+  <!-- ① 산정 흐름 요약 -->
+  <div class="card" style="margin-bottom:12px;">
+    <div class="card-head"><div class="card-ico">🔄</div><span class="card-tit">산정 흐름 한눈에 보기</span><span class="cbadge">KDS 31 30 35 : 2021</span></div>
+    <div class="card-body">
+      <div style="display:flex;align-items:center;gap:0;flex-wrap:wrap;margin-bottom:10px;">
+        <div style="text-align:center;background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:8px;padding:8px 12px;min-width:82px;flex-shrink:0;">
+          <div style="font-size:16px;margin-bottom:2px;">📍</div>
+          <div style="font-size:10px;font-weight:800;color:#1e3a8a;">STEP 1</div>
+          <div style="font-size:9.5px;color:#1d4ed8;margin-top:2px;font-weight:700;">지역 선택</div>
+          <div style="font-size:9px;color:#475569;margin-top:2px;">시간최대강우량<br>R (mm/hr)</div>
         </div>
-        <div class="nb grn" style="margin-bottom:9px"><div class="nb-tit">✅ 산정 절차</div><div class="nb-txt">1. 시간최대강우량(R) 확인 (기상청)<br>2. A_eff = 수평투영면적 + 수직벽×½<br>3. A_conv = A_eff × R÷100 × 안전율<br>4. A_drain = A_conv ÷ 드레인 수<br>5. KDS 표 4.4-1에서 관경 선정</div></div>
-        <div class="nb org"><div class="nb-tit">⚠️ 주의사항</div><div class="nb-txt">· 산정된 관경은 최소값<br>· 연결부 등 마찰손실 고려<br>· 옥내 배관 내식성 재질 권장</div></div>
-      </div></div>
+        <div style="font-size:18px;color:#bfdbfe;padding:0 4px;">→</div>
+        <div style="text-align:center;background:#fff7ed;border:1.5px solid #fed7aa;border-radius:8px;padding:8px 12px;min-width:82px;flex-shrink:0;">
+          <div style="font-size:16px;margin-bottom:2px;">🏠</div>
+          <div style="font-size:10px;font-weight:800;color:#c2410c;">STEP 2</div>
+          <div style="font-size:9.5px;color:#c2410c;margin-top:2px;font-weight:700;">지붕 정보</div>
+          <div style="font-size:9px;color:#475569;margin-top:2px;">면적·형태<br>→ A_eff 산정</div>
+        </div>
+        <div style="font-size:18px;color:#bfdbfe;padding:0 4px;">→</div>
+        <div style="text-align:center;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:8px;padding:8px 12px;min-width:82px;flex-shrink:0;">
+          <div style="font-size:16px;margin-bottom:2px;">🔧</div>
+          <div style="font-size:10px;font-weight:800;color:#15803d;">STEP 3</div>
+          <div style="font-size:9.5px;color:#15803d;margin-top:2px;font-weight:700;">드레인·관 조건</div>
+          <div style="font-size:9px;color:#475569;margin-top:2px;">개수·형태·기울기<br>안전율 설정</div>
+        </div>
+        <div style="font-size:18px;color:#bfdbfe;padding:0 4px;">→</div>
+        <div style="text-align:center;background:linear-gradient(135deg,#1e3a8a,#1d4ed8);border-radius:8px;padding:8px 12px;min-width:82px;flex-shrink:0;">
+          <div style="font-size:16px;margin-bottom:2px;">📐</div>
+          <div style="font-size:10px;font-weight:800;color:#fbbf24;">결과</div>
+          <div style="font-size:9.5px;color:#fff;margin-top:2px;font-weight:700;">관경 자동 산출</div>
+          <div style="font-size:9px;color:#93c5fd;margin-top:2px;">DN 수직관<br>DN 수평관</div>
+        </div>
+      </div>
+      <!-- 핵심 공식 한 줄 -->
+      <div style="background:#f8fafd;border:1px solid #e2e8f0;border-radius:8px;padding:10px 13px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;">
+        <span style="font-size:12px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;">A_base = A_roof × RF + A_wall × 0.5</span>
+        <span style="font-size:11px;color:#94a3b8;">→</span>
+        <span style="font-size:12px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;">A_conv = A_base × (R÷100) × SF × VF</span>
+        <span style="font-size:11px;color:#94a3b8;">→</span>
+        <span style="font-size:12px;font-weight:900;color:#f97316;font-family:'JetBrains Mono',monospace;">A_drain = A_conv ÷ N</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <!-- 왼쪽: 조건별 설명 -->
+    <div>
+
+      <!-- 지붕형태 3종 -->
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-head"><div class="card-ico">🏠</div><span class="card-tit">지붕 형태별 산정 조건</span><span class="cbadge org">면적·계수 보정</span></div>
+        <div class="card-body">
+
+          <!-- 평지붕 -->
+          <div style="border:1.5px solid #bfdbfe;border-radius:9px;padding:10px 12px;margin-bottom:8px;background:#f8fbff;">
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;">
+              <div style="width:28px;height:28px;background:#1d4ed8;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">🏢</div>
+              <div>
+                <div style="font-size:11px;font-weight:900;color:#1e3a8a;">① 평지붕 (옥상)</div>
+                <div style="font-size:9.5px;color:#3b82f6;font-weight:700;">RF = 1.0 · VF = 1.0</div>
+              </div>
+              <div style="margin-left:auto;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:3px 8px;font-size:9.5px;font-weight:800;color:#1d4ed8;">기준값</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:10px;">
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;">
+                <div style="color:#6b7a99;font-weight:700;margin-bottom:2px;">유효면적</div>
+                <div style="font-weight:900;color:#1a2744;font-family:'JetBrains Mono',monospace;">A_base = A₀ + W×0.5</div>
+              </div>
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;">
+                <div style="color:#6b7a99;font-weight:700;margin-bottom:2px;">특징</div>
+                <div style="font-weight:700;color:#1a2744;">방수층·보정계수 없음<br>수직벽 ½ 가산만 적용</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 경사지붕 -->
+          <div style="border:1.5px solid #bbf7d0;border-radius:9px;padding:10px 12px;margin-bottom:8px;background:#f8fff9;">
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;">
+              <div style="width:28px;height:28px;background:#15803d;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">🏠</div>
+              <div>
+                <div style="font-size:11px;font-weight:900;color:#14532d;">② 경사지붕</div>
+                <div style="font-size:9.5px;color:#16a34a;font-weight:700;">RF = 1/cosθ (secθ) · VF = 1.0</div>
+              </div>
+              <div style="margin-left:auto;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:3px 8px;font-size:9.5px;font-weight:800;color:#15803d;">면적 증가</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:10px;margin-bottom:6px;">
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;">
+                <div style="color:#6b7a99;font-weight:700;margin-bottom:2px;">유효면적</div>
+                <div style="font-weight:900;color:#1a2744;font-family:'JetBrains Mono',monospace;">A_base = A₀×secθ + W×0.5</div>
+              </div>
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;">
+                <div style="color:#6b7a99;font-weight:700;margin-bottom:2px;">경사각별 secθ</div>
+                <div style="font-weight:700;color:#1a2744;">15°→1.035 / 30°→1.155<br>45°→1.414 / 60°→2.000</div>
+              </div>
+            </div>
+            <div style="background:#fef9c3;border:1px solid #fde047;border-radius:5px;padding:5px 8px;font-size:9.5px;color:#78350f;font-weight:700;">
+              ⚠ 경사각이 클수록 실 지붕면 &gt; 수평투영 → 유효면적 증가 → 관경 상향 가능
+            </div>
+          </div>
+
+          <!-- 밸리형 -->
+          <div style="border:1.5px solid #fed7aa;border-radius:9px;padding:10px 12px;background:#fffbf5;">
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;">
+              <div style="width:28px;height:28px;background:#c2410c;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">🏘️</div>
+              <div>
+                <div style="font-size:11px;font-weight:900;color:#7c2d12;">③ 밸리형 복합지붕</div>
+                <div style="font-size:9.5px;color:#ea580c;font-weight:700;">RF = 1.0 · VF = 1.10 ~ 1.30</div>
+              </div>
+              <div style="margin-left:auto;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:3px 8px;font-size:9.5px;font-weight:800;color:#c2410c;">집수 집중</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:10px;margin-bottom:6px;">
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;">
+                <div style="color:#6b7a99;font-weight:700;margin-bottom:2px;">유효면적</div>
+                <div style="font-weight:900;color:#1a2744;font-family:'JetBrains Mono',monospace;">A_base = A₀ + W×0.5</div>
+              </div>
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;">
+                <div style="color:#6b7a99;font-weight:700;margin-bottom:2px;">집수집중계수 VF</div>
+                <div style="font-weight:700;color:#1a2744;">완만 1.10 / 일반 1.20<br>급경사 1.30</div>
+              </div>
+            </div>
+            <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:5px;padding:5px 8px;font-size:9.5px;color:#92400e;font-weight:700;">
+              ⚠ 골(Valley) 부분에 빗물 집중 → VF를 환산면적에 곱해 안전율 추가 확보
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 드레인 형태 2종 -->
+      <div class="card">
+        <div class="card-head"><div class="card-ico">💧</div><span class="card-tit">드레인/수직관 형태별 조건</span><span class="cbadge">표 선택 분기</span></div>
+        <div class="card-body">
+
+          <!-- 원형관 -->
+          <div style="border:1.5px solid #bfdbfe;border-radius:9px;padding:10px 12px;margin-bottom:8px;background:#f8fbff;">
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;">
+              <div style="width:28px;height:28px;background:#1d4ed8;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;flex-shrink:0;">원</div>
+              <div>
+                <div style="font-size:11px;font-weight:900;color:#1e3a8a;">원형관 (루프드레인)</div>
+                <div style="font-size:9.5px;color:#3b82f6;font-weight:700;">KDS 표 4.4-1 · 4.4-2 조회</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:10px;">
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;">
+                <div style="color:#6b7a99;font-weight:700;margin-bottom:2px;">수직관 선정</div>
+                <div style="font-weight:700;color:#1a2744;">표 4.4-1 → DN 결정<br>단위: mm (직경)</div>
+              </div>
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;">
+                <div style="color:#6b7a99;font-weight:700;margin-bottom:2px;">수평관 선정</div>
+                <div style="font-weight:700;color:#1a2744;">표 4.4-2 → DN 결정<br>기울기 보정 적용</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 반원형 -->
+          <div style="border:1.5px solid #99f6e4;border-radius:9px;padding:10px 12px;background:#f0fffe;">
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;">
+              <div style="width:28px;height:28px;background:#0f766e;border-radius:50% 50% 0 0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;flex-shrink:0;">반</div>
+              <div>
+                <div style="font-size:11px;font-weight:900;color:#134e4a;">반원형 빗물받이</div>
+                <div style="font-size:9.5px;color:#0d9488;font-weight:700;">KDS 표 4.4-1 · 4.4-2 · 4.4-3 조회</div>
+              </div>
+              <div style="margin-left:auto;background:#f0fdfa;border:1px solid #99f6e4;border-radius:6px;padding:3px 8px;font-size:9.5px;font-weight:800;color:#0f766e;">3표 산출</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;font-size:10px;margin-bottom:6px;">
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;">
+                <div style="color:#6b7a99;font-weight:700;margin-bottom:2px;">수직관</div>
+                <div style="font-weight:700;color:#1a2744;">표 4.4-1<br>DN(mm)</div>
+              </div>
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;">
+                <div style="color:#6b7a99;font-weight:700;margin-bottom:2px;">수평관</div>
+                <div style="font-weight:700;color:#1a2744;">표 4.4-2<br>DN(mm)</div>
+              </div>
+              <div style="background:#f0fdfa;border:1.5px solid #99f6e4;border-radius:6px;padding:6px 8px;">
+                <div style="color:#0f766e;font-weight:700;margin-bottom:2px;">빗물받이</div>
+                <div style="font-weight:700;color:#134e4a;">표 4.4-3<br>폭(mm) ← 단위 상이</div>
+              </div>
+            </div>
+            <div style="background:#f0fdfa;border:1px solid #99f6e4;border-radius:5px;padding:5px 8px;font-size:9.5px;color:#134e4a;font-weight:700;">
+              ⚠ 수직·수평관 DN은 원형관과 동일하게 산정 — 빗물받이 폭이 추가로 산출됨
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 오른쪽: KDS 조문 + 수평관 기울기 + 안전율 -->
+    <div>
+
+      <!-- KDS 조문 -->
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-head"><div class="card-ico">📖</div><span class="card-tit">KDS 31 30 35 : 2021 주요 조문</span></div>
+        <div class="card-body">
+          <div class="nb blue" style="margin-bottom:7px;"><div class="nb-tit">4.4.1 관 지름 기준</div><div class="nb-txt">수직관 및 수평 지관의 크기는 해당 지역 <strong>시간최대강우량</strong>을 기준으로 한다.</div></div>
+          <div class="nb blue" style="margin-bottom:7px;"><div class="nb-tit">4.4.2 우수 수직관</div><div class="nb-txt"><strong>표 4.4-1</strong> — 최대 수평투영 지붕면적 기준 DN 선정. 루프드레인 시 수직벽 면적 ½ 가산.</div></div>
+          <div class="nb blue" style="margin-bottom:7px;"><div class="nb-tit">4.4.3 우수 수평관</div><div class="nb-txt"><strong>표 4.4-2</strong> — 수평 기울기 1/25 이하 우수배관 적용. 수평지관 기울기 1/100 이상 유지.</div></div>
+          <div class="nb blue"><div class="nb-tit">4.4.4 반원형 빗물받이</div><div class="nb-txt"><strong>표 4.4-3</strong> — 폭(mm) 기준 선정. DN 단위와 상이하므로 혼용 주의.</div></div>
+        </div>
+      </div>
+
+      <!-- 수평관 기울기 조건 -->
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-head"><div class="card-ico">📐</div><span class="card-tit">수평관 기울기 보정 조건</span><span class="cbadge">√(100/n) 보정</span></div>
+        <div class="card-body">
+          <div style="overflow-x:auto;border-radius:8px;border:1px solid #e2e8f0;margin-bottom:9px;">
+            <table style="width:100%;border-collapse:collapse;font-size:11px;">
+              <thead>
+                <tr style="background:#eff6ff;">
+                  <th style="padding:7px 10px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;">기울기</th>
+                  <th style="padding:7px 10px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;">보정계수</th>
+                  <th style="padding:7px 10px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;">dc_h 변화</th>
+                  <th style="padding:7px 10px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;">결과 영향</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;">1/100</td>
+                  <td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">√1.0 = 1.000</td>
+                  <td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;">보정 없음</td>
+                  <td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-weight:700;color:#15803d;">기준값</td>
+                </tr>
+                <tr style="background:#f8fafd;">
+                  <td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;">1/50</td>
+                  <td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">√2.0 = 1.414</td>
+                  <td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;">dc ÷ 1.414</td>
+                  <td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-weight:700;color:#15803d;">관경 ↓ 가능</td>
+                </tr>
+                <tr>
+                  <td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;">1/25</td>
+                  <td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">√4.0 = 2.000</td>
+                  <td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;">dc ÷ 2.000</td>
+                  <td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-weight:700;color:#15803d;">관경 최소화</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="nb blue" style="margin-bottom:0;"><div class="nb-tit">ℹ️ 원리</div><div class="nb-txt">기울기가 급할수록 관 내 유속 증가 → 같은 단면에서 더 많은 유량 처리 가능 → 필요 단면적(dc_h) 감소 → 소구경 선정 가능. KDS 표 4.4-2는 1/100 기준이므로 다른 기울기 시 √(100/n)으로 환산.</div></div>
+        </div>
+      </div>
+
+      <!-- 안전율 + 주의사항 -->
+      <div class="card">
+        <div class="card-head"><div class="card-ico">🛡️</div><span class="card-tit">안전 여유율 및 주의사항</span></div>
+        <div class="card-body">
+          <div style="overflow-x:auto;border-radius:8px;border:1px solid #e2e8f0;margin-bottom:9px;">
+            <table style="width:100%;border-collapse:collapse;font-size:11px;">
+              <thead>
+                <tr style="background:#eff6ff;">
+                  <th style="padding:7px 10px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;">안전율</th>
+                  <th style="padding:7px 10px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;">적용 승수</th>
+                  <th style="padding:7px 10px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;">권장 적용 상황</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;font-weight:700;">0%</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">× 1.00</td><td style="padding:6px 10px;border:1px solid #e2e8f0;color:#64748b;">기준값만 적용 (보수적 지역)</td></tr>
+                <tr style="background:#f8fafd;"><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;font-weight:700;">+10%</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">× 1.10</td><td style="padding:6px 10px;border:1px solid #e2e8f0;color:#64748b;">일반 건축물 최소 여유</td></tr>
+                <tr><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;font-weight:700;color:#1d4ed8;">+20%</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;font-weight:700;color:#1d4ed8;">× 1.20</td><td style="padding:6px 10px;border:1px solid #e2e8f0;font-weight:700;color:#1d4ed8;">권장값 — 집중호우·기후변화 대응</td></tr>
+                <tr style="background:#f8fafd;"><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;font-weight:700;">+30%</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">× 1.30</td><td style="padding:6px 10px;border:1px solid #e2e8f0;color:#64748b;">고위험 지역·대형 건축물</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="nb org"><div class="nb-tit">⚠️ 설계 주의사항</div><div class="nb-txt">· 산정된 관경은 <strong>최솟값</strong> — 실시설계 시 상위 규격 검토 권장<br>· 수평관 연결부·곡관 등 마찰손실 별도 고려<br>· 옥내 배관은 내식성 재질(스테인리스·PVC) 사용 권장<br>· 반원형 빗물받이 폭(mm) ≠ 원형관 DN(mm) — 단위 혼용 금지<br>· 기상청 자료는 최신값(data.kma.go.kr) 확인 후 적용</div></div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -724,15 +1002,23 @@ input[type="number"]{-moz-appearance:textfield;}
     </div>
     <div class="modal-body">
       <div style="background:#f8fafd;border:1.5px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:13px;text-align:center">
-        <div style="font-size:10px;font-weight:700;color:#6b7a99;margin-bottom:10px">▶ 단계별 계산식</div>
-        <div style="font-size:14px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;margin-bottom:5px">A_eff = A_roof + A_wall × 0.5</div>
-        <div style="font-size:11px;color:#64748b;margin-bottom:11px">유효면적 = 수평투영면적 + 수직벽면적 × ½</div>
-        <div style="font-size:14px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;margin-bottom:5px">A_conv = A_eff × (R ÷ 100) × SF</div>
-        <div style="font-size:11px;color:#64748b;margin-bottom:11px">환산면적 = 유효면적 × (강우량 ÷ 100) × 안전율</div>
-        <div style="font-size:14px;font-weight:900;color:#f97316;font-family:'JetBrains Mono',monospace;margin-bottom:5px">A_drain = A_conv ÷ N</div>
-        <div style="font-size:11px;color:#64748b">드레인당 분담면적 = 환산면적 ÷ 드레인 개수</div>
+        <div style="font-size:10px;font-weight:700;color:#6b7a99;margin-bottom:10px">▶ 단계별 계산식 (지붕형태 보정 포함)</div>
+        <div style="font-size:13px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;margin-bottom:3px">A_base = A_roof × RF + A_wall × 0.5</div>
+        <div style="font-size:10.5px;color:#64748b;margin-bottom:10px">RF : 지붕형태 면적보정계수 (평지붕=1.0 / 경사=secθ / 밸리=1.0)</div>
+        <div style="font-size:13px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;margin-bottom:3px">A_conv = A_base × (R ÷ 100) × SF × VF</div>
+        <div style="font-size:10.5px;color:#64748b;margin-bottom:10px">VF : 밸리형 집수집중계수 (평·경사=1.0 / 밸리=1.10~1.30)</div>
+        <div style="font-size:13px;font-weight:900;color:#f97316;font-family:'JetBrains Mono',monospace;margin-bottom:3px">A_drain = A_conv ÷ N</div>
+        <div style="font-size:10.5px;color:#64748b">드레인당 분담 환산면적 → KDS 표 조회</div>
       </div>
-      <div class="nb blue" style="margin-bottom:10px"><div class="nb-tit">📊 변수 설명</div><div class="nb-txt"><strong>A_eff</strong> : 유효 수평투영 지붕면적 (m²)<br><strong>A_roof</strong> : 수평투영 지붕면적 (m²)<br><strong>A_wall</strong> : 수직벽 면적 (m²) — 루프드레인 시 ½ 가산<br><strong>R</strong> : 해당 지점 시간최대강우량 (mm/hr) — 기상청<br><strong>SF</strong> : 안전 여유율 (예: 1.20 = +20%)<br><strong>N</strong> : 우수 드레인 설치 개수<br><strong>A_drain</strong> : 드레인 1개당 분담 환산면적 → KDS 표 조회</div></div>
+      <div class="nb blue" style="margin-bottom:10px"><div class="nb-tit">📊 변수 설명</div><div class="nb-txt">
+        <strong>A_base</strong> : 지붕형태 보정 후 유효면적 (m²)<br>
+        <strong>A_roof</strong> : 수평투영 지붕면적 (m²)<br>
+        <strong>RF</strong> : 면적보정계수 — 평지붕 1.0, 경사지붕 1/cosθ (secθ), 밸리형 1.0<br>
+        <strong>A_wall</strong> : 수직벽 면적 — 루프드레인 시 ½ 가산 (KDS 4.4.2)<br>
+        <strong>R</strong> : 시간최대강우량 (mm/hr) — 기상청<br>
+        <strong>SF</strong> : 안전 여유율 (1.00~1.30)<br>
+        <strong>VF</strong> : 밸리형 집수 집중계수 (1.10/1.20/1.30)<br>
+        <strong>N</strong> : 우수 드레인 설치 개수</div></div>
       <div class="nb grn" style="margin-bottom:10px"><div class="nb-tit">📋 KDS 표 조회 방법</div><div class="nb-txt">A_drain 값을 KDS 31 30 35 : 2021 <strong>표 4.4-1</strong> (100mm/hr 열)에서 해당 값 이상인 최소 관경(DN)을 선택합니다.<br>수평관은 <strong>표 4.4-2</strong>, 반원형 빗물받이는 <strong>표 4.4-3</strong> 동일 적용.</div></div>
       <div class="nb org"><div class="nb-tit">💡 적용 예시</div><div class="nb-txt">지역: 서울 (98.5mm/hr) / 면적: 500m² / 드레인: 4개 / 안전율: +20%<br>→ A_eff = 500m²<br>→ A_conv = 500 × (98.5÷100) × 1.20 = <strong>591m²</strong><br>→ A_drain = 591 ÷ 4 = <strong>147.75m²</strong><br>→ 표 4.4-1 → DN125 (215m²) 선정 ✓</div></div>
     </div>
@@ -790,6 +1076,8 @@ let S={
   sido:'',sigun:'',rainfall:null,station:'',period:'',stationNo:0,
   projName:'만민 건축사 신사옥 신축공사',projDate:'',
   area:0,wall:0,rooftype:'flat',
+  slopeAngle:30,   // 경사지붕: 경사각(도)
+  valleyFactor:1.20, // 밸리형: 집수 집중계수
   drains:1,drainMode:'manual',
   pipetype:'circular',material:'pvc',slope:100,safety:20,
   hasResult:false,result:null
@@ -1020,6 +1308,30 @@ function getEffAreaAndWall(){
   };
 }
 
+/* ═══════ ROOF TYPE UI 전환 ═══════ */
+function onRoofTypeChange(){
+  const rt=document.getElementById('sel-rooftype').value;
+  document.getElementById('slope-angle-group').style.display = rt==='slope'?'block':'none';
+  document.getElementById('valley-group').style.display       = rt==='valley'?'block':'none';
+  updateRoofInfoCard(rt);
+  liveCalc();
+}
+
+function updateRoofInfoCard(rt){
+  const el=document.getElementById('roof-info-card');
+  if(!el)return;
+  const cfg={
+    flat:{cls:'blue',ico:'🏢',tit:'평지붕 (옥상)',
+      txt:'방수층이 시공된 수평 지붕입니다.<br>유출계수 최고(C≈0.90), 수직벽 면적 ½ 가산.<br>수평투영 면적이 그대로 유효면적으로 사용됩니다.'},
+    slope:{cls:'grn',ico:'🏠',tit:'경사지붕',
+      txt:'기와·슬레이트 등 경사가 있는 지붕입니다.<br>실 지붕면 = 수평투영 × <b>secθ</b> — 경사각이 클수록 유효면적 증가.<br>경사각 θ를 아래에 입력하면 자동 보정됩니다.'},
+    valley:{cls:'org',ico:'🏘️',tit:'밸리형 복합지붕',
+      txt:'두 경사면이 만나는 골(Valley) 구조입니다.<br>빗물이 밸리 집수선에 집중되어 집중계수(VF) 적용.<br>배수구를 밸리 최저점에 반드시 배치하세요.'}
+  };
+  const c=cfg[rt]||cfg.flat;
+  el.innerHTML=`<div class="nb ${c.cls}"><div class="nb-tit">${c.ico} ${c.tit}</div><div class="nb-txt">${c.txt}</div></div>`;
+}
+
 /* ═══════ LIVE CALC ═══════ */
 function liveCalc(){
   const aw=getEffAreaAndWall();
@@ -1027,6 +1339,14 @@ function liveCalc(){
   S.projName=(document.getElementById('inp-projname').value||'').trim();
   S.projDate=document.getElementById('inp-projdate').value||'';
   S.rooftype=zoneMode==='single'?(document.getElementById('sel-rooftype').value):'flat';
+  S.slopeAngle=parseFloat(document.getElementById('inp-slope-angle')?.value)||30;
+  S.valleyFactor=parseFloat(document.getElementById('sel-valley-factor')?.value)||1.20;
+  // secθ 디스플레이 갱신
+  if(S.rooftype==='slope'){
+    const sec=(1/Math.cos(S.slopeAngle*Math.PI/180));
+    const el=document.getElementById('slope-sec-display');
+    if(el)el.textContent=sec.toFixed(3);
+  }
   S.pipetype=document.getElementById('sel-pipetype').value;
   S.material=document.getElementById('sel-material').value;
   S.slope=parseInt(document.getElementById('sel-slope').value);
@@ -1039,57 +1359,106 @@ function liveCalc(){
 /* ═══════ CORE CALC ═══════ */
 function doCalc(){
   if(!S.rainfall||S.area<=0)return;
-  const wc=S.wall*0.5,ea=S.area+wc,SF=1+S.safety/100;
-  const ct=ea*(S.rainfall/100)*SF,dc=ct/S.drains,de=ea/S.drains;
-  const fl=ea*S.rainfall/60;
-  // 수평관 기울기 보정: KDS 표 4.4-2는 1/100 기준
-  // 기울기 1/n → 허용유량 ∝ √(1/n), 환산면적 보정계수 = √(100/n)
-  const slopeN=S.slope; // 100, 50, 25
-  const slopeFactor=Math.sqrt(100/slopeN); // 1.0, 1.414, 2.0
-  const dc_h=dc/slopeFactor; // 수평관용 보정 환산면적 (더 작아져 작은 관경 선택 가능)
-  const vp=findPipe(VT,dc),hp=findPipe(HT,dc_h),gp=findPipe(GT,dc);
-  S.hasResult=true;
-  S.result={ea,wc,ct,dc,dc_h,de,fl,vp,hp,gp,SF,slopeN,slopeFactor,zoneMode,zonesSnap:JSON.parse(JSON.stringify(zones))};
-  // show result area
-  document.getElementById('no-result-card').style.display='none';
-  document.getElementById('result-area').style.display='block';
-  // hero
-  document.getElementById('res-main-dn').textContent=vp.dn;
-  document.getElementById('res-main-desc').textContent=S.station+' '+S.rainfall+'mm/hr · 드레인 '+S.drains+'개 · 개당 '+fmtN(de,1)+'m²';
-  document.getElementById('res-eff-area').textContent=fmtN(ea,1);
-  document.getElementById('res-rainfall').textContent=S.rainfall;
-  document.getElementById('res-flow').textContent=fmtN(fl,0);
-  // calc box
-  document.getElementById('cv-area').textContent=fmtN(S.area,1)+' m²';
-  document.getElementById('cv-wall').textContent=wc>0?'+'+fmtN(wc,1)+' m²':'없음 (0)';
-  document.getElementById('cv-eff').textContent=fmtN(ea,1)+' m²';
-  document.getElementById('cv-rain').textContent=S.rainfall+' mm/hr';
-  document.getElementById('cv-conv').textContent=fmtN(ea,1)+'×('+S.rainfall+'/100)×'+SF.toFixed(2)+' = '+fmtN(ct,1)+' m²';
-  document.getElementById('cv-zone').textContent=fmtN(ct,1)+'÷'+S.drains+' = '+fmtN(dc,1)+' m²';
-  document.getElementById('cv-result').textContent='DN '+vp.dn+'mm (표 최대 '+vp.maxArea+' m²)';
-  // 수평관 기울기 보정 표시
-  const slopeEl=document.getElementById('cv-slope-h');
+
+  /* ── 지붕형태 보정계수 ── */
+  // RF: 면적보정계수 (경사지붕: secθ, 나머지: 1.0)
+  const thetaRad = S.slopeAngle * Math.PI / 180;
+  const RF = S.rooftype==='slope' ? (1/Math.cos(thetaRad)) : 1.0;
+  // VF: 밸리형 집수집중계수 (밸리형에만 적용)
+  const VF = S.rooftype==='valley' ? S.valleyFactor : 1.0;
+
+  /* ── 면적 산정 ── */
+  const wc  = S.wall * 0.5;                    // 수직벽 보정
+  const ea  = S.area * RF + wc;                // 유효면적 (RF 반영)
+  const SF  = 1 + S.safety / 100;
+  const ct  = ea * (S.rainfall / 100) * SF * VF; // 환산면적 (VF 반영)
+  const dc  = ct / S.drains;
+  const de  = ea / S.drains;
+  const fl  = ea * S.rainfall / 60;
+
+  /* ── 수평관 기울기 보정 ── */
+  const slopeN      = S.slope;
+  const slopeFactor = Math.sqrt(100 / slopeN);
+  const dc_h        = dc / slopeFactor;
+
+  const vp = findPipe(VT, dc);
+  const hp = findPipe(HT, dc_h);
+  const gp = findPipe(GT, dc);
+
+  S.hasResult = true;
+  S.result = {
+    ea, wc, ct, dc, dc_h, de, fl,
+    vp, hp, gp, SF, slopeN, slopeFactor,
+    RF, VF, thetaDeg: S.slopeAngle,
+    zoneMode, zonesSnap: JSON.parse(JSON.stringify(zones))
+  };
+
+  /* ── DOM 업데이트 ── */
+  document.getElementById('no-result-card').style.display = 'none';
+  document.getElementById('result-area').style.display    = 'block';
+
+  document.getElementById('res-main-dn').textContent   = vp.dn;
+  document.getElementById('res-main-desc').textContent = S.station+' '+S.rainfall+'mm/hr · 드레인 '+S.drains+'개 · 개당 '+fmtN(de,1)+'m²';
+  document.getElementById('res-eff-area').textContent  = fmtN(ea,1);
+  document.getElementById('res-rainfall').textContent  = S.rainfall;
+  document.getElementById('res-flow').textContent      = fmtN(fl,0);
+
+  /* 산정 과정 표시 */
+  document.getElementById('cv-area').textContent  = fmtN(S.area,1)+' m²';
+  document.getElementById('cv-wall').textContent  = wc>0 ? '+'+fmtN(wc,1)+' m²' : '없음 (0)';
+
+  // 지붕형태 보정 행 동적 갱신
+  const roofRowEl    = document.getElementById('cv-roof-factor');
+  const roofCrowEl   = document.getElementById('crow-roof-factor');
+  if(roofRowEl && roofCrowEl){
+    if(S.rooftype==='slope'){
+      roofCrowEl.style.display='flex';
+      roofRowEl.textContent='경사지붕 secθ ('+S.slopeAngle+'°) = '+RF.toFixed(3)
+        +' → '+fmtN(S.area,1)+'×'+RF.toFixed(3)+' = '+fmtN(S.area*RF,1)+' m²';
+    } else if(S.rooftype==='valley'){
+      roofCrowEl.style.display='flex';
+      roofRowEl.textContent='밸리형 집수집중계수 VF='+VF.toFixed(2)+' 환산면적에 적용';
+    } else {
+      roofCrowEl.style.display='none';
+    }
+  }
+
+  document.getElementById('cv-eff').textContent  = fmtN(ea,1)+' m²';
+  document.getElementById('cv-rain').textContent = S.rainfall+' mm/hr';
+  document.getElementById('cv-conv').textContent =
+    fmtN(ea,1)+'×('+S.rainfall+'/100)×'+SF.toFixed(2)
+    +(VF!==1.0?'×VF'+VF.toFixed(2):'')
+    +' = '+fmtN(ct,1)+' m²';
+  document.getElementById('cv-zone').textContent   = fmtN(ct,1)+'÷'+S.drains+' = '+fmtN(dc,1)+' m²';
+  document.getElementById('cv-result').textContent = 'DN '+vp.dn+'mm (표 최대 '+vp.maxArea+' m²)';
+
+  const slopeEl   = document.getElementById('cv-slope-h');
+  const slopeElDc = document.getElementById('cv-slope-h-dc');
   if(slopeEl){
-    if(slopeN===100){slopeEl.textContent='1/100 (보정 없음, dc_h = dc)';}
-    else{slopeEl.textContent='1/'+slopeN+' → 배율 √(100/'+slopeN+')='+slopeFactor.toFixed(3);}
+    slopeEl.textContent = slopeN===100
+      ? '1/100 (보정 없음, dc_h = dc)'
+      : '1/'+slopeN+' → 배율 √(100/'+slopeN+')='+slopeFactor.toFixed(3);
   }
-  const slopeElDc=document.getElementById('cv-slope-h-dc');
   if(slopeElDc){
-    if(slopeN===100){slopeElDc.textContent=dc.toFixed(1)+' m² (보정 없음)';}
-    else{slopeElDc.textContent=dc.toFixed(1)+' ÷ '+slopeFactor.toFixed(3)+' = '+dc_h.toFixed(1)+' m²';}
+    slopeElDc.textContent = slopeN===100
+      ? dc.toFixed(1)+' m² (보정 없음)'
+      : dc.toFixed(1)+' ÷ '+slopeFactor.toFixed(3)+' = '+dc_h.toFixed(1)+' m²';
   }
-  // pipe candidates
-  renderCandidates('vresults',VT,dc);
-  renderCandidates('hresults',HT,dc_h);
-  if(S.pipetype==='semi'){document.getElementById('gutter-card').style.display='block';renderCandidates('gresults',GT,dc);}
-  else document.getElementById('gutter-card').style.display='none';
-  // drain detail
-  renderDrainDetail(de,dc,vp,hp,gp,ct,ea);
-  // count
-  renderCountSummary(vp.dn,hp.dn,gp.dn);
+
+  renderCandidates('vresults', VT, dc);
+  renderCandidates('hresults', HT, dc_h);
+  if(S.pipetype==='semi'){
+    document.getElementById('gutter-card').style.display='block';
+    renderCandidates('gresults', GT, dc);
+  } else {
+    document.getElementById('gutter-card').style.display='none';
+  }
+
+  renderDrainDetail(de, dc, vp, hp, gp, ct, ea);
+  renderCountSummary(vp.dn, hp.dn, gp.dn);
   updateSteps();
-  // auto-update previews if tabs already open
-  if(document.getElementById('panel-a4').classList.contains('active'))renderA4();
+
+  if(document.getElementById('panel-a4').classList.contains('active'))    renderA4();
   if(document.getElementById('panel-mobile').classList.contains('active'))renderMobile();
 }
 
@@ -1329,11 +1698,23 @@ function renderA4(){
     <div class="a4-sub" style="break-after:avoid;page-break-after:avoid;">3. 계산 과정</div>
     <table class="a4-tbl"><thead style="display:table-header-group;"><tr><th>단계</th><th>계산식</th><th>결과</th></tr></thead><tbody>
       <tr style="break-inside:avoid;page-break-inside:avoid;"><td>① 수직벽 면적 보정</td><td>${S.wall} m² × 0.5</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">+${fmtN(R.wc,1)} m²</td></tr>
-      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>② 유효 지붕면적</td><td>${S.area} + ${R.wc.toFixed(1)}</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">${fmtN(R.ea,1)} m²</td></tr>
-      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>③ 강우량 보정 환산면적</td><td>${R.ea.toFixed(1)} × (${S.rainfall} ÷ 100) × ${R.SF.toFixed(2)}</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">${fmtN(R.ct,1)} m²</td></tr>
-      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>④ 드레인당 환산면적</td><td>${R.ct.toFixed(1)} ÷ ${S.drains}개</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">${fmtN(R.dc,1)} m²</td></tr>
-      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>⑤ 수직관 관경 선정</td><td>표 4.4-1 조회 (≥ ${R.dc.toFixed(1)} m²)</td><td style="text-align:right;font-weight:900;color:#1d4ed8">DN ${R.vp.dn}mm <span style="color:#6b7a99;font-weight:600">(허용 ${R.vp.maxArea}m²)</span></td></tr>
-      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>⑥ 수평관 관경 선정</td><td>표 4.4-2 조회, 기울기 1/${S.slope} 보정</td><td style="text-align:right;font-weight:900;color:#1d4ed8">DN ${R.hp.dn}mm <span style="color:#6b7a99;font-weight:600">(허용 ${R.hp.maxArea}m²)</span></td></tr>
+      ${(()=>{
+        if(S.rooftype==='slope'){
+          return '<tr style="background:#fff7ed;break-inside:avoid;"><td style="font-weight:800;color:#c2410c">② 경사지붕 면적 보정</td>'
+            +'<td>'+S.area+' m² × secθ('+R.thetaDeg+'°) = '+S.area+' × '+R.RF.toFixed(3)+'</td>'
+            +'<td style="text-align:right;font-family:\'JetBrains Mono\',monospace;font-weight:900;color:#c2410c">'+fmtN(S.area*R.RF,1)+' m²</td></tr>';
+        } else if(S.rooftype==='valley'){
+          return '<tr style="background:#fff7ed;break-inside:avoid;"><td style="font-weight:800;color:#c2410c">② 밸리형 집수집중 보정</td>'
+            +'<td>집수집중계수 VF = '+R.VF.toFixed(2)+' (환산면적에 적용)</td>'
+            +'<td style="text-align:right;font-family:\'JetBrains Mono\',monospace;font-weight:900;color:#c2410c">×'+R.VF.toFixed(2)+'</td></tr>';
+        }
+        return '';
+      })()}
+      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'②':'③'} 유효 지붕면적</td><td>${S.rooftype==='slope'?(fmtN(S.area*R.RF,1)):S.area} + ${R.wc.toFixed(1)}</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">${fmtN(R.ea,1)} m²</td></tr>
+      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'③':'④'} 강우량 보정 환산면적</td><td>${R.ea.toFixed(1)} × (${S.rainfall} ÷ 100) × ${R.SF.toFixed(2)}${R.VF!==1.0?' × VF'+R.VF.toFixed(2):''}</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">${fmtN(R.ct,1)} m²</td></tr>
+      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'④':'⑤'} 드레인당 환산면적</td><td>${R.ct.toFixed(1)} ÷ ${S.drains}개</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">${fmtN(R.dc,1)} m²</td></tr>
+      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'⑤':'⑥'} 수직관 관경 선정</td><td>표 4.4-1 조회 (≥ ${R.dc.toFixed(1)} m²)</td><td style="text-align:right;font-weight:900;color:#1d4ed8">DN ${R.vp.dn}mm <span style="color:#6b7a99;font-weight:600">(허용 ${R.vp.maxArea}m²)</span></td></tr>
+      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'⑥':'⑦'} 수평관 관경 선정</td><td>표 4.4-2 조회, 기울기 1/${S.slope} 보정</td><td style="text-align:right;font-weight:900;color:#1d4ed8">DN ${R.hp.dn}mm <span style="color:#6b7a99;font-weight:600">(허용 ${R.hp.maxArea}m²)</span></td></tr>
     </tbody></table>
   </div>
 
@@ -1469,7 +1850,9 @@ function printA4(){
 
 /* ═══════ RESET ═══════ */
 function resetAll(){
-  S={sido:'',sigun:'',rainfall:null,station:'',period:'',stationNo:0,area:0,wall:0,rooftype:'flat',drains:1,drainMode:'manual',pipetype:'circular',material:'pvc',slope:100,safety:20,hasResult:false,result:null};
+  S={sido:'',sigun:'',rainfall:null,station:'',period:'',stationNo:0,area:0,wall:0,
+    rooftype:'flat',slopeAngle:30,valleyFactor:1.20,
+    drains:1,drainMode:'manual',pipetype:'circular',material:'pvc',slope:100,safety:20,hasResult:false,result:null};
   document.getElementById('sel-sido').value='';
   document.getElementById('sel-sigun').innerHTML='<option value="">-- 선택 --</option>';
   document.getElementById('regionGrid').innerHTML='';
@@ -1487,6 +1870,14 @@ function resetAll(){
   document.getElementById('sel-drain-mode').value='manual';
   document.getElementById('drain-count-group').style.display='block';
   document.getElementById('drain-auto-group').style.display='none';
+  // 지붕형태 초기화
+  document.getElementById('sel-rooftype').value='flat';
+  document.getElementById('slope-angle-group').style.display='none';
+  document.getElementById('valley-group').style.display='none';
+  document.getElementById('roof-info-card').innerHTML='';
+  if(document.getElementById('inp-slope-angle'))document.getElementById('inp-slope-angle').value='30';
+  if(document.getElementById('slope-sec-display'))document.getElementById('slope-sec-display').textContent='1.000';
+  if(document.getElementById('sel-valley-factor'))document.getElementById('sel-valley-factor').value='1.20';
   document.getElementById('no-result-card').style.display='block';
   document.getElementById('result-area').style.display='none';
   // 구간 초기화
