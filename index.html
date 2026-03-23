@@ -280,38 +280,49 @@ input[type="number"]{-moz-appearance:textfield;}
 .mob-footer{font-size:8px;color:#94a3b8;text-align:center;padding:7px;}
 @media(max-width:430px){.mob-device{width:100%;}}
 
-/* ── PRINT (ISO A4 기준 — 참조: MANMIN-Ver3.0) ── */
-@page{size:A4 portrait;margin:8mm 8mm 19mm;}
+/* ── PRINT (ISO A4 기준) ── */
+@page{size:A4 portrait;margin:12mm 10mm 14mm;}
 @media print{
-  *,*::before,*::after{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
-  /* 배경색/테두리 강제 출력 */
-  .a4-ic-inner,.a4-sc-inner,.a4-rbox,.a4-tbl th,.a4-tbl tfoot td{
+  /* ❶ 배경색·테두리 강제 출력 (전체) */
+  *,*::before,*::after{
     -webkit-print-color-adjust:exact!important;
     print-color-adjust:exact!important;
+    color-adjust:exact!important;
   }
-  /* 폰트 강제 */
-  .a4-iv,.a4-rnum,.a4-stat-tbl td div{
-    font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif!important;
-  }
+  /* ❷ 폰트 전체 강제 (웹폰트 누락 대비 시스템 폰트 fallback 포함) */
+  *{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif!important;}
+  .mono,
+  .a4-iv,
+  .a4-rnum{font-family:'JetBrains Mono','Courier New',monospace!important;}
+
+  /* ❸ 화면 레이아웃 숨기고 인쇄 타깃만 표시 */
   .no-print{display:none!important;}
-  /* ❷ fix: html/body/root-app 모두 숨기고 인쇄 타깃만 표시 */
   html,body{margin:0!important;padding:0!important;width:auto!important;background:#fff!important;}
   #root-app{display:none!important;}
   #a4-print-target{display:block!important;}
-  /* 인쇄용 a4-page: 패딩 제거, 100% 너비 */
-  #a4-print-target .a4-page{padding:15px 23px 28px!important;width:100%!important;box-shadow:none!important;min-height:auto!important;box-sizing:border-box!important;}
-  /* ── 섹션 페이지 나눔 제어 ── */
-  /* 기본 섹션: 내부 분리 방지 */
+
+  /* ❹ a4-page: box-shadow 제거, 전체 너비, padding은 @page margin과 겹치지 않게 0 */
+  #a4-print-target .a4-page{
+    padding:0!important;
+    width:100%!important;
+    box-shadow:none!important;
+    min-height:auto!important;
+    box-sizing:border-box!important;
+    font-size:10.5px!important;
+  }
+
+  /* ❺ 섹션 페이지 나눔 제어 */
   .a4-section{break-inside:avoid;page-break-inside:avoid;}
-  /* 긴 테이블 포함 섹션: 분리 허용 (테이블 행 단위 제어) */
   .a4-section.allow-break{break-inside:auto!important;page-break-inside:auto!important;}
-  /* 테이블 자체: 행 단위 나눔 허용, 헤더 반복 */
+  .a4-section.page-aware{break-before:auto;page-break-before:auto;}
+
+  /* ❻ 테이블: 행 단위 나눔 허용, 헤더 반복 */
   .a4-tbl{break-inside:auto;page-break-inside:auto;width:100%;}
   .a4-tbl thead{display:table-header-group;}
   .a4-tbl tr{break-inside:avoid;page-break-inside:avoid;}
-  /* 테이블 포함 섹션이 페이지 경계 걸리면 → 다음 페이지 시작 */
-  .a4-section.page-aware{break-before:auto;page-break-before:auto;}
-  /* 나머지 블록 */
+  .a4-sub+table,.a4-sub+.a4-tbl{break-before:avoid;page-break-before:avoid;}
+
+  /* ❼ 기타 블록 분리 방지 */
   .a4-igrid{break-inside:avoid;page-break-inside:avoid;display:grid!important;grid-template-columns:1fr 1fr!important;}
   .a4-igrid .a4-ic{display:block!important;}
   .a4-rbox{break-inside:avoid;page-break-inside:avoid;}
@@ -322,22 +333,26 @@ input[type="number"]{-moz-appearance:textfield;}
   .a4-cond-tbl td{width:50%!important;}
   .a4-sub{break-after:avoid;page-break-after:avoid;color:#1d4ed8!important;border-left-color:#1d4ed8!important;}
   .a4-tit{break-inside:avoid;page-break-inside:avoid;}
-  /* 섹션 제목(.a4-sub) 바로 다음에 테이블이 오면 제목+테이블 같이 이동 */
-  .a4-sub+table,.a4-sub+.a4-tbl{break-before:avoid;page-break-before:avoid;}
-  /* 바닥글 문서흐름 내 처리 */
+
+  /* ❽ 바닥글: table 방식으로 좌우 정렬 안정화 (flex가 일부 엔진에서 깨짐) */
   .a4-footer{
-    margin-top:16px;
-    border-top:1px solid #e2e8f0;
+    margin-top:14px;
+    border-top:1px solid #e2e8f0!important;
     padding-top:6px;
-    display:flex;
-    justify-content:space-between;
+    display:table!important;
+    width:100%!important;
     font-size:8px;
-    color:#94a3b8;
+    color:#94a3b8!important;
     font-weight:600;
     break-inside:avoid;
     page-break-inside:avoid;
   }
-  /* ❸ fix: 모바일 폰트 강제(16px)가 인쇄 시 A4 레이아웃 깨지는 것 방지 */
+  .a4-footer span{display:table-cell!important;width:33.33%!important;}
+  .a4-footer span:first-child{text-align:left!important;}
+  .a4-footer span:nth-child(2){text-align:center!important;}
+  .a4-footer span:last-child{text-align:right!important;}
+
+  /* ❾ 모바일 font-size:16px 강제 → 인쇄 레이아웃 깨짐 방지 */
   input,select,textarea{font-size:inherit!important;}
 }
 
@@ -1833,19 +1848,40 @@ function closeModalOv(e){if(e.target===document.getElementById('calcModal'))clos
 
 /* ═══════ PRINT ═══════ */
 function printA4(){
-  renderA4();
-  var src=document.getElementById('a4-page').outerHTML;
-  var pt=document.getElementById('a4-print-target');
-  pt.innerHTML=src;
-  pt.style.display='block';
-  // 인쇄 창 닫힌 후 확실하게 정리 (onafterprint)
-  function cleanup(){
-    pt.innerHTML='';
-    pt.style.display='none';
-    window.removeEventListener('afterprint',cleanup);
+  // ❶ 결과 없으면 사전 안내
+  if(!S.hasResult||!S.result){
+    showToast('⚠️ 산정 결과가 없습니다. 관경 산정 탭에서 조건을 입력해주세요.');
+    return;
   }
-  window.addEventListener('afterprint',cleanup);
-  window.print();
+
+  renderA4();
+
+  // ❷ DOM 렌더링 완료 후 인쇄 타깃에 복사 (rAF × 2)
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      var page=document.getElementById('a4-page');
+      if(!page){showToast('⚠️ 인쇄 콘텐츠를 생성할 수 없습니다.');return;}
+
+      var pt=document.getElementById('a4-print-target');
+
+      // ❸ innerHTML 복사 (outerHTML 사용 시 id=a4-page 중복 방지)
+      pt.innerHTML='<div class="a4-page" style="padding:15px 23px 28px;width:100%;box-shadow:none;min-height:auto;box-sizing:border-box;">'
+                  +page.innerHTML
+                  +'</div>';
+      pt.style.display='block';
+
+      // ❹ afterprint 정리
+      function cleanup(){
+        pt.innerHTML='';
+        pt.style.display='none';
+        window.removeEventListener('afterprint',cleanup);
+      }
+      window.addEventListener('afterprint',cleanup);
+
+      // ❺ 레이아웃 안정화 후 인쇄 (16ms 딜레이)
+      setTimeout(function(){window.print();},16);
+    });
+  });
 }
 
 /* ═══════ RESET ═══════ */
