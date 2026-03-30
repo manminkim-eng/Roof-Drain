@@ -436,17 +436,20 @@ input[type="number"]{-moz-appearance:textfield;}
 
   /* ❸ 화면 레이아웃 숨기고 인쇄 타깃만 표시 */
   .no-print{display:none!important;}
+  .fab-calc,.fab-tooltip{display:none!important;}
+  #pwa-banner,#pwa-hdr-btn{display:none!important;}
   html,body{margin:0!important;padding:0!important;width:auto!important;background:#fff!important;}
   #root-app{display:none!important;}
   #a4-print-target{display:block!important;}
 
-  /* ❹ a4-page: box-shadow 제거, 전체 너비, padding은 @page margin과 겹치지 않게 0 */
+  /* ❹ a4-page: box-shadow/min-height 제거, padding은 CSS 그대로 유지
+     (@page margin으로 용지 여백 확보, a4-page padding으로 내부 여백 확보) */
   #a4-print-target .a4-page{
-    padding:0!important;
     width:100%!important;
     box-shadow:none!important;
     min-height:auto!important;
     box-sizing:border-box!important;
+    transform:none!important;
     font-size:10.5px!important;
   }
 
@@ -537,7 +540,7 @@ input[type="number"]{-moz-appearance:textfield;}
   transform:translateX(-50%);
 }
 .fab-tooltip.show{opacity:1;}
-@media print{.fab-calc,.fab-tooltip{display:none!important;}}
+/* FAB 인쇄 숨김: 메인 @media print 블록으로 통합 */
 
 /* ── iOS Safari 폼 입력 자동 줌 방지 (font-size 16px 이상 강제) ── */
 @media screen and (max-width:768px){
@@ -684,7 +687,7 @@ input[type="number"]{-moz-appearance:textfield;}
 .pwa-no{background:rgba(255,255,255,.1);color:#93c5fd;border:1px solid rgba(147,197,253,.3);padding:9px 11px;border-radius:7px;font-size:.8rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;}
 .pwa-no:hover{color:#eff6ff;}
 @media(max-width:460px){.pwa-desc{display:none;}}
-@media print{#pwa-banner,#pwa-hdr-btn{display:none!important;}}
+/* PWA 배너 인쇄 숨김: 메인 @media print 블록으로 통합 */
 </style>
 </head>
 <body>
@@ -2299,6 +2302,13 @@ function printA4(){
     return;
   }
 
+  // ❷-pre: panel-a4가 hidden 상태면 잠깐 표시해 레이아웃 확보
+  var panelA4 = document.getElementById('panel-a4');
+  var panelWasHidden = panelA4 && getComputedStyle(panelA4).display === 'none';
+  if(panelWasHidden){
+    panelA4.style.cssText = 'display:block!important;visibility:hidden;position:absolute;top:0;left:0;width:794px;z-index:-1;';
+  }
+
   renderA4();
 
   // ❷ DOM 렌더링 완료 후 인쇄 타깃에 복사 (rAF × 2)
@@ -2310,7 +2320,8 @@ function printA4(){
       var pt=document.getElementById('a4-print-target');
 
       // ❸ innerHTML 복사 (outerHTML 사용 시 id=a4-page 중복 방지)
-      pt.innerHTML='<div class="a4-page" style="padding:15px 23px 28px;width:100%;box-shadow:none;min-height:auto;box-sizing:border-box;">'
+      // padding은 @page margin으로 처리 — 인라인 padding 제거
+      pt.innerHTML='<div class="a4-page" style="width:100%;box-shadow:none;min-height:auto;box-sizing:border-box;">'
                   +page.innerHTML
                   +'</div>';
       pt.style.display='block';
@@ -2319,12 +2330,16 @@ function printA4(){
       function cleanup(){
         pt.innerHTML='';
         pt.style.display='none';
+        // panel-a4 hidden 복원
+        if(panelWasHidden && panelA4){
+          panelA4.style.cssText='';
+        }
         window.removeEventListener('afterprint',cleanup);
       }
       window.addEventListener('afterprint',cleanup);
 
-      // ❺ 레이아웃 안정화 후 인쇄 (16ms 딜레이)
-      setTimeout(function(){window.print();},16);
+      // ❺ 레이아웃 안정화 후 인쇄 (120ms: 웹폰트·배경·그라디언트 렌더 대기)
+      setTimeout(function(){window.print();},120);
     });
   });
 }
