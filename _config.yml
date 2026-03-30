@@ -1,0 +1,19 @@
+# GitHub Pages 설정 — 건물우수 MANMIN PWA
+title: 건축물 우수관경 산정 시스템
+description: KDS 31 30 35 우수관경 산정 — MANMIN Ver2.0
+theme: null
+
+# Service Worker 파일을 Jekyll 처리에서 제외
+exclude:
+  - sw.js
+  - README.md
+  - .gitignore
+
+# MIME 타입 처리를 위한 설정
+plugins: []
+
+# permalink 설정
+permalink: pretty
+
+# 인코딩
+encoding: utf-8

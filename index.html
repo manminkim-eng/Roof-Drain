@@ -2596,56 +2596,148 @@ document.addEventListener('DOMContentLoaded',function(){
 </div>
 
 <script>
-/* ══ PWA — 건물우수 완전 구현 v2.1 ══ */
+/* ══════════════════════════════════════════════════════
+   건물우수 PWA Controller v3.0
+   데스크탑 / 태블릿 / 모바일 완전 통합
+   ══════════════════════════════════════════════════════ */
 (function(){
-  var deferred = null;
-  var _isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  var _isSA  = window.matchMedia('(display-mode:standalone)').matches || !!navigator.standalone;
+  'use strict';
 
-  /* ── 1. Service Worker 등록 ── */
+  /* ── 환경 감지 ── */
+  var UA      = navigator.userAgent;
+  var _isIOS  = /iphone|ipad|ipod/i.test(UA) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var _isAnd  = /android/i.test(UA);
+  var _isSA   = window.matchMedia('(display-mode:standalone)').matches ||
+                !!navigator.standalone ||
+                document.referrer.includes('android-app://');
+  var _isMob  = window.innerWidth < 768;
+  var _isTab  = window.innerWidth >= 768 && window.innerWidth < 1100;
+  var _isDesk = window.innerWidth >= 1100;
+
+  var deferred    = null;
+  var _swReg      = null;
+  var _updateReady= false;
+
+  /* ── 디버그 로그 ── */
+  function log(msg){ console.log('[PWA-v3] ' + msg); }
+
+  /* ════════════════════════════════
+     1. Service Worker 등록
+  ════════════════════════════════ */
   if('serviceWorker' in navigator){
     window.addEventListener('load', function(){
-      navigator.serviceWorker.register('./sw.js', {scope:'./'})
-        .then(function(r){
-          console.log('[PWA] SW:', r.scope);
-          r.addEventListener('updatefound', function(){
-            var nw = r.installing; if(!nw) return;
+      navigator.serviceWorker.register('./sw.js', {scope:'./', updateViaCache:'none'})
+        .then(function(reg){
+          _swReg = reg;
+          log('SW registered: ' + reg.scope);
+
+          /* 즉시 업데이트 체크 */
+          reg.update().catch(function(){});
+
+          /* 업데이트 감지 */
+          reg.addEventListener('updatefound', function(){
+            var nw = reg.installing;
+            if(!nw) return;
             nw.addEventListener('statechange', function(){
-              if(nw.state==='installed' && navigator.serviceWorker.controller){
-                var b = document.createElement('div');
-                b.style.cssText = 'position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:9999;background:#1d4ed8;color:#fff;padding:10px 20px;border-radius:12px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(29,78,216,.5);white-space:nowrap;font-family:inherit;';
-                b.innerHTML = '<span>🔄 새 버전 준비됨</span>'
-                  + '<button onclick="navigator.serviceWorker.ready.then(function(r){if(r.waiting)r.waiting.postMessage({type:\'SKIP_WAITING\'});});this.parentNode.remove();location.reload();" '
-                  + 'style="background:rgba(255,255,255,.2);border:none;color:#fff;padding:5px 12px;border-radius:7px;cursor:pointer;font-weight:800;font-family:inherit;">지금 적용</button>'
-                  + '<button onclick="this.parentNode.remove()" style="background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:16px;padding:0 4px;">✕</button>';
-                document.body.appendChild(b);
-                setTimeout(function(){if(b.parentNode)b.remove();}, 8000);
+              if(nw.state === 'installed' && navigator.serviceWorker.controller){
+                _updateReady = true;
+                showUpdateBar();
               }
             });
           });
-        }).catch(function(e){console.warn('[PWA] 실패:', e);});
+
+          /* 이미 waiting 상태인 SW 처리 */
+          if(reg.waiting){
+            _updateReady = true;
+            showUpdateBar();
+          }
+        })
+        .catch(function(e){ console.warn('[PWA-v3] SW 등록 실패:', e); });
+
+      /* controller 변경 → 자동 새로고침 */
       navigator.serviceWorker.addEventListener('controllerchange', function(){
-        if(!window._pwaR){window._pwaR=true;location.reload();}
+        if(!window._pwaRefreshing){
+          window._pwaRefreshing = true;
+          log('Controller changed → reloading');
+          location.reload();
+        }
       });
     });
   }
 
-  /* ── 2. beforeinstallprompt (Android/PC) ── */
+  /* ════════════════════════════════
+     2. 업데이트 알림 바
+  ════════════════════════════════ */
+  function showUpdateBar(){
+    var bar = document.createElement('div');
+    bar.id  = 'pwa-update-bar';
+    bar.style.cssText = [
+      'position:fixed;top:0;left:0;right:0;z-index:10001',
+      'background:linear-gradient(135deg,#0f172a,#1e3a8a)',
+      'color:#fff;padding:10px 16px',
+      'display:flex;align-items:center;justify-content:space-between;gap:10px',
+      'box-shadow:0 4px 20px rgba(15,23,42,.5)',
+      'animation:slide-down .35s cubic-bezier(.22,.61,.36,1)',
+      'font-family:inherit'
+    ].join(';');
+
+    bar.innerHTML =
+      '<style>@keyframes slide-down{from{transform:translateY(-100%)}to{transform:translateY(0)}}</style>'
+      + '<span style="font-size:13px;font-weight:700;flex:1">🔄 새 버전이 준비되었습니다</span>'
+      + '<button id="pwa-apply-btn" style="background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;'
+      + 'border:none;padding:7px 15px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;'
+      + 'font-family:inherit;white-space:nowrap;">지금 적용</button>'
+      + '<button onclick="document.getElementById(\'pwa-update-bar\').remove()" '
+      + 'style="background:rgba(255,255,255,.1);border:none;color:#93c5fd;padding:7px 10px;'
+      + 'border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit;">✕</button>';
+
+    document.body.prepend(bar);
+
+    document.getElementById('pwa-apply-btn').addEventListener('click', function(){
+      if(_swReg && _swReg.waiting){
+        _swReg.waiting.postMessage({type:'SKIP_WAITING'});
+      }
+      bar.remove();
+      log('Update applied');
+    });
+
+    /* 10초 후 자동 제거 */
+    setTimeout(function(){ if(bar.parentNode) bar.remove(); }, 10000);
+  }
+
+  /* ════════════════════════════════
+     3. beforeinstallprompt (Android / PC Chrome/Edge)
+  ════════════════════════════════ */
   window.addEventListener('beforeinstallprompt', function(e){
     e.preventDefault();
     deferred = e;
+    log('beforeinstallprompt captured — platform: ' + (_isMob ? 'mobile' : _isTab ? 'tablet' : 'desktop'));
+
+    /* 헤더 설치 버튼 표시 */
     var btn = document.getElementById('pwa-hdr-btn');
     if(btn) btn.classList.add('visible');
+
+    /* 배너 지연 표시 (이미 dismissed 아닐 때) */
     if(!sessionStorage.getItem('pwa-dismissed')){
+      var delay = _isDesk ? 3000 : 2000; /* 데스크탑은 3초, 모바일/태블릿 2초 */
       setTimeout(function(){
         var b = document.getElementById('pwa-banner');
-        if(b){ b.style.display='block'; b.classList.add('visible'); }
-      }, 2000);
+        if(b && !_isSA){
+          b.style.display = 'block';
+          b.classList.add('visible');
+        }
+      }, delay);
     }
   });
 
-  /* ── 3. iOS: 헤더 버튼 표시 + 2초 후 모달 ── */
+  /* ════════════════════════════════
+     4. DOMContentLoaded 초기화
+  ════════════════════════════════ */
   document.addEventListener('DOMContentLoaded', function(){
+    _updateLayout();
+
+    /* iOS Safari: 홈화면 추가 유도 */
     if(_isIOS && !_isSA){
       var btn = document.getElementById('pwa-hdr-btn');
       if(btn) btn.classList.add('visible');
@@ -2653,63 +2745,160 @@ document.addEventListener('DOMContentLoaded',function(){
         setTimeout(function(){
           var m = document.getElementById('ios-modal-rain');
           if(m) m.classList.add('show');
-        }, 2000);
+        }, 2500);
       }
     }
+
+    /* 이미 설치됨 → 버튼 숨기기 */
     if(_isSA){
       var btn = document.getElementById('pwa-hdr-btn');
       if(btn) btn.style.display = 'none';
+      log('App is running in standalone mode');
     }
+
+    /* 온라인/오프라인 상태 표시 */
+    _bindNetworkStatus();
+
+    /* 화면 크기 변경 대응 */
+    window.addEventListener('resize', _debounce(_updateLayout, 250));
   });
 
-  /* ── 4. 설치 실행 (공통) ── */
+  /* ════════════════════════════════
+     5. 설치 트리거 (공통)
+  ════════════════════════════════ */
   window.pwaTriggerInstall = function(){
-    var b = document.getElementById('pwa-banner');
-    if(b){ b.style.display='none'; b.classList.remove('visible'); }
+    /* 배너 닫기 */
+    _hideBanner();
+
+    /* 이미 설치됨 */
+    if(_isSA){
+      if(typeof showToast === 'function') showToast('✅ 이미 앱으로 설치되어 있습니다.');
+      return;
+    }
+
     /* iOS → 안내 모달 */
-    if(_isIOS && !_isSA){
+    if(_isIOS){
       var m = document.getElementById('ios-modal-rain');
       if(m) m.classList.add('show');
       return;
     }
-    if(!deferred){
-      if(_isSA){ if(typeof showToast==='function') showToast('✅ 이미 앱으로 설치되어 있습니다.'); return; }
-      if(typeof showToast==='function') showToast('📱 브라우저 메뉴 → 앱 설치 / 홈 화면에 추가');
-      else alert('📱 브라우저 메뉴 → 앱 설치 또는 홈 화면에 추가를 선택하세요.');
+
+    /* Android/PC: 네이티브 프롬프트 */
+    if(deferred){
+      deferred.prompt();
+      deferred.userChoice.then(function(result){
+        log('Install choice: ' + result.outcome);
+        if(result.outcome === 'accepted'){
+          var btn = document.getElementById('pwa-hdr-btn');
+          if(btn) btn.classList.remove('visible');
+          if(typeof showToast === 'function') showToast('🎉 건물우수 앱이 설치되었습니다!');
+        }
+        deferred = null;
+      });
       return;
     }
-    deferred.prompt();
-    deferred.userChoice.then(function(r){
-      if(r.outcome==='accepted'){
-        var btn = document.getElementById('pwa-hdr-btn');
-        if(btn) btn.classList.remove('visible');
-        if(typeof showToast==='function') showToast('🎉 건물우수 앱이 설치되었습니다!');
+
+    /* 프롬프트 없음: 수동 안내 */
+    if(typeof showToast === 'function'){
+      if(_isMob){
+        showToast('📱 브라우저 메뉴 → 앱 설치 / 홈 화면에 추가');
+      } else {
+        showToast('💻 주소창 오른쪽 설치 아이콘(⊕)을 클릭하세요');
       }
-      deferred = null;
-    });
+    }
   };
 
-  /* ── 5. 배너 닫기 ── */
+  /* ════════════════════════════════
+     6. 배너 닫기
+  ════════════════════════════════ */
   window.pwaDismiss = function(){
-    var b = document.getElementById('pwa-banner');
-    if(b){
-      b.style.transition = 'transform .3s,opacity .25s';
-      b.style.transform  = 'translateY(100%)';
-      b.style.opacity    = '0';
-      setTimeout(function(){ b.style.display='none'; b.classList.remove('visible'); b.style=''; }, 320);
-    }
+    _hideBanner();
     try{ sessionStorage.setItem('pwa-dismissed','1'); }catch(e){}
   };
 
-  /* ── 6. 설치 완료 ── */
+  function _hideBanner(){
+    var b = document.getElementById('pwa-banner');
+    if(!b || b.style.display === 'none') return;
+    b.style.transition = 'transform .3s ease,opacity .25s ease';
+    b.style.transform  = 'translateY(100%)';
+    b.style.opacity    = '0';
+    setTimeout(function(){
+      b.style.display = 'none';
+      b.classList.remove('visible');
+      b.style.cssText = '';
+    }, 320);
+  }
+
+  /* ════════════════════════════════
+     7. appinstalled
+  ════════════════════════════════ */
   window.addEventListener('appinstalled', function(){
+    log('App installed!');
     var btn = document.getElementById('pwa-hdr-btn');
     var b   = document.getElementById('pwa-banner');
-    if(btn) btn.classList.remove('visible');
-    if(b){ b.style.display='none'; b.classList.remove('visible'); }
+    if(btn){ btn.classList.remove('visible'); btn.style.display = 'none'; }
+    if(b){   b.style.display = 'none'; b.classList.remove('visible'); }
     deferred = null;
-    if(typeof showToast==='function') showToast('🎉 건물우수 앱이 설치되었습니다!');
+    if(typeof showToast === 'function') showToast('🎉 건물우수 앱이 설치되었습니다!');
+    try{ sessionStorage.setItem('pwa-installed','1'); }catch(e){}
   });
+
+  /* ════════════════════════════════
+     8. 레이아웃 업데이트
+  ════════════════════════════════ */
+  function _updateLayout(){
+    var w   = window.innerWidth;
+    _isMob  = w < 768;
+    _isTab  = w >= 768 && w < 1100;
+    _isDesk = w >= 1100;
+
+    /* 데스크탑: 배너 대신 상단 토스트 형식 고려 (현재는 공통 사용) */
+    var banner = document.getElementById('pwa-banner');
+    if(banner && banner.classList.contains('visible')){
+      if(_isDesk){
+        /* 데스크탑: 배너 폭 제한, 중앙 정렬 */
+        banner.style.maxWidth = '560px';
+        banner.style.left     = '50%';
+        banner.style.transform= 'translateX(-50%)';
+        banner.style.borderRadius = '16px 16px 0 0';
+      } else {
+        banner.style.maxWidth = '';
+        banner.style.left     = '0';
+        banner.style.transform= '';
+      }
+    }
+  }
+
+  /* ════════════════════════════════
+     9. 네트워크 상태 표시
+  ════════════════════════════════ */
+  function _bindNetworkStatus(){
+    function _onOnline(){
+      log('Network: online');
+      var t = document.getElementById('pwa-net-toast');
+      if(t) t.remove();
+    }
+    function _onOffline(){
+      log('Network: offline');
+      if(typeof showToast === 'function'){
+        showToast('📡 오프라인 — 캐시 데이터로 동작 중');
+      }
+    }
+    window.addEventListener('online',  _onOnline);
+    window.addEventListener('offline', _onOffline);
+    if(!navigator.onLine) _onOffline();
+  }
+
+  /* ════════════════════════════════
+     유틸
+  ════════════════════════════════ */
+  function _debounce(fn, ms){
+    var t;
+    return function(){ clearTimeout(t); t = setTimeout(fn, ms); };
+  }
+
+  log('PWA Controller v3.0 initialized');
+  log('iOS:' + _isIOS + ' Android:' + _isAnd + ' Standalone:' + _isSA);
 })();
 </script>
 </body>
