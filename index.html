@@ -91,6 +91,9 @@ input[type="number"]{-moz-appearance:textfield;}
 .fselect:focus{border-color:#1d4ed8;box-shadow:0 0 0 3px rgba(29,78,216,.1);}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
 @media(max-width:480px){.frow{grid-template-columns:1fr;}}
+/* 작성일+작성자: 481px 이상은 2열 유지, 480px 이하는 각 1열 */
+.frow-author{grid-template-columns:1fr 1fr;}
+@media(max-width:480px){.frow-author{grid-template-columns:1fr;}}
 .fgrp{display:flex;flex-direction:column;gap:3px;}
 .fgrp.full{grid-column:1/-1;}
 .input-sfx{display:flex;}
@@ -749,34 +752,26 @@ input[type="number"]{-moz-appearance:textfield;}
             <div class="rain-row"><span class="rain-key">📅 관측기간</span><span class="rain-val" id="ri-period">-</span></div>
             <div class="rain-row"><span class="rain-key">📌 자료출처</span><span class="rain-val">기상청</span></div>
           </div>
-          <!-- 공사명 + 작성일 -->
-          <div class="frow" style="margin-top:10px;margin-bottom:8px">
-            <div class="fgrp">
-              <label class="flbl">&#x1F3D7;&#xFE0F; 공사명</label>
-              <input type="text" class="finput" id="inp-projname"
-                placeholder="예: 만민 건축사 신사옥 신축공사"
-                value="만민 건축사 신사옥 신축공사"
-                oninput="liveCalc()">
-            </div>
+          <!-- 공사명 (전체 너비) -->
+          <div class="fgrp" style="margin-top:10px;margin-bottom:8px">
+            <label class="flbl">&#x1F3D7;&#xFE0F; 공사명</label>
+            <input type="text" class="finput" id="inp-projname"
+              placeholder="예: 만민 건축사 신사옥 신축공사"
+              value="만민 건축사 신사옥 신축공사"
+              oninput="liveCalc()">
+          </div>
+          <!-- 작성일 + 작성자: 데스크탑/태블릿=같은 행, 모바일=각 행 -->
+          <div class="frow frow-author" style="margin-bottom:0">
             <div class="fgrp">
               <label class="flbl">&#x1F4C5; 작성일</label>
               <input type="date" class="finput" id="inp-projdate"
                 oninput="liveCalc()">
             </div>
-          </div>
-          <!-- 작성자 + 소속/직책 -->
-          <div class="frow" style="margin-bottom:0">
             <div class="fgrp">
               <label class="flbl">&#x270D;&#xFE0F; 작성자</label>
               <input type="text" class="finput" id="inp-author"
                 placeholder="작성자 이름"
                 value="김만민"
-                oninput="liveCalc()">
-            </div>
-            <div class="fgrp">
-              <label class="flbl">&#x1F3E2; 소속 / 직책</label>
-              <input type="text" class="finput" id="inp-affiliation"
-                placeholder="예: 기계설비팀 / 주임"
                 oninput="liveCalc()">
             </div>
           </div>
@@ -1770,7 +1765,6 @@ function liveCalc(){
   S.projName=(document.getElementById('inp-projname').value||'').trim();
   S.projDate=document.getElementById('inp-projdate').value||'';
   S.author=(document.getElementById('inp-author')?.value||'').trim();
-  S.affiliation=(document.getElementById('inp-affiliation')?.value||'').trim();
   S.rooftype=zoneMode==='single'?(document.getElementById('sel-rooftype').value):'flat';
   S.slopeAngle=parseFloat(document.getElementById('inp-slope-angle')?.value)||30;
   S.valleyFactor=parseFloat(document.getElementById('sel-valley-factor')?.value)||1.20;
@@ -2350,8 +2344,6 @@ function resetAll(){
   S.projName='만민 건축사 신사옥 신축공사';
   var authorEl=document.getElementById('inp-author');
   if(authorEl){authorEl.value='김만민';S.author='김만민';}
-  var affEl=document.getElementById('inp-affiliation');
-  if(affEl){affEl.value='';S.affiliation='';}
   var tdy=new Date();
   var rinit=tdy.getFullYear()+'-'+('0'+(tdy.getMonth()+1)).slice(-2)+'-'+('0'+tdy.getDate()).slice(-2);
   document.getElementById('inp-projdate').value=rinit;
