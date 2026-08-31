@@ -680,7 +680,7 @@ input[type="number"]{-moz-appearance:textfield;}
       </div>
       <div class="hdr-btns">
 <button id="pwa-hdr-btn" onclick="window.pwaTriggerInstall&&window.pwaTriggerInstall()">📲 <span class="pwa-hdr-txt">설치</span></button>
-<button class="btn-g" onclick="resetAll()">🔄 <span class="btn-txt">초기화</span></button>
+<!-- v5.0 — 초기화 버튼을 우측 하단 FAB 스택으로 이설 (계산식 안내 위) -->
         <!-- v5.0 — 헤더 출력 버튼 삭제. 인쇄는 A4 탭의 .mm-btn 으로 일원화(§4-3) -->
       </div>
     </div>
@@ -1260,6 +1260,11 @@ input[type="number"]{-moz-appearance:textfield;}
 
 <!-- FAB: 계산식 안내 플로팅 버튼 -->
 <div class="fab-wrap no-print">
+  <button class="fab-calc" id="fabReset" onclick="resetAll()" title="입력 초기화">
+    <span class="fi-icon">🔄</span>
+    <span class="fi-lbl">초기화</span>
+    <span class="fi-sub">전체</span>
+  </button>
   <button class="fab-calc" id="fabCalc" title="계산식 안내">
     <span class="fi-icon">📐</span>
     <span class="fi-lbl">계산식</span>
