@@ -47,23 +47,30 @@ input[type="number"]{-moz-appearance:textfield;}
 /* ═══ 헤더 v5.0 — 소방 마스터 규격 (§4-7)
    높이 162.2px = 상단패딩 20 + 본문 78.2 + 간격 16 + 탭패딩 4 + 탭 44
    상단패딩 20px 은 전 브레이크포인트 고정, 좌우만 24 → 14px 로 줄인다.   ═══ */
-.app-header{background:#dbeafe;position:sticky;top:0;z-index:50;box-shadow:0 2px 16px rgba(147,197,253,.45);}
-.header-inner{max-width:1300px;margin:0 auto;padding:20px 24px 0;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+/* v5.0 — 헤더 단일색(소방 마스터 방식: 진한 배경 + 흰 텍스트, 그라데이션 없음)
+   + 고정 해제. 소방 마스터에 position:sticky 는 0건이다. 3단 헤더는 177px 로 커서
+   고정하면 모바일 세로의 21% 를 상시 점유하는데, 탭바가 header 요소 밖이라 함께 붙지 않아
+   스크롤하면 탭만 사라진다 — 자리는 차지하고 기능은 못 쓰는 상태가 된다. */
+.app-header{background:#1d4ed8;color:#fff;box-shadow:0 2px 16px rgba(29,78,216,.35);}
+/* v5.0 — 본문↔탭 간격 16px 은 .tab-bar 의 margin-top 이 아니라 헤더의 padding-bottom 으로 둔다.
+   margin 구간은 어느 요소의 배경도 칠하지 않으므로, 헤더가 진한 색이면 그 16px 에 body 배경이
+   비쳐 밝은 띠가 생긴다. 높이 합은 동일하다. */
+.header-inner{max-width:1300px;margin:0 auto;padding:20px 24px 16px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;}
 .brand-logo{display:flex;align-items:flex-start;min-width:0;}
 /* v5.0 — .brand-icon 폐지 (헤더 로고 심벌 삭제) */
 .brand-texts{min-width:0;}
-.hdr-eyebrow{font-size:11px;font-weight:600;opacity:.7;color:#1e40af;letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px;}
-.hdr-h1{font-size:26px;font-weight:900;color:#1e3a8a;letter-spacing:.04em;line-height:1.2;}
+.hdr-eyebrow{font-size:11px;font-weight:600;opacity:.7;color:#fff;letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px;}
+.hdr-h1{font-size:26px;font-weight:900;color:#fff;letter-spacing:.04em;line-height:1.2;}
 /* v5.0 — 마스터와 동일하게 block(인라인 흐름). flex + gap 이면 텍스트와 각인이
    별개 항목으로 끊겨 한 줄 안에서 자연스럽게 이어지지 않는다.
    block 이면 폭이 좁아질 때 문장 중간에서 알아서 다음 줄로 넘어간다. */
-.hdr-sub{font-size:11px;margin-top:8px;color:#1e40af;opacity:.85;letter-spacing:.02em;line-height:1.7;}
+.hdr-sub{font-size:11px;margin-top:8px;color:#fff;opacity:.85;letter-spacing:.02em;line-height:1.7;}
 /* 각인은 통째로 넘어가게 — 문장 중간에서 쪼개지지 않는다 */
-.hdr-manmin{font-family:'Orbitron',sans-serif!important;font-weight:900;font-size:12px;color:#0c4da2;letter-spacing:.08em;text-shadow:0 0 10px rgba(29,78,216,.28);white-space:nowrap;display:inline-block;}
+.hdr-manmin{font-family:'Orbitron',sans-serif!important;font-weight:900;font-size:12px;color:#93c5fd;letter-spacing:.08em;text-shadow:0 0 8px rgba(147,197,253,.6);white-space:nowrap;display:inline-block;}
 .hdr-right-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding-bottom:2px;flex-shrink:0;}
-.hdr-right{text-align:right;opacity:.75;color:#1e40af;font-size:11px;line-height:1.5;padding-bottom:4px;}
+.hdr-right{text-align:right;opacity:.75;color:#fff;font-size:11px;line-height:1.5;padding-bottom:4px;}
 .hdr-right strong{font-size:13px;font-weight:700;opacity:1;}
-.hdr-right em{font-size:10px;color:#3b82f6;font-style:normal;}
+.hdr-right em{font-size:10px;color:#bfdbfe;font-style:normal;}
 /* v5.0 — 마스터와 동일하게 768px 이하에서 우측 근거블록을 접는다.
    좁은 화면에서는 세로로 접히며 헤더를 두 배로 늘려 놓았다.
    같은 정보(KDS 31 30 35)는 eyebrow 와 계산서 제목부에 이미 표기된다. */
@@ -72,7 +79,7 @@ input[type="number"]{-moz-appearance:textfield;}
   .hdr-right-wrap{gap:0;}
 }
 .hdr-btns{display:flex;gap:5px;flex-shrink:0;}
-.btn-g{background:#fff;color:#374151;border:1.5px solid #d1d5db;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit;transition:all .15s;white-space:nowrap;}
+.btn-g{background:rgba(255,255,255,.14);color:#fff;border:1.5px solid rgba(255,255,255,.35);padding:6px 10px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit;transition:all .15s;white-space:nowrap;}
 .btn-g:hover{border-color:#1d4ed8;color:#1d4ed8;background:#eff6ff;}
 .btn-b{background:#1d4ed8;color:#fff;border:none;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit;transition:all .15s;white-space:nowrap;}
 .btn-b:hover{background:#1e40af;}
@@ -90,13 +97,13 @@ input[type="number"]{-moz-appearance:textfield;}
 /* TAB BAR */
 /* v5.0 — 본문↔탭 간격 16px. 마스터 헤더 높이 162.2px 을 맞추는 마지막 항목이다
    (20 + 본문 78.2 + 간격 16 + 탭패딩 4 + 탭 44 = 162.2) */
-.tab-bar{background:#bfdbfe;border-top:1px solid rgba(147,197,253,.3);overflow-x:auto;scrollbar-width:none;margin-top:16px;}
+.tab-bar{background:#1d4ed8;overflow-x:auto;scrollbar-width:none;}
 .tab-bar::-webkit-scrollbar{display:none;}
 /* v5.0 — 탭 13px/700, padding 11px 상하 → 높이 44px (§4-7) */
 .tab-bar-inner{max-width:1300px;margin:0 auto;padding:4px 24px 0;display:flex;}
-.tb{background:none;border:none;cursor:pointer;color:#1e40af;font-family:inherit;padding:11px 16px;font-size:13px;font-weight:700;letter-spacing:.02em;position:relative;transition:color .15s,background .15s;display:flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
-.tb:hover{color:#1e3a8a;background:rgba(30,58,138,.07);}
-.tb.active{color:#1e3a8a;}
+.tb{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.75);font-family:inherit;padding:11px 16px;font-size:13px;font-weight:700;letter-spacing:.02em;position:relative;transition:color .15s,background .15s;display:flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
+.tb:hover{color:#fff;background:rgba(255,255,255,.09);}
+.tb.active{color:#fff;background:rgba(255,255,255,.12);}
 .tb.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:#f97316;border-radius:2px 2px 0 0;}
 
 /* LAYOUT */
@@ -104,6 +111,14 @@ input[type="number"]{-moz-appearance:textfield;}
 @media(max-width:640px){.main-wrap{padding:10px 10px 100px;}}
 .tab-panel{display:none;}.tab-panel.active{display:block;}
 .two-col{display:grid;grid-template-columns:430px 1fr;gap:13px;align-items:start;}
+/* ⛔ v5.0 모바일 필수 — 2026-08-31 추가
+   grid 자식의 기본값 min-width:auto 는 "내용보다 작아질 수 없다" 는 뜻이다.
+   .rtbl{min-width:560px} 표가 들어오면 grid item 이 586px 로 부풀고, 그것이 부모를
+   차례로 밀어 390px 화면에서 문서 폭이 596px 가 된다(206px 초과 · 넘친 요소 250개).
+   .twrap{overflow-x:auto} 는 이미 부풀어버린 뒤라 무력하다.
+   min-width:0 을 주면 grid item 이 화면 폭을 지키고, 표는 .twrap 안에서 좌우 스크롤된다.
+   실측 : 문서폭 596→385(390px) · 596→355(360px) · 표 스크롤 0/3→3/3 */
+.two-col>*{min-width:0;}
 /* v5.0 — 태블릿(1024px)부터 1단으로 세운다.
    기존 1fr 1fr 2단은 입력칸이 눌려 값이 잘려 보였다.
    1단이면 STEP 1~3 을 채운 뒤 결과가 그 아래로 이어져 자연스럽게 읽힌다. */
@@ -285,10 +300,11 @@ input[type="number"]{-moz-appearance:textfield;}
    기존에는 .a4-wrap 의 flex(justify-content:center) 가 중앙 배치를 하고
    JS 가 다시 translateX(offset) 를 걸어 **이중 이동** 이 발생했다.
    마스터와 동일하게 block 컨테이너로 두고 JS 의 translateX 하나만 쓴다. ═══ */
+/* v5.0 — Ver2.0 헤더58+탭44 기준 120px 잔재를 실측값으로 보정 (헤더+탭 = 177px) */
 .a4-wrap{
   background:#94a3b8;
   padding:20px;
-  min-height:calc(100vh - 120px);
+  min-height:calc(100vh - 177px);
   overflow-x:hidden;
   overflow-y:auto;
   position:relative;
