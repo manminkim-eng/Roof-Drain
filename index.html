@@ -51,7 +51,7 @@ input[type="number"]{-moz-appearance:textfield;}
    + 고정 해제. 소방 마스터에 position:sticky 는 0건이다. 3단 헤더는 177px 로 커서
    고정하면 모바일 세로의 21% 를 상시 점유하는데, 탭바가 header 요소 밖이라 함께 붙지 않아
    스크롤하면 탭만 사라진다 — 자리는 차지하고 기능은 못 쓰는 상태가 된다. */
-.app-header{background:#1d4ed8;color:#fff;box-shadow:0 2px 16px rgba(29,78,216,.35);}
+.app-header{background:linear-gradient(135deg,#0a1628 0%,#1e3a5f 50%,#2d5186 100%);color:#fff;box-shadow:0 2px 20px rgba(29,78,216,.35);}
 /* v5.0 — 본문↔탭 간격 16px 은 .tab-bar 의 margin-top 이 아니라 헤더의 padding-bottom 으로 둔다.
    margin 구간은 어느 요소의 배경도 칠하지 않으므로, 헤더가 진한 색이면 그 16px 에 body 배경이
    비쳐 밝은 띠가 생긴다. 높이 합은 동일하다. */
@@ -66,7 +66,7 @@ input[type="number"]{-moz-appearance:textfield;}
    block 이면 폭이 좁아질 때 문장 중간에서 알아서 다음 줄로 넘어간다. */
 .hdr-sub{font-size:11px;margin-top:8px;color:#fff;opacity:.85;letter-spacing:.02em;line-height:1.7;}
 /* 각인은 통째로 넘어가게 — 문장 중간에서 쪼개지지 않는다 */
-.hdr-manmin{font-family:'Orbitron',sans-serif!important;font-weight:900;font-size:12px;color:#93c5fd;letter-spacing:.08em;text-shadow:0 0 8px rgba(147,197,253,.6);white-space:nowrap;display:inline-block;}
+.hdr-manmin{font-family:'Orbitron',sans-serif!important;font-weight:900;font-size:12px;color:#fbbf24;letter-spacing:.08em;text-shadow:0 0 8px rgba(251,191,36,.55);white-space:nowrap;display:inline-block;}
 .hdr-right-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding-bottom:2px;flex-shrink:0;}
 .hdr-right{text-align:right;opacity:.75;color:#fff;font-size:11px;line-height:1.5;padding-bottom:4px;}
 .hdr-right strong{font-size:13px;font-weight:700;opacity:1;}
@@ -97,7 +97,7 @@ input[type="number"]{-moz-appearance:textfield;}
 /* TAB BAR */
 /* v5.0 — 본문↔탭 간격 16px. 마스터 헤더 높이 162.2px 을 맞추는 마지막 항목이다
    (20 + 본문 78.2 + 간격 16 + 탭패딩 4 + 탭 44 = 162.2) */
-.tab-bar{background:#1d4ed8;overflow-x:auto;scrollbar-width:none;}
+.tab-bar{background:#2d5186;overflow-x:auto;scrollbar-width:none;}
 .tab-bar::-webkit-scrollbar{display:none;}
 /* v5.0 — 탭 13px/700, padding 11px 상하 → 높이 44px (§4-7) */
 .tab-bar-inner{max-width:1300px;margin:0 auto;padding:4px 24px 0;display:flex;}
@@ -300,11 +300,12 @@ input[type="number"]{-moz-appearance:textfield;}
    기존에는 .a4-wrap 의 flex(justify-content:center) 가 중앙 배치를 하고
    JS 가 다시 translateX(offset) 를 걸어 **이중 이동** 이 발생했다.
    마스터와 동일하게 block 컨테이너로 두고 JS 의 translateX 하나만 쓴다. ═══ */
-/* v5.0 — Ver2.0 헤더58+탭44 기준 120px 잔재를 실측값으로 보정 (헤더+탭 = 177px) */
+/* v5.0 — Ver2.0 헤더58+탭44 기준 120px 잔재를 실측값으로 보정.
+   헤더+탭 실측 162px (= 규격 162.2) — margin 을 padding 으로 옮긴 뒤 값이 확정됐다. */
 .a4-wrap{
   background:#94a3b8;
   padding:20px;
-  min-height:calc(100vh - 177px);
+  min-height:calc(100vh - 162px);
   overflow-x:hidden;
   overflow-y:auto;
   position:relative;
