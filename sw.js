@@ -3,7 +3,7 @@
    MANMIN Architecture · KDS 31 30 35 : 2021
    ══════════════════════════════════════════════════════ */
 
-const SW_VERSION   = 'manmin-v3.0.0';
+const SW_VERSION   = 'manmin-v5.0.0';
 const CACHE_STATIC = `${SW_VERSION}-static`;
 const CACHE_FONTS  = `${SW_VERSION}-fonts`;
 const CACHE_DYNAMIC= `${SW_VERSION}-dynamic`;
@@ -21,14 +21,17 @@ const PRECACHE_URLS = [
   './icons/icon-144x144.png',
   './icons/icon-152x152.png',
   './icons/brand-icon.jpg',
-  './offline.html'
+  './offline.html',
+  /* v5.0 — 로컬 폴백 폰트. CDN 차단·오프라인 시 한글 깨짐 방지 (§4-4) */
+  './assets/fonts/manmin-fonts.css',
+  './assets/fonts/NotoSansKR-var.woff2'
 ];
 
 /* ── 폰트 캐시 URL 패턴 ── */
 const FONT_ORIGINS = [
   'https://fonts.googleapis.com',
-  'https://fonts.gstatic.com',
-  'https://cdn.jsdelivr.net'
+  'https://fonts.gstatic.com'
+  /* v5.0 — Pretendard(jsdelivr) 제거. 본문 폰트를 Noto Sans KR 로 교체했다 */
 ];
 
 /* ── CDN 스크립트 패턴 ── */
