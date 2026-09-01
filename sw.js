@@ -3,7 +3,7 @@
    MANMIN Architecture · KDS 31 30 35 : 2021
    ══════════════════════════════════════════════════════ */
 
-const SW_VERSION   = 'manmin-v5.0.0';
+const SW_VERSION   = 'manmin-v5.0.1';
 const CACHE_STATIC = `${SW_VERSION}-static`;
 const CACHE_FONTS  = `${SW_VERSION}-fonts`;
 const CACHE_DYNAMIC= `${SW_VERSION}-dynamic`;

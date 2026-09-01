@@ -51,7 +51,11 @@ input[type="number"]{-moz-appearance:textfield;}
    + 고정 해제. 소방 마스터에 position:sticky 는 0건이다. 3단 헤더는 177px 로 커서
    고정하면 모바일 세로의 21% 를 상시 점유하는데, 탭바가 header 요소 밖이라 함께 붙지 않아
    스크롤하면 탭만 사라진다 — 자리는 차지하고 기능은 못 쓰는 상태가 된다. */
-.app-header{background:linear-gradient(135deg,#0a1628 0%,#1e3a5f 50%,#2d5186 100%);color:#fff;box-shadow:0 2px 20px rgba(29,78,216,.35);}
+/* v5.0.1 — 헤더+탭바를 하나의 그라데이션 면으로 통합한다.
+   135deg 대각 그라데이션은 하단 가장자리 색이 좌우로 변하는데 탭바를 끝색 단색으로 두면
+   좌측에서 색이 어긋나 띠가 둘로 갈라진다. 소방 마스터(탭이 header 안)와 같은 1면 구조로 되돌린다. */
+.hdr-shell{background:linear-gradient(135deg,#0a1628 0%,#1e3a5f 50%,#2d5186 100%);box-shadow:0 2px 20px rgba(29,78,216,.35);}
+.app-header{background:transparent;color:#fff;}
 /* v5.0 — 본문↔탭 간격 16px 은 .tab-bar 의 margin-top 이 아니라 헤더의 padding-bottom 으로 둔다.
    margin 구간은 어느 요소의 배경도 칠하지 않으므로, 헤더가 진한 색이면 그 16px 에 body 배경이
    비쳐 밝은 띠가 생긴다. 높이 합은 동일하다. */
@@ -97,7 +101,7 @@ input[type="number"]{-moz-appearance:textfield;}
 /* TAB BAR */
 /* v5.0 — 본문↔탭 간격 16px. 마스터 헤더 높이 162.2px 을 맞추는 마지막 항목이다
    (20 + 본문 78.2 + 간격 16 + 탭패딩 4 + 탭 44 = 162.2) */
-.tab-bar{background:#2d5186;overflow-x:auto;scrollbar-width:none;}
+.tab-bar{background:transparent;overflow-x:auto;scrollbar-width:none;}   /* 배경은 .hdr-shell 이 담당 */
 .tab-bar::-webkit-scrollbar{display:none;}
 /* v5.0 — 탭 13px/700, padding 11px 상하 → 높이 44px (§4-7) */
 .tab-bar-inner{max-width:1300px;margin:0 auto;padding:4px 24px 0;display:flex;}
@@ -659,6 +663,8 @@ input[type="number"]{-moz-appearance:textfield;}
 <div id="root-app">
 
 <!-- HEADER -->
+<!-- v5.0.1 : 헤더+탭바 그라데이션 1면 통합 래퍼 -->
+<div class="hdr-shell no-print">
 <header class="app-header no-print">
   <div class="header-inner">
     <div class="brand-logo">
@@ -698,6 +704,7 @@ input[type="number"]{-moz-appearance:textfield;}
     <button class="tb" onclick="switchTab('a4',this)" id="tab-a4">📄 A4 미리보기</button>
   </div>
 </nav>
+</div><!-- /.hdr-shell -->
 
 <div class="main-wrap">
 
