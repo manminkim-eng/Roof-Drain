@@ -3,7 +3,9 @@
    MANMIN Architecture · KDS 31 30 35 : 2021
    ══════════════════════════════════════════════════════ */
 
-const SW_VERSION   = 'manmin-v5.0.1';
+/* §17-1 — 도구 고유 접두어. 'manmin-' 공통 접두어는 같은 origin 의 01~07·46 캐시까지 지운다 */
+const PREFIX       = 'usu-';
+const SW_VERSION   = 'usu-v5.0.2';
 const CACHE_STATIC = `${SW_VERSION}-static`;
 const CACHE_FONTS  = `${SW_VERSION}-fonts`;
 const CACHE_DYNAMIC= `${SW_VERSION}-dynamic`;
@@ -70,7 +72,7 @@ self.addEventListener('activate', event => {
       .then(keys => Promise.all(
         keys
           .filter(key =>
-            key.startsWith('manmin-') &&
+            key.startsWith(PREFIX) &&
             ![CACHE_STATIC, CACHE_FONTS, CACHE_DYNAMIC].includes(key)
           )
           .map(key => {
