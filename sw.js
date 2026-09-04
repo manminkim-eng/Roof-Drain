@@ -1,11 +1,27 @@
 /* ══════════════════════════════════════════════════════
+   R25 회차 2026-09-04 — 자기 접두어 캐시 조회 · cors 프리캐시 · opaque 가드 · 캐시명 v5.0.3 (S10)
    건축물 우수관경 산정 시스템 — Service Worker v3.0
    MANMIN Architecture · KDS 31 30 35 : 2021
    ══════════════════════════════════════════════════════ */
 
 /* §17-1 — 도구 고유 접두어. 'manmin-' 공통 접두어는 같은 origin 의 01~07·46 캐시까지 지운다 */
 const PREFIX       = 'usu-';
-const SW_VERSION   = 'usu-v5.0.2';
+/* ═ R25 (2026-09-04) — SW 캐시 origin 오염 차단 (S10 · 지시서 §21-1 R25)
+   전역 caches 의 match 는 origin 전체를 검색한다. manminkim-eng.github.io 는 34종이 한 origin 이라
+   다른 도구 캐시의 opaque 응답이 <script crossorigin>(cors) 요청에 돌아가 스크립트가 폐기됐다
+   (30 #root 빈 화면 · 40 html2canvas undefined). 자기 접두어 캐시만 조회하고, cross-origin
+   프리캐시는 cors 로 받으며, opaque↔cors 불일치 시 캐시를 쓰지 않는다. */
+const MM_EXCLUDE = [];   /* 내 접두어로 시작하지만 남의 캐시인 이름 (§17-1 충돌) */
+const mmOwn   = (k) => k.indexOf(PREFIX) === 0 && !MM_EXCLUDE.some((x) => k.indexOf(x) === 0);
+const mmReq   = (u) => (typeof u === 'string' && u.indexOf('http') === 0) ? new Request(u, { mode: 'cors' }) : u;
+const mmMatch = (req, opt) => caches.keys()
+  .then((ks) => ks.filter(mmOwn))
+  .then((ks) => ks.reduce((p, k) => p.then((r) => r || caches.open(k).then((c) => c.match(req, opt))), Promise.resolve(undefined)))
+  .then((r) => (r && r.type === 'opaque' && req && req.mode === 'cors') ? undefined : r);
+
+const SW_VERSION   = 'usu-v5.0.3';
+/* 종전 접두어 잔재 — 한 번 지우고 나면 무해하다 */
+const ORPHAN       = ['manmin-v5.0.1-static','manmin-v5.0.1-fonts','manmin-v5.0.1-dynamic','manmin-v5.0.0-static','manmin-v5.0.0-fonts','manmin-v5.0.0-dynamic'];
 const CACHE_STATIC = `${SW_VERSION}-static`;
 const CACHE_FONTS  = `${SW_VERSION}-fonts`;
 const CACHE_DYNAMIC= `${SW_VERSION}-dynamic`;
@@ -51,7 +67,7 @@ self.addEventListener('install', event => {
         /* 각 URL 개별 처리 — 실패해도 전체 중단 방지 */
         return Promise.allSettled(
           PRECACHE_URLS.map(url =>
-            cache.add(url).catch(err =>
+            cache.add(mmReq(url)).catch(err =>
               console.warn(`[SW] Precache failed: ${url}`, err)
             )
           )
@@ -72,7 +88,7 @@ self.addEventListener('activate', event => {
       .then(keys => Promise.all(
         keys
           .filter(key =>
-            key.startsWith(PREFIX) &&
+            (mmOwn(key) || ORPHAN.includes(key)) &&
             ![CACHE_STATIC, CACHE_FONTS, CACHE_DYNAMIC].includes(key)
           )
           .map(key => {
