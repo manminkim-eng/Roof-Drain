@@ -680,6 +680,7 @@ input[type="number"]{-moz-appearance:textfield;}
 @media print{.mono,.a4-iv,.a4-rnum,.num,td.num,.a4-val{font-family:'JetBrains Mono','Noto Sans KR','Noto Sans KR Local','Malgun Gothic',Consolas,monospace!important;}}
 /* R2 (§3-4-1) — 미리보기 padding 을 인쇄 여백(14/12/22/14mm)과 일치 → 내용폭 696px = 184mm. 인쇄는 #a4-print-target .a4-page{padding:0}+@page, JPG v5.4 는 자체 mm 여백이라 출력 불변 */
 .a4-page{padding:53px 45px 83px 53px;}
+#a4-content{padding:0!important;}   /* S8 — 플레이스홀더 인라인 padding:40px 이 결과 렌더 후 남아 인쇄·JPG 4면 +10.6mm (2026-09-05 PDF 실측) */
 </style>
 </head>
 <body>
