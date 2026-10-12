@@ -1,4 +1,5 @@
 /* ══════════════════════════════════════════════════════
+   2026-10-13 — v5.0.10 KDS 31 30 35:2021 원문 표 4.4-1~3 · 기상청 1시간 최다강수량 관측 최대값 · secθ 폐지 동반 캐시명 v5.0.10
    S9 회차 2026-09-05 — R28 JPG v5.5 소제목 동반 이관 동반 캐시명 v5.0.9
    S8 회차 2026-09-05 — 20 #a4-content 패딩 / 21 .no-print 인쇄 숨김 동반 캐시명 v5.0.8
    S7 회차 2026-09-05 — R24①②+R2 표 선·mono 한글·A4 패딩 소급 동반 캐시명 v5.0.7
@@ -25,7 +26,7 @@ const mmMatch = (req, opt) => caches.keys()
   .then((ks) => ks.reduce((p, k) => p.then((r) => r || caches.open(k).then((c) => c.match(req, opt))), Promise.resolve(undefined)))
   .then((r) => (r && r.type === 'opaque' && req && req.mode === 'cors') ? undefined : r);
 
-const SW_VERSION   = 'usu-v5.0.9';
+const SW_VERSION   = 'usu-v5.0.10';
 /* 종전 접두어 잔재 — 한 번 지우고 나면 무해하다 */
 const ORPHAN       = ['manmin-v5.0.1-static','manmin-v5.0.1-fonts','manmin-v5.0.1-dynamic','manmin-v5.0.0-static','manmin-v5.0.0-fonts','manmin-v5.0.0-dynamic'];
 const CACHE_STATIC = `${SW_VERSION}-static`;

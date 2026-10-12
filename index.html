@@ -770,7 +770,7 @@ input[type="number"]{-moz-appearance:textfield;}
           <div class="rain-info" id="rain-info-box" style="display:none">
             <div class="rain-row"><span class="rain-key">📡 관측지점</span><span class="rain-val" id="ri-station">-</span></div>
             <div class="rain-row"><span class="rain-key">🌧️ 시간최대강우량</span><span class="rain-val" id="ri-rain">-</span></div>
-            <div class="rain-row"><span class="rain-key">📅 관측기간</span><span class="rain-val" id="ri-period">-</span></div>
+            <div class="rain-row"><span class="rain-key">📅 자료기간</span><span class="rain-val" id="ri-period">-</span></div>
             <div class="rain-row"><span class="rain-key">📌 자료출처</span><span class="rain-val">기상청</span></div>
           </div>
           <!-- 공사명 (전체 너비) -->
@@ -818,27 +818,13 @@ input[type="number"]{-moz-appearance:textfield;}
             <div class="frow" style="margin-bottom:0">
               <div class="fgrp"><label class="flbl">지붕 유형</label><select class="fselect" id="sel-rooftype" onchange="onRoofTypeChange()"><option value="flat">평지붕 (옥상)</option><option value="slope">경사지붕</option><option value="valley">밸리형 복합</option></select></div>
             </div>
-            <!-- 경사지붕 전용: 경사각 입력 -->
-            <div id="slope-angle-group" style="display:none;margin-top:8px;">
-              <div class="frow" style="margin-bottom:0">
-                <div class="fgrp">
-                  <label class="flbl">경사각 θ (°) — 수평 기준</label>
-                  <div class="input-sfx">
-                    <input type="number" class="finput" id="inp-slope-angle" placeholder="예: 30" min="1" max="75" value="30" oninput="liveCalc()">
-                    <span class="sfx">°</span>
-                  </div>
-                </div>
-                <div class="fgrp">
-                  <label class="flbl">경사 보정계수 (secθ)</label>
-                  <div style="padding:7px 10px;background:#fff;border:2px solid #1d4ed8;border-radius:7px;font-size:15px;font-weight:900;color:#1d4ed8;text-align:center;font-family:'JetBrains Mono',monospace;" id="slope-sec-display">1.155</div>
-                </div>
-              </div>
-            </div>
+            <!-- 경사지붕 : v5.0.10 secθ 보정 폐지 — 안내는 roof-info-card -->
+            <div id="slope-angle-group" style="display:none"></div>
             <!-- 밸리형 전용: 집수집중계수 선택 -->
             <div id="valley-group" style="display:none;margin-top:8px;">
               <div class="frow" style="margin-bottom:0">
                 <div class="fgrp">
-                  <label class="flbl">밸리 집수 집중계수</label>
+                  <label class="flbl">밸리 집수 집중계수 (KDS 외 · 선택)</label>
                   <select class="fselect" id="sel-valley-factor" onchange="liveCalc()">
                     <option value="1.10">1.10 — 완만한 밸리 (경사 낮음)</option>
                     <option value="1.20" selected>1.20 — 일반 밸리 (표준)</option>
@@ -864,7 +850,7 @@ input[type="number"]{-moz-appearance:textfield;}
             </div>
           </div>
 
-          <div class="nb blue" style="margin-top:8px;margin-bottom:0"><div class="nb-tit">ℹ️ 수직벽 보정</div><div class="nb-txt">루프드레인 설치 시 수직벽 면적의 ½을 수평투영 면적에 가산합니다. (KDS 31 30 35 : 2021)</div></div>
+          <div class="nb blue" style="margin-top:8px;margin-bottom:0"><div class="nb-tit">ℹ️ 수직벽 보정</div><div class="nb-txt">지붕으로 빗물이 흐르는 모든 수직벽 면적의 ½을 수평투영 면적에 가산합니다. (KDS 31 30 35 : 2021 4.4.4)</div></div>
         </div>
       </div>
 
@@ -892,8 +878,8 @@ input[type="number"]{-moz-appearance:textfield;}
             <div class="fgrp"><label class="flbl">관 재질</label><select class="fselect" id="sel-material" onchange="liveCalc()"><option value="pvc">PVC / PE</option><option value="cast">주철관</option><option value="stainless">스테인리스</option><option value="galv">아연도금강관</option></select></div>
           </div>
           <div class="frow" style="margin-bottom:0">
-            <div class="fgrp"><label class="flbl">수평관 기울기</label><select class="fselect" id="sel-slope" onchange="liveCalc()"><option value="100">1/100</option><option value="50">1/50</option><option value="25">1/25 (최소)</option></select></div>
-            <div class="fgrp"><label class="flbl">안전 여유율</label><select class="fselect" id="sel-safety" onchange="liveCalc()"><option value="0">0%</option><option value="10">+10%</option><option value="20" selected>+20% (권장)</option><option value="30">+30%</option></select></div>
+            <div class="fgrp"><label class="flbl">수평관 기울기</label><select class="fselect" id="sel-slope" onchange="liveCalc()"><option value="100">1/100 (최소)</option><option value="50">1/50</option><option value="25">1/25</option></select></div>
+            <div class="fgrp"><label class="flbl">여유율 (KDS 외 · 선택)</label><select class="fselect" id="sel-safety" onchange="liveCalc()"><option value="0" selected>0% (KDS 원문)</option><option value="10">+10%</option><option value="20">+20%</option><option value="30">+30%</option></select></div>
           </div>
         </div>
       </div>
@@ -935,7 +921,7 @@ input[type="number"]{-moz-appearance:textfield;}
               <div class="crow" id="crow-roof-factor" style="display:none"><span class="ck" style="color:#c2410c;font-weight:800">🏠 지붕형태 보정</span><span class="cv" id="cv-roof-factor" style="color:#c2410c">—</span></div>
               <div class="crow"><span class="ck">유효면적 합계</span><span class="cv" id="cv-eff">—</span></div>
               <div class="crow"><span class="ck">시간최대강우량</span><span class="cv" id="cv-rain">—</span></div>
-              <div class="crow"><span class="ck">100mm환산×안전율</span><span class="cv" id="cv-conv">—</span></div>
+              <div class="crow"><span class="ck">100mm환산×여유율</span><span class="cv" id="cv-conv">—</span></div>
               <div class="crow"><span class="ck">드레인당 환산면적(수직관)</span><span class="cv" id="cv-zone">—</span></div>
               <div class="crow"><span class="ck">적용 관경(수직관)</span><span class="cv" id="cv-result">—</span></div>
             </div>
@@ -973,9 +959,9 @@ input[type="number"]{-moz-appearance:textfield;}
 
         <div class="ref-box">
           <div class="ref-tit">📌 산정 근거</div>
-          <div class="ref-item">KDS 31 30 35 : 2021 (국토교통부고시 제2021-203호)</div>
-          <div class="ref-item">기상청 기후통계분석 포털 시간최대강우량 (1991~2020 평년값)</div>
-          <div class="ref-item">환산면적 = 유효면적 × (강우량 ÷ 100) × 안전율 ÷ 드레인수</div>
+          <div class="ref-item">KDS 31 30 35 : 2021 우수설비 (국토교통부고시 제2021-203호 제정 · 현행 고시 제2026-92호, 2026.3.1 시행)</div>
+          <div class="ref-item">기상자료개방포털 조건별통계 — ASOS 1시간 최다강수량 관측 최대값(~2025)</div>
+          <div class="ref-item">환산면적 = 유효면적 × (강우량 ÷ 100) × 여유율(KDS 외·기본 1.00) ÷ 드레인수</div>
         </div>
       </div>
     </div>
@@ -984,18 +970,18 @@ input[type="number"]{-moz-appearance:textfield;}
 
 <!-- ████ TAB: 표준표 ████ -->
 <div class="tab-panel" id="panel-stdtable">
-  <div class="card"><div class="card-head"><div class="card-ico">📋</div><span class="card-tit">표 4.4-1 원형 옥내외 우수 수직관</span><span class="cbadge">KDS 31 30 35 : 2021</span></div><div class="card-body"><div class="nb blue" style="margin-bottom:9px"><div class="nb-tit">ℹ️ 기준</div><div class="nb-txt">강우량 100mm/hr 기준. 환산면적 = 실제면적 × (강우량 ÷ 100)</div></div><div class="twrap"><table class="rtbl"><thead><tr><th rowspan="2">DN (mm)</th><th colspan="6">강우량별 최대 수평투영 지붕면적 (m²)</th></tr><tr><th>50</th><th>75</th><th>100</th><th>125</th><th>150</th><th>200</th></tr></thead><tbody id="std-v-body"></tbody></table></div></div></div>
-  <div class="card"><div class="card-head"><div class="card-ico">📋</div><span class="card-tit">표 4.4-2 우수 수평관 (1/100 기울기)</span><span class="cbadge">KDS 31 30 35 : 2021</span></div><div class="card-body"><div class="twrap"><table class="rtbl"><thead><tr><th rowspan="2">DN (mm)</th><th colspan="6">강우량별 최대 수평투영 지붕면적 (m²)</th></tr><tr><th>50</th><th>75</th><th>100</th><th>125</th><th>150</th><th>200</th></tr></thead><tbody id="std-h-body"></tbody></table></div></div></div>
-  <div class="card"><div class="card-head"><div class="card-ico">📋</div><span class="card-tit">표 4.4-3 반원형 빗물받이</span><span class="cbadge">KDS 31 30 35 : 2021</span></div><div class="card-body"><div class="twrap"><table class="rtbl"><thead><tr><th rowspan="2">폭 (mm)</th><th colspan="6">강우량별 최대 수평투영 지붕면적 (m²)</th></tr><tr><th>50</th><th>75</th><th>100</th><th>125</th><th>150</th><th>200</th></tr></thead><tbody id="std-g-body"></tbody></table></div></div></div>
+  <div class="card"><div class="card-head"><div class="card-ico">📋</div><span class="card-tit">표 4.4-1 원형 옥내외 우수 수직관 관 지름</span><span class="cbadge">KDS 31 30 35 : 2021</span></div><div class="card-body"><div class="nb blue" style="margin-bottom:9px"><div class="nb-tit">ℹ️ 조회 방법</div><div class="nb-txt">표는 강우량에 반비례합니다(면적 × 강우량 일정). 계산은 환산면적 = 실제면적 × (강우량 ÷ 100)을 100mm/h 열과 비교합니다. 주 1) 관 지름은 원형관의 관 지름이며, 단면적이 같은 다른 모양의 배관에도 적용할 수 있습니다.</div></div><div class="tbl-hint no-print"><span style="font-size:14px;">←</span><span>좌우로 스크롤하여 전체 항목 확인</span><span style="font-size:14px;">→</span></div><div class="twrap"><table class="rtbl"><thead><tr><th rowspan="2">DN</th><th colspan="12">강우량(mm/h)별 최대 수평투영 지붕면적 (m²)</th></tr><tr><th>25</th><th>50</th><th>75</th><th>100</th><th>125</th><th>150</th><th>175</th><th>200</th><th>225</th><th>250</th><th>275</th><th>300</th></tr></thead><tbody id="std-v-body"></tbody></table></div></div></div>
+  <div class="card"><div class="card-head"><div class="card-ico">📋</div><span class="card-tit">표 4.4-2 우수수평관의 크기 (구배 1/100 · 1/50 · 1/25)</span><span class="cbadge">KDS 31 30 35 : 2021</span></div><div class="card-body"><div class="tbl-hint no-print"><span style="font-size:14px;">←</span><span>좌우로 스크롤하여 전체 항목 확인</span><span style="font-size:14px;">→</span></div><div class="twrap"><table class="rtbl"><thead><tr><th rowspan="2">DN</th><th colspan="6">강우량(mm/h)별 최대 수평투영 지붕면적 (m²)</th></tr><tr><th>25</th><th>50</th><th>75</th><th>100</th><th>125</th><th>150</th></tr></thead><tbody id="std-h-body"></tbody></table></div></div></div>
+  <div class="card"><div class="card-head"><div class="card-ico">📋</div><span class="card-tit">표 4.4-3 반원형 지붕빗물받이 (기울기 1/200 ~ 1/25)</span><span class="cbadge">KDS 31 30 35 : 2021</span></div><div class="card-body"><div class="nb org" style="margin-bottom:9px"><div class="nb-tit">⚠️ 원문 확인</div><div class="nb-txt">1/100 기울기 DN 100 · 75mm/h 칸은 원문에 「637」로 실려 있으나, 같은 행이 강우량에 반비례(188 · 94 · ? · 47)하므로 63의 오기로 보고 63을 적용했습니다. 계산은 STEP 3에서 고른 구배(1/100 · 1/50 · 1/25)의 표를 조회합니다.</div></div><div class="tbl-hint no-print"><span style="font-size:14px;">←</span><span>좌우로 스크롤하여 전체 항목 확인</span><span style="font-size:14px;">→</span></div><div class="twrap"><table class="rtbl"><thead><tr><th rowspan="2">DN</th><th colspan="6">강우량(mm/h)별 최대 수평투영 지붕면적 (m²)</th></tr><tr><th>25</th><th>50</th><th>75</th><th>100</th><th>125</th><th>150</th></tr></thead><tbody id="std-g-body"></tbody></table></div></div></div>
 </div>
 
 <!-- ████ TAB: 지역 강우량 ████ -->
 <div class="tab-panel" id="panel-rain">
-  <div class="card"><div class="card-head"><div class="card-ico">🌧️</div><span class="card-tit">전국 지점별 시간최대강우량</span><span class="cbadge">기상청</span></div><div class="card-body">
-    <div class="nb org" style="margin-bottom:9px"><div class="nb-tit">⚠️ 자료 안내</div><div class="nb-txt">기상청 기후통계분석 포털 1991~2020 평년값 기준. 설계 시 최신 자료(data.kma.go.kr) 확인 필요.</div></div>
+  <div class="card"><div class="card-head"><div class="card-ico">🌧️</div><span class="card-tit">전국 지점별 시간최대강우량 (1시간 최다강수량 관측 최대값)</span><span class="cbadge">기상청</span></div><div class="card-body">
+    <div class="nb org" style="margin-bottom:9px"><div class="nb-tit">⚠️ 자료 안내</div><div class="nb-txt">기상자료개방포털(data.kma.go.kr) 조건별통계 — 지상(ASOS) 관측소의 연 1시간 최다강수량 가운데 관측 이래 최대값(~2025년, 2026-10-13 조회). 관측소가 없는 시군은 인근 관측소 값을 쓰고 「(인근)」으로 표기했습니다. 설계 시 최신 자료를 확인하십시오.</div></div>
     <div class="frow" style="margin-bottom:9px"><div class="fgrp"><label class="flbl">지역 검색</label><input type="text" class="finput" id="rain-search" placeholder="지역명 검색..." oninput="filterRainTable()"></div><div class="fgrp"><label class="flbl">강우량 범위</label><select class="fselect" id="rain-filter" onchange="filterRainTable()"><option value="">전체</option><option value="0-80">80mm/hr 미만</option><option value="80-100">80~100mm/hr</option><option value="100-120">100~120mm/hr</option><option value="120-999">120mm/hr 초과</option></select></div></div>
     <div class="tbl-hint no-print"><span style="font-size:14px;">←</span><span>좌우로 스크롤하여 전체 항목 확인</span><span style="font-size:14px;">→</span></div>
-    <div class="twrap"><table class="rtbl"><thead><tr><th>시/도</th><th>지점명</th><th>관측소 번호</th><th>시간최대강우량 (mm/hr)</th><th>관측기간</th></tr></thead><tbody id="rain-table-body"></tbody></table></div>
+    <div class="twrap"><table class="rtbl"><thead><tr><th>시/도</th><th>지점명</th><th>관측소</th><th>관측소 번호</th><th>시간최대강우량 (mm/hr)</th><th>발생일</th><th>자료기간</th></tr></thead><tbody id="rain-table-body"></tbody></table></div>
   </div></div>
 </div>
 
@@ -1025,7 +1011,7 @@ input[type="number"]{-moz-appearance:textfield;}
           <div style="font-size:16px;margin-bottom:2px;">🔧</div>
           <div style="font-size:10px;font-weight:800;color:#15803d;">STEP 3</div>
           <div style="font-size:9.5px;color:#15803d;margin-top:2px;font-weight:700;">드레인·관 조건</div>
-          <div style="font-size:9px;color:#475569;margin-top:2px;">개수·형태·기울기<br>안전율 설정</div>
+          <div style="font-size:9px;color:#475569;margin-top:2px;">개수·형태·기울기<br>여유율 설정</div>
         </div>
         <div style="font-size:18px;color:#bfdbfe;padding:0 4px;">→</div>
         <div style="text-align:center;background:linear-gradient(135deg,#1e3a8a,#1d4ed8);border-radius:8px;padding:8px 12px;min-width:82px;flex-shrink:0;">
@@ -1037,7 +1023,7 @@ input[type="number"]{-moz-appearance:textfield;}
       </div>
       <!-- 핵심 공식 한 줄 -->
       <div style="background:#f8fafd;border:1px solid #e2e8f0;border-radius:8px;padding:10px 13px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;">
-        <span style="font-size:12px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;">A_base = A_roof × RF + A_wall × 0.5</span>
+        <span style="font-size:12px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;">A_base = A_roof + A_wall × 0.5</span>
         <span style="font-size:11px;color:#94a3b8;">→</span>
         <span style="font-size:12px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;">A_conv = A_base × (R÷100) × SF × VF</span>
         <span style="font-size:11px;color:#94a3b8;">→</span>
@@ -1061,7 +1047,7 @@ input[type="number"]{-moz-appearance:textfield;}
               <div style="width:28px;height:28px;background:#1d4ed8;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">🏢</div>
               <div>
                 <div style="font-size:11px;font-weight:900;color:#1e3a8a;">① 평지붕 (옥상)</div>
-                <div style="font-size:9.5px;color:#3b82f6;font-weight:700;">RF = 1.0 · VF = 1.0</div>
+                <div style="font-size:9.5px;color:#3b82f6;font-weight:700;">VF = 1.0</div>
               </div>
               <div style="margin-left:auto;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:3px 8px;font-size:9.5px;font-weight:800;color:#1d4ed8;">기준값</div>
             </div>
@@ -1083,22 +1069,22 @@ input[type="number"]{-moz-appearance:textfield;}
               <div style="width:28px;height:28px;background:#15803d;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">🏠</div>
               <div>
                 <div style="font-size:11px;font-weight:900;color:#14532d;">② 경사지붕</div>
-                <div style="font-size:9.5px;color:#16a34a;font-weight:700;">RF = 1/cosθ (secθ) · VF = 1.0</div>
+                <div style="font-size:9.5px;color:#16a34a;font-weight:700;">수평투영 면적 · 보정 없음</div>
               </div>
-              <div style="margin-left:auto;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:3px 8px;font-size:9.5px;font-weight:800;color:#15803d;">면적 증가</div>
+              <div style="margin-left:auto;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:3px 8px;font-size:9.5px;font-weight:800;color:#15803d;">KDS 4.4.2</div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:10px;margin-bottom:6px;">
               <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;">
                 <div style="color:#6b7a99;font-weight:700;margin-bottom:2px;">유효면적</div>
-                <div style="font-weight:900;color:#1a2744;font-family:'JetBrains Mono',monospace;">A_base = A₀×secθ + W×0.5</div>
+                <div style="font-weight:900;color:#1a2744;font-family:'JetBrains Mono',monospace;">A_base = A₀ + W×0.5</div>
               </div>
               <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;">
-                <div style="color:#6b7a99;font-weight:700;margin-bottom:2px;">경사각별 secθ</div>
-                <div style="font-weight:700;color:#1a2744;">15°→1.035 / 30°→1.155<br>45°→1.414 / 60°→2.000</div>
+                <div style="color:#6b7a99;font-weight:700;margin-bottom:2px;">A₀ (입력 면적)</div>
+                <div style="font-weight:700;color:#1a2744;">경사면 실면적 ✗<br>수평투영 면적 ✓</div>
               </div>
             </div>
             <div style="background:#fef9c3;border:1px solid #fde047;border-radius:5px;padding:5px 8px;font-size:9.5px;color:#78350f;font-weight:700;">
-              ⚠ 경사각이 클수록 실 지붕면 &gt; 수평투영 → 유효면적 증가 → 관경 상향 가능
+              ⚠ KDS 표 4.4-1~3은 「최대 수평투영 지붕면적」 기준 — 경사 보정계수(secθ)는 두지 않음
             </div>
           </div>
 
@@ -1108,7 +1094,7 @@ input[type="number"]{-moz-appearance:textfield;}
               <div style="width:28px;height:28px;background:#c2410c;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">🏘️</div>
               <div>
                 <div style="font-size:11px;font-weight:900;color:#7c2d12;">③ 밸리형 복합지붕</div>
-                <div style="font-size:9.5px;color:#ea580c;font-weight:700;">RF = 1.0 · VF = 1.10 ~ 1.30</div>
+                <div style="font-size:9.5px;color:#ea580c;font-weight:700;">VF = 1.10 ~ 1.30 (KDS 외 · 선택)</div>
               </div>
               <div style="margin-left:auto;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:3px 8px;font-size:9.5px;font-weight:800;color:#c2410c;">집수 집중</div>
             </div>
@@ -1123,7 +1109,7 @@ input[type="number"]{-moz-appearance:textfield;}
               </div>
             </div>
             <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:5px;padding:5px 8px;font-size:9.5px;color:#92400e;font-weight:700;">
-              ⚠ 골(Valley) 부분에 빗물 집중 → VF를 환산면적에 곱해 안전율 추가 확보
+              ⚠ 골(Valley) 부분에 빗물 집중 → VF(KDS 외·설계자 선택)를 환산면적에 곱함
             </div>
           </div>
 
@@ -1151,7 +1137,7 @@ input[type="number"]{-moz-appearance:textfield;}
               </div>
               <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;">
                 <div style="color:#6b7a99;font-weight:700;margin-bottom:2px;">수평관 선정</div>
-                <div style="font-weight:700;color:#1a2744;">표 4.4-2 → DN 결정<br>기울기 보정 적용</div>
+                <div style="font-weight:700;color:#1a2744;">표 4.4-2 → DN 결정<br>구배별 표 직접 조회</div>
               </div>
             </div>
           </div>
@@ -1177,11 +1163,11 @@ input[type="number"]{-moz-appearance:textfield;}
               </div>
               <div style="background:#f0fdfa;border:1.5px solid #99f6e4;border-radius:6px;padding:6px 8px;">
                 <div style="color:#0f766e;font-weight:700;margin-bottom:2px;">빗물받이</div>
-                <div style="font-weight:700;color:#134e4a;">표 4.4-3<br>폭(mm) ← 단위 상이</div>
+                <div style="font-weight:700;color:#134e4a;">표 4.4-3 DN(mm)</div>
               </div>
             </div>
             <div style="background:#f0fdfa;border:1px solid #99f6e4;border-radius:5px;padding:5px 8px;font-size:9.5px;color:#134e4a;font-weight:700;">
-              ⚠ 수직·수평관 DN은 원형관과 동일하게 산정 — 빗물받이 폭이 추가로 산출됨
+              ⚠ 수직·수평관 DN은 원형관과 동일하게 산정 — 반원형 빗물받이 DN이 추가로 산출됨
             </div>
           </div>
 
@@ -1197,77 +1183,62 @@ input[type="number"]{-moz-appearance:textfield;}
       <div class="card" style="margin-bottom:12px;">
         <div class="card-head"><div class="card-ico">📖</div><span class="card-tit">KDS 31 30 35 : 2021 주요 조문</span></div>
         <div class="card-body">
-          <div class="nb blue" style="margin-bottom:7px;"><div class="nb-tit">4.4.1 관 지름 기준</div><div class="nb-txt">수직관 및 수평 지관의 크기는 해당 지역 <strong>시간최대강우량</strong>을 기준으로 한다.</div></div>
-          <div class="nb blue" style="margin-bottom:7px;"><div class="nb-tit">4.4.2 우수 수직관</div><div class="nb-txt"><strong>표 4.4-1</strong> — 최대 수평투영 지붕면적 기준 DN 선정. 루프드레인 시 수직벽 면적 ½ 가산.</div></div>
-          <div class="nb blue" style="margin-bottom:7px;"><div class="nb-tit">4.4.3 우수 수평관</div><div class="nb-txt"><strong>표 4.4-2</strong> — 수평 기울기 1/25 이하 우수배관 적용. 수평지관 기울기 1/100 이상 유지.</div></div>
-          <div class="nb blue"><div class="nb-tit">4.4.4 반원형 빗물받이</div><div class="nb-txt"><strong>표 4.4-3</strong> — 폭(mm) 기준 선정. DN 단위와 상이하므로 혼용 주의.</div></div>
+          <div class="nb blue" style="margin-bottom:7px;"><div class="nb-tit">4.4.1 관 지름 기준</div><div class="nb-txt">옥내·옥외 우수 수직관, 부지 우수배수·부지 하수 및 모든 수평 지관의 크기는 그 지역의 기상자료에 의한 <strong>시간최대강우량</strong>을 기준으로 한다.</div></div>
+          <div class="nb blue" style="margin-bottom:7px;"><div class="nb-tit">4.4.2 우수 수직관</div><div class="nb-txt"><strong>표 4.4-1</strong> — 최대 수평투영 지붕면적으로 관 지름 선정(DN 50~200).</div></div>
+          <div class="nb blue" style="margin-bottom:7px;"><div class="nb-tit">4.4.4 수직 벽</div><div class="nb-txt">지붕으로 빗물이 흐르는 모든 수직 벽 면적의 <strong>1/2</strong>을 수평투영 지붕 면적에 더하여 수직관·수평관 크기를 정한다.</div></div>
+          <div class="nb blue" style="margin-bottom:7px;"><div class="nb-tit">4.4.3 우수 수평관</div><div class="nb-txt"><strong>표 4.4-2</strong> — 수평 기울기 1/25 이하 우수배관에 적용(1/100·1/50·1/25 구배별 표). 별도 승인이 없으면 수평지관 기울기 1/100 이상.</div></div>
+          <div class="nb blue"><div class="nb-tit">4.4.5 지붕 빗물받이의 크기</div><div class="nb-txt"><strong>표 4.4-3</strong> — 반원형 빗물받이 DN 80~250, 기울기 1/200·1/100·1/50·1/25별 최대 수평투영 지붕면적 기준.</div></div>
         </div>
       </div>
 
-      <!-- 수평관 기울기 조건 -->
+      <!-- 수평관 기울기 조건 — v5.0.10 표 4.4-2 구배별 직접 조회 -->
       <div class="card" style="margin-bottom:12px;">
-        <div class="card-head"><div class="card-ico">📐</div><span class="card-tit">수평관 기울기 보정 조건</span><span class="cbadge">√(100/n) 보정</span></div>
+        <div class="card-head"><div class="card-ico">📐</div><span class="card-tit">수평관 기울기별 조회</span><span class="cbadge">표 4.4-2 구배별</span></div>
         <div class="card-body">
           <div class="tbl-hint no-print"><span style="font-size:14px;">←</span><span>좌우로 스크롤하여 전체 항목 확인</span><span style="font-size:14px;">→</span></div>
           <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:0 0 8px 8px;border:1px solid #e2e8f0;margin-bottom:9px;">
             <table style="width:100%;border-collapse:collapse;font-size:11px;min-width:460px;">
               <thead>
                 <tr style="background:#eff6ff;">
-                  <th style="padding:7px 10px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;">기울기</th>
-                  <th style="padding:7px 10px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;">보정계수</th>
-                  <th style="padding:7px 10px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;">dc_h 변화</th>
-                  <th style="padding:7px 10px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;">결과 영향</th>
+                  <th style="padding:7px 10px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;">구배</th>
+                  <th style="padding:7px 10px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;">DN 80 @100mm/h</th>
+                  <th style="padding:7px 10px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;">DN 100 @100mm/h</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;">1/100</td>
-                  <td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">√1.0 = 1.000</td>
-                  <td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;">보정 없음</td>
-                  <td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-weight:700;color:#15803d;">기준값</td>
-                </tr>
-                <tr style="background:#f8fafd;">
-                  <td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;">1/50</td>
-                  <td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">√2.0 = 1.414</td>
-                  <td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;">dc ÷ 1.414</td>
-                  <td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-weight:700;color:#15803d;">관경 ↓ 가능</td>
-                </tr>
-                <tr>
-                  <td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;">1/25</td>
-                  <td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">√4.0 = 2.000</td>
-                  <td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;">dc ÷ 2.000</td>
-                  <td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-weight:700;color:#15803d;">관경 최소화</td>
-                </tr>
+                <tr><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;">1/100</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">76 m²</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">167 m²</td></tr>
+                <tr style="background:#f8fafd;"><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;">1/50</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">108 m²</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">246 m²</td></tr>
+                <tr><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;">1/25</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">153 m²</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">349 m²</td></tr>
               </tbody>
             </table>
           </div>
-          <div class="nb blue" style="margin-bottom:0;"><div class="nb-tit">ℹ️ 원리</div><div class="nb-txt">기울기가 급할수록 관 내 유속 증가 → 같은 단면에서 더 많은 유량 처리 가능 → 필요 단면적(dc_h) 감소 → 소구경 선정 가능. KDS 표 4.4-2는 1/100 기준이므로 다른 기울기 시 √(100/n)으로 환산.</div></div>
+          <div class="nb blue" style="margin-bottom:0;"><div class="nb-tit">ℹ️ 조회 방법</div><div class="nb-txt">KDS 표 4.4-2는 1/100·1/50·1/25 구배별 표를 따로 둡니다. 선택한 구배의 표를 그대로 조회하며 보정식(√ 환산)은 쓰지 않습니다. 수평관은 DN 80부터이며, 별도 승인이 없으면 수평지관 기울기는 1/100 이상입니다(4.4.3).</div></div>
         </div>
       </div>
 
       <!-- 안전율 + 주의사항 -->
       <div class="card">
-        <div class="card-head"><div class="card-ico">🛡️</div><span class="card-tit">안전 여유율 및 주의사항</span></div>
+        <div class="card-head"><div class="card-ico">🛡️</div><span class="card-tit">여유율(KDS 외 · 선택) 및 주의사항</span></div>
         <div class="card-body">
           <div class="tbl-hint no-print"><span style="font-size:14px;">←</span><span>좌우로 스크롤하여 전체 항목 확인</span><span style="font-size:14px;">→</span></div>
           <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:0 0 8px 8px;border:1px solid #e2e8f0;margin-bottom:9px;">
             <table style="width:100%;border-collapse:collapse;font-size:11px;min-width:460px;">
               <thead>
                 <tr style="background:#eff6ff;">
-                  <th style="padding:7px 10px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;">안전율</th>
+                  <th style="padding:7px 10px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;">여유율</th>
                   <th style="padding:7px 10px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;">적용 승수</th>
-                  <th style="padding:7px 10px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;">권장 적용 상황</th>
+                  <th style="padding:7px 10px;text-align:center;font-weight:800;color:#1e40af;border:1px solid #bfdbfe;">비고</th>
                 </tr>
               </thead>
               <tbody>
-                <tr><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;font-weight:700;">0%</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">× 1.00</td><td style="padding:6px 10px;border:1px solid #e2e8f0;color:#64748b;">기준값만 적용 (보수적 지역)</td></tr>
-                <tr style="background:#f8fafd;"><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;font-weight:700;">+10%</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">× 1.10</td><td style="padding:6px 10px;border:1px solid #e2e8f0;color:#64748b;">일반 건축물 최소 여유</td></tr>
-                <tr><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;font-weight:700;color:#1d4ed8;">+20%</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;font-weight:700;color:#1d4ed8;">× 1.20</td><td style="padding:6px 10px;border:1px solid #e2e8f0;font-weight:700;color:#1d4ed8;">권장값 — 집중호우·기후변화 대응</td></tr>
-                <tr style="background:#f8fafd;"><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;font-weight:700;">+30%</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">× 1.30</td><td style="padding:6px 10px;border:1px solid #e2e8f0;color:#64748b;">고위험 지역·대형 건축물</td></tr>
+                <tr><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;font-weight:700;">0%</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">× 1.00</td><td style="padding:6px 10px;border:1px solid #e2e8f0;color:#64748b;">KDS 31 30 35 원문 기준 — 기본값</td></tr>
+                <tr style="background:#f8fafd;"><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;font-weight:700;">+10%</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">× 1.10</td><td style="padding:6px 10px;border:1px solid #e2e8f0;color:#64748b;">설계자 선택 (KDS 외)</td></tr>
+                <tr><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;font-weight:700;">+20%</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">× 1.20</td><td style="padding:6px 10px;border:1px solid #e2e8f0;color:#64748b;">설계자 선택 (KDS 외)</td></tr>
+                <tr style="background:#f8fafd;"><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;font-weight:700;">+30%</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">× 1.30</td><td style="padding:6px 10px;border:1px solid #e2e8f0;color:#64748b;">설계자 선택 (KDS 외)</td></tr>
               </tbody>
             </table>
           </div>
-          <div class="nb org"><div class="nb-tit">⚠️ 설계 주의사항</div><div class="nb-txt">· 산정된 관경은 <strong>최솟값</strong> — 실시설계 시 상위 규격 검토 권장<br>· 수평관 연결부·곡관 등 마찰손실 별도 고려<br>· 옥내 배관은 내식성 재질(스테인리스·PVC) 사용 권장<br>· 반원형 빗물받이 폭(mm) ≠ 원형관 DN(mm) — 단위 혼용 금지<br>· 기상청 자료는 최신값(data.kma.go.kr) 확인 후 적용</div></div>
+          <div class="nb org"><div class="nb-tit">⚠️ 설계 주의사항</div><div class="nb-txt">· 산정된 관경은 <strong>최솟값</strong> — 실시설계 시 상위 규격 검토 권장<br>· 수평관 연결부·곡관 등 마찰손실 별도 고려<br>· 옥내 배관은 내식성 재질(스테인리스·PVC) 사용 권장<br>· 반원형 빗물받이는 표 4.4-3(반원형 DN) 별도 조회<br>· 지역 강우량은 관측 최대값(~2025) — 설계 시 최신값(data.kma.go.kr) 확인 후 적용</div></div>
         </div>
       </div>
 
@@ -1349,7 +1320,7 @@ input[type="number"]{-moz-appearance:textfield;}
             <div style="font-size:10px;color:#93c5fd;line-height:1.65;">
               ① <strong style="color:#e0f2fe;">지붕 형태</strong>를 선택 : 평지붕 / 경사지붕 / 밸리형<br>
               ② <strong style="color:#e0f2fe;">수평투영 면적(m²)</strong>과 <strong style="color:#e0f2fe;">수직벽 면적(m²)</strong>을 입력합니다.<br>
-              ③ 경사지붕은 <strong style="color:#fbbf24;">경사각(°)</strong>, 밸리형은 <strong style="color:#fbbf24;">집수집중계수</strong>를 추가 선택합니다.<br>
+              ③ 경사지붕도 <strong style="color:#fbbf24;">수평투영 면적</strong>을 입력합니다. 밸리형은 <strong style="color:#fbbf24;">집수집중계수</strong>(KDS 외 · 선택)를 고릅니다.<br>
               ④ 공사명·날짜는 결과 보고서 출력 시 표시됩니다.
             </div>
           </div>
@@ -1362,7 +1333,7 @@ input[type="number"]{-moz-appearance:textfield;}
             <div style="font-size:10px;color:#93c5fd;line-height:1.65;">
               ① <strong style="color:#e0f2fe;">드레인 개수 모드</strong>를 선택 : 수동 입력 또는 구역별 설정<br>
               ② <strong style="color:#e0f2fe;">관 종류</strong>(원형관/반원형 빗물받이), <strong style="color:#e0f2fe;">재질</strong>, <strong style="color:#e0f2fe;">수평관 기울기</strong>를 설정합니다.<br>
-              ③ <strong style="color:#fbbf24;">안전 여유율</strong>은 기후변화 대응을 위해 <strong style="color:#fbbf24;">+20%(권장)</strong>을 사용합니다.
+              ③ <strong style="color:#fbbf24;">여유율</strong>은 KDS 원문에 없는 설계자 선택 항목입니다. 기본값은 <strong style="color:#fbbf24;">0%</strong>입니다.
             </div>
           </div>
         </div>
@@ -1399,7 +1370,7 @@ input[type="number"]{-moz-appearance:textfield;}
           </div>
           <div style="background:#fff;border:1px solid #e0f2fe;border-radius:6px;padding:6px 8px;">
             <div style="font-size:10px;font-weight:800;color:#0369a1;">📖 설계 기준</div>
-            <div style="font-size:9.5px;color:#475569;margin-top:2px;line-height:1.5;">산정 흐름·지붕형태·안전율 해설</div>
+            <div style="font-size:9.5px;color:#475569;margin-top:2px;line-height:1.5;">산정 흐름·지붕형태·여유율 해설</div>
           </div>
           <div style="background:#fff;border:1px solid #e0f2fe;border-radius:6px;padding:6px 8px;">
             <div style="font-size:10px;font-weight:800;color:#0369a1;">📄 A4 미리보기</div>
@@ -1415,24 +1386,23 @@ input[type="number"]{-moz-appearance:textfield;}
       <!-- ══ 기존 계산식 섹션 ══ -->
       <div style="background:#f8fafd;border:1.5px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:13px;text-align:center">
         <div style="font-size:10px;font-weight:700;color:#6b7a99;margin-bottom:10px">▶ 단계별 계산식 (지붕형태 보정 포함)</div>
-        <div style="font-size:13px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;margin-bottom:3px">A_base = A_roof × RF + A_wall × 0.5</div>
-        <div style="font-size:10.5px;color:#64748b;margin-bottom:10px">RF : 지붕형태 면적보정계수 (평지붕=1.0 / 경사=secθ / 밸리=1.0)</div>
+        <div style="font-size:13px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;margin-bottom:3px">A_base = A_roof + A_wall × 0.5</div>
+        <div style="font-size:10.5px;color:#64748b;margin-bottom:10px">A_roof : 수평투영 지붕면적 — 경사지붕도 같음(KDS 4.4.2, 경사 보정 없음)</div>
         <div style="font-size:13px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;margin-bottom:3px">A_conv = A_base × (R ÷ 100) × SF × VF</div>
-        <div style="font-size:10.5px;color:#64748b;margin-bottom:10px">VF : 밸리형 집수집중계수 (평·경사=1.0 / 밸리=1.10~1.30)</div>
+        <div style="font-size:10.5px;color:#64748b;margin-bottom:10px">SF·VF : KDS 외 설계자 선택 계수 (기본 SF 1.00 · 밸리 VF 1.10~1.30)</div>
         <div style="font-size:13px;font-weight:900;color:#f97316;font-family:'JetBrains Mono',monospace;margin-bottom:3px">A_drain = A_conv ÷ N</div>
         <div style="font-size:10.5px;color:#64748b">드레인당 분담 환산면적 → KDS 표 조회</div>
       </div>
       <div class="nb blue" style="margin-bottom:10px"><div class="nb-tit">📊 변수 설명</div><div class="nb-txt">
-        <strong>A_base</strong> : 지붕형태 보정 후 유효면적 (m²)<br>
+        <strong>A_base</strong> : 유효면적 (m²)<br>
         <strong>A_roof</strong> : 수평투영 지붕면적 (m²)<br>
-        <strong>RF</strong> : 면적보정계수 — 평지붕 1.0, 경사지붕 1/cosθ (secθ), 밸리형 1.0<br>
-        <strong>A_wall</strong> : 수직벽 면적 — 루프드레인 시 ½ 가산 (KDS 4.4.2)<br>
-        <strong>R</strong> : 시간최대강우량 (mm/hr) — 기상청<br>
-        <strong>SF</strong> : 안전 여유율 (1.00~1.30)<br>
-        <strong>VF</strong> : 밸리형 집수 집중계수 (1.10/1.20/1.30)<br>
+                <strong>A_wall</strong> : 수직벽 면적 — ½ 가산 (KDS 4.4.4)<br>
+        <strong>R</strong> : 시간최대강우량 (mm/hr) — 기상청 1시간 최다강수량 관측 최대값<br>
+        <strong>SF</strong> : 여유율 — KDS 외 선택 (1.00~1.30, 기본 1.00)<br>
+        <strong>VF</strong> : 밸리형 집수 집중계수 — KDS 외 선택 (1.10/1.20/1.30)<br>
         <strong>N</strong> : 우수 드레인 설치 개수</div></div>
-      <div class="nb grn" style="margin-bottom:10px"><div class="nb-tit">📋 KDS 표 조회 방법</div><div class="nb-txt">A_drain 값을 KDS 31 30 35 : 2021 <strong>표 4.4-1</strong> (100mm/hr 열)에서 해당 값 이상인 최소 관경(DN)을 선택합니다.<br>수평관은 <strong>표 4.4-2</strong>, 반원형 빗물받이는 <strong>표 4.4-3</strong> 동일 적용.</div></div>
-      <div class="nb org"><div class="nb-tit">💡 적용 예시</div><div class="nb-txt">지역: 서울 (98.5mm/hr) / 면적: 500m² / 드레인: 4개 / 안전율: +20%<br>→ A_eff = 500m²<br>→ A_conv = 500 × (98.5÷100) × 1.20 = <strong>591m²</strong><br>→ A_drain = 591 ÷ 4 = <strong>147.75m²</strong><br>→ 표 4.4-1 → DN125 (215m²) 선정 ✓</div></div>
+      <div class="nb grn" style="margin-bottom:10px"><div class="nb-tit">📋 KDS 표 조회 방법</div><div class="nb-txt">A_drain 값을 KDS 31 30 35 : 2021 <strong>표 4.4-1</strong> (100mm/hr 열)에서 해당 값 이상인 최소 관경(DN)을 선택합니다.<br>수평관은 선택 구배의 <strong>표 4.4-2</strong>, 반원형 빗물받이는 <strong>표 4.4-3</strong> 동일 적용.</div></div>
+      <div class="nb org"><div class="nb-tit">💡 적용 예시</div><div class="nb-txt">지역: 서울 (118.6mm/hr) / 면적: 500m² / 드레인: 4개 / 여유율: 0% → A_eff = 500m² → A_conv = 500 × (118.6÷100) × 1.00 = 593m² → A_drain = 593 ÷ 4 = 148.25m² → 표 4.4-1 (100mm/h 열) → DN80 (204m²) 선정 ✓</div></div>
     </div>
   </div>
 </div>
@@ -1440,47 +1410,59 @@ input[type="number"]{-moz-appearance:textfield;}
 <!-- SCRIPT -->
 <script>
 /* ═══════ KDS 표 데이터 ═══════ */
-const VT=[[50,33,22,16,13,11,8],[65,67,45,34,27,22,17],[80,114,76,57,46,38,29],[100,226,151,113,91,76,57],[125,430,287,215,172,143,108],[150,710,474,355,284,237,178],[200,1486,991,743,594,495,372]];
-const HT=[[50,67,45,34,27,22,17],[65,135,90,67,54,45,34],[80,228,152,114,91,76,57],[100,452,301,226,181,151,113],[125,860,573,430,344,287,215],[150,1419,946,710,568,474,355],[200,2972,1981,1486,1189,991,743]];
-const GT=[[76,33,22,16,13,11,8],[102,72,48,36,29,24,18],[127,129,86,64,51,43,32],[152,202,135,101,81,67,51],[203,414,276,207,165,138,103],[254,737,491,368,295,246,184],[305,1182,788,591,473,394,296]];
+/* KDS 31 30 35:2021 원문(국토교통부고시 첨부 hwp 추출, 2026-10-13). 열 = 강우량(mm/h). 조회는 100mm/h 열(인덱스 4) — 표는 강우량에 반비례(면적×강우량 일정) */
+const VCOL=[25,50,75,100,125,150,175,200,225,250,275,300];
+const VT=[[50,268,134,89,67,54,45,38,34,30,27,24,22],[80,816,408,272,204,164,136,117,102,91,82,74,68],[100,1708,854,570,427,342,285,244,214,190,171,155,142],[125,3216,1608,1072,804,643,536,460,402,357,322,292,268],[150,5016,2508,1672,1254,1003,836,717,627,557,502,456,418],[200,10776,5388,3592,2694,2155,1796,1540,1347,1197,1078,980,898]];
+const HCOL=[25,50,75,100,125,150];
+const HTS={100:[[80,305,153,102,76,61,51],[100,668,334,223,167,134,111],[125,1241,621,414,310,248,207],[150,1988,994,663,497,398,331],[200,4273,2137,1424,1068,855,712],[250,7692,3846,2564,1923,1538,1282],[300,12374,6187,4125,3094,2475,2062],[375,20252,10126,6751,5063,4050,3375]],
+ 50:[[80,431,216,144,108,86,72],[100,985,492,328,246,197,164],[125,1754,877,585,438,351,292],[150,2806,1403,935,701,561,468],[200,6057,3029,2019,1514,1211,1010],[250,10851,5425,3617,2713,2170,1808],[300,17465,8733,5822,4366,3493,2911],[375,31214,15607,10405,7804,6243,5202]],
+ 25:[[80,611,305,204,153,122,102],[100,1397,699,466,349,279,233],[125,2482,1241,827,621,496,414],[150,3976,1988,1325,994,795,663],[200,8547,4273,2849,2137,1709,1424],[250,15384,7692,5128,3846,3077,2564],[300,24748,12374,8249,6187,4950,4125],[375,44220,22110,14740,11055,8844,7370]]};
+/* 표 4.4-3 — 1/100 구배 DN100 75mm/h 원문 「637」은 행 반비례(188·94·?·47)로 보아 63의 오기 → 63 적용 */
+const GTS={200:[[80,63,31,21,16,13,10],[100,133,66,44,33,27,22],[125,231,115,77,58,46,38],[150,354,177,118,89,71,59],[175,509,255,170,127,102,85],[200,735,367,245,184,147,122],[250,1336,668,445,334,267,223]],
+ 100:[[80,89,44,30,22,18,15],[100,188,94,63,47,38,31],[125,325,162,108,81,65,54],[150,502,251,167,126,100,84],[175,720,360,240,180,144,120],[200,1040,520,347,260,208,173],[250,1896,948,632,474,379,316]],
+ 50:[[80,126,63,42,31,25,21],[100,266,133,89,66,53,44],[125,464,232,155,116,93,77],[150,712,356,237,178,142,119],[175,1020,510,340,255,204,170],[200,1480,740,493,370,296,247],[250,2676,1338,892,669,535,446]],
+ 25:[[80,177,89,59,44,35,30],[100,377,188,126,94,75,63],[125,653,327,218,163,131,109],[150,1023,511,341,256,205,170],[175,1448,724,483,362,290,241],[200,2080,1040,693,520,416,347],[250,3716,1858,1239,929,743,619]]};
+const C100=4; /* 100mm/h 열 인덱스 */
 
-/* ═══════ 기상청 지역 데이터 [sido, sigun, stationNo, rainfall, period] ═══════ */
+/* ═══════ 기상청 지역 데이터 [sido, sigun, stationNo, rainfall, period, 발생일, 관측소] ═══════
+   기상자료개방포털 조건별통계(지상 ASOS·강수량·년) 연 1시간 최다강수량의 관측 최대값(~2025), 2026-10-13 조회.
+   관측소 없는 시군(경기 광주·화성·안성·삼척·공주·익산·나주)은 인근 관측소 값 — 관측소명에 (인근) 표기 */
 const RD=[
-  ["서울특별시","서울",108,98.5,"1973~2020"],["부산광역시","부산",159,91.0,"1973~2020"],
-  ["대구광역시","대구",143,88.0,"1973~2020"],["인천광역시","인천",112,85.5,"1973~2020"],
-  ["광주광역시","광주",156,80.0,"1973~2020"],["대전광역시","대전",133,87.5,"1973~2020"],
-  ["울산광역시","울산",152,92.0,"1973~2020"],["세종특별자치시","세종",239,85.0,"2012~2020"],
-  ["경기도","수원",119,88.0,"1964~2020"],["경기도","파주",203,80.5,"2000~2020"],
-  ["경기도","이천",203,85.0,"2000~2020"],["경기도","양평",202,90.0,"2000~2020"],
-  ["경기도","광주",247,88.0,"2013~2020"],["경기도","화성",487,82.0,"2011~2020"],
-  ["경기도","동두천",211,85.5,"2001~2020"],["경기도","안성",273,83.5,"2013~2020"],
-  ["강원특별자치도","춘천",101,80.0,"1973~2020"],["강원특별자치도","강릉",105,100.0,"1973~2020"],
-  ["강원특별자치도","원주",114,85.0,"1973~2020"],["강원특별자치도","속초",90,110.5,"1973~2020"],
-  ["강원특별자치도","태백",216,70.0,"1988~2020"],["강원특별자치도","삼척",217,100.5,"1988~2020"],
-  ["강원특별자치도","홍천",212,83.5,"1988~2020"],["충청북도","청주",131,91.8,"1973~2020"],
-  ["충청북도","충주",127,89.5,"1973~2020"],["충청북도","제천",221,92.5,"1988~2020"],
-  ["충청북도","보은",226,95.0,"1988~2020"],["충청남도","서산",129,77.0,"1973~2020"],
-  ["충청남도","천안",232,84.5,"2000~2020"],["충청남도","공주",235,82.0,"2000~2020"],
-  ["충청남도","보령",235,79.0,"2000~2020"],["충청남도","부여",236,80.0,"2000~2020"],
-  ["충청남도","금산",238,84.5,"2000~2020"],["충청남도","홍성",177,77.5,"1985~2020"],
-  ["전북특별자치도","전주",146,84.5,"1973~2020"],["전북특별자치도","군산",140,80.0,"1973~2020"],
-  ["전북특별자치도","남원",243,87.5,"2002~2020"],["전북특별자치도","익산",140,82.0,"1973~2020"],
-  ["전북특별자치도","정읍",146,85.0,"1973~2020"],["전북특별자치도","장수",248,75.0,"2002~2020"],
-  ["전라남도","목포",168,78.5,"1973~2020"],["전라남도","여수",168,90.0,"1973~2020"],
-  ["전라남도","순천",244,89.0,"2002~2020"],["전라남도","나주",245,82.0,"2002~2020"],
-  ["전라남도","장흥",260,82.0,"2012~2020"],["전라남도","강진",260,83.5,"2012~2020"],
-  ["전라남도","해남",261,79.0,"2012~2020"],["전라남도","고흥",262,80.5,"2012~2020"],
-  ["전라남도","광양",245,90.0,"2002~2020"],["경상북도","포항",138,100.0,"1973~2020"],
-  ["경상북도","안동",136,84.5,"1973~2020"],["경상북도","경주",136,87.5,"1973~2020"],
-  ["경상북도","구미",279,85.5,"2013~2020"],["경상북도","영주",271,82.0,"2013~2020"],
-  ["경상북도","울진",130,108.0,"1973~2020"],["경상북도","영천",281,86.0,"2013~2020"],
-  ["경상북도","상주",137,85.0,"1973~2020"],["경상남도","창원",155,93.5,"1973~2020"],
-  ["경상남도","진주",192,90.0,"1985~2020"],["경상남도","통영",162,92.5,"1973~2020"],
-  ["경상남도","밀양",288,89.0,"2013~2020"],["경상남도","거창",284,82.5,"2013~2020"],
-  ["경상남도","합천",285,86.0,"2013~2020"],["경상남도","거제",289,95.0,"2013~2020"],
-  ["경상남도","함양",286,85.0,"2013~2020"],["제주특별자치도","제주",184,107.5,"1973~2020"],
-  ["제주특별자치도","서귀포",189,110.0,"1973~2020"],["제주특별자치도","성산",188,112.5,"1973~2020"],
-  ["제주특별자치도","고산",185,88.5,"1988~2020"]
+  ["서울특별시","서울",108,118.6,"1937~2025","1942-08-05","서울"],["부산광역시","부산",159,106.0,"1914~2025","2008-08-13","부산"],
+  ["대구광역시","대구",143,80.0,"1916~2025","1941-07-06","대구"],["인천광역시","인천",112,103.3,"1917~2025","1953-08-13","인천"],
+  ["광주광역시","광주",156,86.5,"1939~2025","2008-08-08","광주"],["대전광역시","대전",133,79.1,"1969~2025","1969-07-31","대전"],
+  ["울산광역시","울산",152,104.2,"1945~2025","2016-10-05","울산"],["세종특별자치시","세종",239,59.0,"2019~2025","2020-08-28","세종"],
+  ["경기도","수원",119,92.5,"1964~2025","2000-07-22","수원"],["경기도","파주",99,101.0,"2002~2025","2024-07-17","파주"],
+  ["경기도","이천",203,98.0,"1972~2025","2010-09-21","이천"],["경기도","양평",202,97.0,"1971~2025","1975-07-25","양평"],
+  ["경기도","광주",203,98.0,"1972~2025","2010-09-21","이천 (인근)"],["경기도","화성",119,92.5,"1964~2025","2000-07-22","수원 (인근)"],
+  ["경기도","동두천",98,86.0,"1998~2025","1998-08-06","동두천"],["경기도","안성",232,90.0,"1972~2025","1976-08-14","천안 (인근)"],
+  ["강원특별자치도","춘천",101,62.0,"1966~2025","1988-07-13","춘천"],["강원특별자치도","강릉",105,100.5,"1928~2025","2002-08-31","강릉"],
+  ["강원특별자치도","원주",114,79.5,"1971~2025","1976-08-13","원주"],["강원특별자치도","속초",90,91.3,"1968~2025","2023-08-10","속초"],
+  ["강원특별자치도","태백",216,75.5,"1985~2025","2005-07-01","태백"],["강원특별자치도","삼척",106,67.4,"1992~2025","2019-10-03","동해 (인근)"],
+  ["강원특별자치도","홍천",212,89.0,"1971~2025","2006-07-15","홍천"],["충청북도","청주",131,91.8,"1967~2025","2017-07-16","청주"],
+  ["충청북도","충주",127,89.5,"1972~2025","1989-07-25","충주"],["충청북도","제천",221,92.5,"1973~2025","2007-08-05","제천"],
+  ["충청북도","보은",226,95.0,"1972~2025","1998-08-12","보은"],["충청남도","서산",129,114.9,"1968~2025","2025-07-17","서산"],
+  ["충청남도","천안",232,90.0,"1972~2025","1976-08-14","천안"],["충청남도","공주",236,116.0,"1973~2025","1999-09-10","부여 (인근)"],
+  ["충청남도","보령",235,98.0,"1972~2025","2010-07-23","보령"],["충청남도","부여",236,116.0,"1973~2025","1999-09-10","부여"],
+  ["충청남도","금산",238,84.1,"1972~2025","2024-07-10","금산"],["충청남도","홍성",177,98.2,"2016~2025","2025-07-17","홍성"],
+  ["전북특별자치도","전주",146,109.6,"1918~2025","1951-05-26","전주"],["전북특별자치도","군산",140,152.2,"1968~2025","2025-09-07","군산"],
+  ["전북특별자치도","남원",247,110.2,"1973~2025","2024-08-26","남원"],["전북특별자치도","익산",140,152.2,"1968~2025","2025-09-07","군산 (인근)"],
+  ["전북특별자치도","정읍",245,83.5,"1972~2025","2010-07-01","정읍"],["전북특별자치도","장수",248,63.0,"1988~2025","2009-07-15","장수"],
+  ["전라남도","목포",165,64.5,"1927~2025","2004-07-03","목포"],["전라남도","여수",168,77.4,"1942~2025","1981-09-24","여수"],
+  ["전라남도","순천",174,82.5,"2011~2025","2014-08-25","순천"],["전라남도","나주",156,86.5,"1939~2025","2008-08-08","광주 (인근)"],
+  ["전라남도","장흥",260,95.5,"1972~2025","2000-08-04","장흥"],["전라남도","강진",259,96.5,"2010~2025","2024-09-21","강진군"],
+  ["전라남도","해남",261,80.5,"1971~2025","1998-08-02","해남"],["전라남도","고흥",262,106.6,"1972~2025","2017-06-26","고흥"],
+  ["전라남도","광양",266,106.5,"2011~2025","2011-08-07","광양시"],["경상북도","포항",138,93.4,"1949~2025","1998-09-30","포항"],
+  ["경상북도","안동",136,65.5,"1973~2025","2010-08-13","안동"],["경상북도","경주",283,56.4,"2010~2025","2022-09-06","경주시"],
+  ["경상북도","구미",279,58.6,"1973~2025","2017-08-19","구미"],["경상북도","영주",272,86.0,"1972~2025","1978-08-16","영주"],
+  ["경상북도","울진",130,104.5,"1971~2025","2019-10-03","울진"],["경상북도","영천",281,61.5,"1972~2025","1988-08-16","영천"],
+  ["경상북도","상주",137,54.2,"2002~2025","2020-08-30","상주"],["경상남도","창원",155,104.9,"1985~2025","2024-09-21","창원"],
+  ["경상남도","진주",192,80.0,"1969~2025","1970-08-07","진주"],["경상남도","통영",162,86.5,"1968~2025","1999-07-30","통영"],
+  ["경상남도","밀양",288,70.0,"1973~2025","1998-09-30","밀양"],["경상남도","거창",284,83.0,"1972~2025","2007-08-08","거창"],
+  ["경상남도","합천",285,78.6,"1973~2025","2025-07-19","합천"],["경상남도","거제",294,96.5,"1973~2025","2001-07-05","거제"],
+  ["경상남도","함양",264,62.5,"2010~2025","2011-08-07","함양군"],["제주특별자치도","제주",184,105.0,"1923~2025","1927-09-11","제주"],
+  ["제주특별자치도","서귀포",189,120.7,"1961~2025","2018-09-01","서귀포"],["제주특별자치도","성산",188,101.0,"1972~2025","1981-08-10","성산"],
+  ["제주특별자치도","고산",185,73.8,"1988~2025","2021-09-02","고산"]
 ];
 
 /* ═══════ STATE ═══════ */
@@ -1491,7 +1473,7 @@ let S={
   slopeAngle:30,   // 경사지붕: 경사각(도)
   valleyFactor:1.20, // 밸리형: 집수 집중계수
   drains:1,drainMode:'manual',
-  pipetype:'circular',material:'pvc',slope:100,safety:20,
+  pipetype:'circular',material:'pvc',slope:100,safety:0,
   hasResult:false,result:null
 };
 
@@ -1603,16 +1585,16 @@ function selectRegionBySelect(){
   if(r)selectRegionData(r);
 }
 function selectRegionData(r){
-  S.sido=r[0];S.sigun=r[1];S.stationNo=r[2];S.rainfall=r[3];S.period=r[4];S.station=r[1];
+  S.sido=r[0];S.sigun=r[1];S.stationNo=r[2];S.rainfall=r[3];S.period=r[4];S.station=r[1];S.kmaStn=r[6];S.rainDate=r[5];
   document.getElementById('sel-sido').value=r[0];
   filterCities();
   document.getElementById('sel-sigun').value=r[1];
   document.querySelectorAll('.rcard').forEach(c=>{
     c.classList.toggle('sel',c.querySelector('.rcard-nm').textContent===r[1]);
   });
-  document.getElementById('ri-station').textContent=r[1]+' (No.'+r[2]+')';
+  document.getElementById('ri-station').textContent=r[6]+' (No.'+r[2]+')';
   document.getElementById('ri-rain').textContent=r[3]+' mm/hr';
-  document.getElementById('ri-period').textContent=r[4];
+  document.getElementById('ri-period').textContent=r[4]+' · 최대 발생 '+r[5];
   document.getElementById('rain-info-box').style.display='block';
   document.getElementById('region-badge').textContent=r[1];
   updateSteps();
@@ -1756,9 +1738,9 @@ function updateRoofInfoCard(rt){
     flat:{cls:'blue',ico:'🏢',tit:'평지붕 (옥상)',
       txt:'방수층이 시공된 수평 지붕입니다.<br>유출계수 최고(C≈0.90), 수직벽 면적 ½ 가산.<br>수평투영 면적이 그대로 유효면적으로 사용됩니다.'},
     slope:{cls:'grn',ico:'🏠',tit:'경사지붕',
-      txt:'기와·슬레이트 등 경사가 있는 지붕입니다.<br>실 지붕면 = 수평투영 × <b>secθ</b> — 경사각이 클수록 유효면적 증가.<br>경사각 θ를 아래에 입력하면 자동 보정됩니다.'},
+      txt:'기와·슬레이트 등 경사가 있는 지붕입니다.<br>KDS 표는 <b>수평투영 지붕면적</b> 기준 — 경사면 실면적이 아닌 평면 투영 면적을 입력합니다.<br>수직벽 ½ 가산은 평지붕과 같습니다(KDS 4.4.4).'},
     valley:{cls:'org',ico:'🏘️',tit:'밸리형 복합지붕',
-      txt:'두 경사면이 만나는 골(Valley) 구조입니다.<br>빗물이 밸리 집수선에 집중되어 집중계수(VF) 적용.<br>배수구를 밸리 최저점에 반드시 배치하세요.'}
+      txt:'두 경사면이 만나는 골(Valley) 구조입니다.<br>집중계수(VF)는 <b>KDS 외 설계자 선택</b> 계수입니다(KDS 원문에는 없음).<br>배수구를 밸리 최저점에 반드시 배치하세요.'}
   };
   const c=cfg[rt]||cfg.flat;
   el.innerHTML=`<div class="nb ${c.cls}"><div class="nb-tit">${c.ico} ${c.tit}</div><div class="nb-txt">${c.txt}</div></div>`;
@@ -1774,12 +1756,6 @@ function liveCalc(){
   S.rooftype=zoneMode==='single'?(document.getElementById('sel-rooftype').value):'flat';
   S.slopeAngle=parseFloat(document.getElementById('inp-slope-angle')?.value)||30;
   S.valleyFactor=parseFloat(document.getElementById('sel-valley-factor')?.value)||1.20;
-  // secθ 디스플레이 갱신
-  if(S.rooftype==='slope'){
-    const sec=(1/Math.cos(S.slopeAngle*Math.PI/180));
-    const el=document.getElementById('slope-sec-display');
-    if(el)el.textContent=sec.toFixed(3);
-  }
   S.pipetype=document.getElementById('sel-pipetype').value;
   S.material=document.getElementById('sel-material').value;
   S.slope=parseInt(document.getElementById('sel-slope').value);
@@ -1794,16 +1770,16 @@ function doCalc(){
   if(!S.rainfall||S.area<=0)return;
 
   /* ── 지붕형태 보정계수 ── */
-  // RF: 면적보정계수 (경사지붕: secθ, 나머지: 1.0)
+  // RF: v5.0.10 폐지(1.0 고정) — 경사지붕도 수평투영 면적을 입력한다
   const thetaRad = S.slopeAngle * Math.PI / 180;
-  const RF = S.rooftype==='slope' ? (1/Math.cos(thetaRad)) : 1.0;
+  const RF = 1.0; // KDS 4.4.2·표 4.4-1 : 수평투영 지붕면적 기준 — 경사 보정(secθ) 없음
   // VF: 밸리형 집수집중계수 (밸리형에만 적용)
-  const VF = S.rooftype==='valley' ? S.valleyFactor : 1.0;
+  const VF = S.rooftype==='valley' ? S.valleyFactor : 1.0; // KDS 외 — 설계자 선택 계수
 
   /* ── 면적 산정 ── */
   const wc  = S.wall * 0.5;                    // 수직벽 보정
   const ea  = S.area * RF + wc;                // 유효면적 (RF 반영)
-  const SF  = 1 + S.safety / 100;
+  const SF  = 1 + S.safety / 100;             // KDS 외 여유율(기본 0%)
   const ct  = ea * (S.rainfall / 100) * SF * VF; // 환산면적 (VF 반영)
   const dc  = ct / S.drains;
   const de  = ea / S.drains;
@@ -1811,12 +1787,12 @@ function doCalc(){
 
   /* ── 수평관 기울기 보정 ── */
   const slopeN      = S.slope;
-  const slopeFactor = Math.sqrt(100 / slopeN);
-  const dc_h        = dc / slopeFactor;
+  const slopeFactor = 1;      // v5.0.10 — √(100/n) 근사 폐지 : 표 4.4-2 구배별 표를 직접 조회
+  const dc_h        = dc;
 
   const vp = findPipe(VT, dc);
-  const hp = findPipe(HT, dc_h);
-  const gp = findPipe(GT, dc);
+  const hp = findPipe(HTS[slopeN]||HTS[100], dc_h);
+  const gp = findPipe(GTS[slopeN]||GTS[100], dc);
 
   S.hasResult = true;
   S.result = {
@@ -1846,11 +1822,10 @@ function doCalc(){
   if(roofRowEl && roofCrowEl){
     if(S.rooftype==='slope'){
       roofCrowEl.style.display='flex';
-      roofRowEl.textContent='경사지붕 secθ ('+S.slopeAngle+'°) = '+RF.toFixed(3)
-        +' → '+fmtN(S.area,1)+'×'+RF.toFixed(3)+' = '+fmtN(S.area*RF,1)+' m²';
+      roofRowEl.textContent='경사지붕 — 수평투영 면적 '+fmtN(S.area,1)+' m² 그대로 적용 (KDS 4.4.2, 경사 보정 없음)';
     } else if(S.rooftype==='valley'){
       roofCrowEl.style.display='flex';
-      roofRowEl.textContent='밸리형 집수집중계수 VF='+VF.toFixed(2)+' 환산면적에 적용';
+      roofRowEl.textContent='밸리형 집수집중계수 VF='+VF.toFixed(2)+' 환산면적에 적용 (KDS 외 설계자 선택)';
     } else {
       roofCrowEl.style.display='none';
     }
@@ -1868,21 +1843,17 @@ function doCalc(){
   const slopeEl   = document.getElementById('cv-slope-h');
   const slopeElDc = document.getElementById('cv-slope-h-dc');
   if(slopeEl){
-    slopeEl.textContent = slopeN===100
-      ? '1/100 (보정 없음, dc_h = dc)'
-      : '1/'+slopeN+' → 배율 √(100/'+slopeN+')='+slopeFactor.toFixed(3);
+    slopeEl.textContent = '1/'+slopeN+' — 표 4.4-2 해당 구배 표 직접 조회';
   }
   if(slopeElDc){
-    slopeElDc.textContent = slopeN===100
-      ? dc.toFixed(1)+' m² (보정 없음)'
-      : dc.toFixed(1)+' ÷ '+slopeFactor.toFixed(3)+' = '+dc_h.toFixed(1)+' m²';
+    slopeElDc.textContent = dc_h.toFixed(1)+' m² (보정 없음)';
   }
 
   renderCandidates('vresults', VT, dc);
-  renderCandidates('hresults', HT, dc_h);
+  renderCandidates('hresults', HTS[slopeN]||HTS[100], dc_h);
   if(S.pipetype==='semi'){
     document.getElementById('gutter-card').style.display='block';
-    renderCandidates('gresults', GT, dc);
+    renderCandidates('gresults', GTS[slopeN]||GTS[100], dc);
   } else {
     document.getElementById('gutter-card').style.display='none';
   }
@@ -1895,15 +1866,15 @@ function doCalc(){
 }
 
 function findPipe(t,target){
-  for(let i=0;i<t.length;i++)if(t[i][3]>=target)return{dn:t[i][0],maxArea:t[i][3],row:t[i]};
-  const l=t[t.length-1];return{dn:l[0],maxArea:l[3],row:l,over:true};
+  for(let i=0;i<t.length;i++)if(t[i][C100]>=target)return{dn:t[i][0],maxArea:t[i][C100],row:t[i]};
+  const l=t[t.length-1];return{dn:l[0],maxArea:l[C100],row:l,over:true};
 }
 
 /* ═══════ PIPE CANDIDATES (컴팩트 테이블) ═══════ */
 function renderCandidates(id,t,target){
   const found=findPipe(t,target);
   const rows=t.map(row=>{
-    const dn=row[0],m100=row[3],isRec=dn===found.dn,ok=m100>=target;
+    const dn=row[0],m100=row[C100],isRec=dn===found.dn,ok=m100>=target;
     const tag=isRec?`<span class="pc-tag-inline">✅ 추천</span>`:'';
     const margin=ok?(m100-target>0?'+':'')+(m100-target).toFixed(0):''+(m100-target).toFixed(0);
     const cls=isRec?'pc-rec':(!ok?'pc-dim':'');
@@ -1969,8 +1940,8 @@ function renderCountSummary(vDN,hDN,gDN){
       · 루프드레인(집수구) : <strong>${S.drains}개소</strong><br>
       · 우수 수직관 : DN ${vDN}mm × <strong>${S.drains}개소</strong><br>
       · 우수 수평관 : DN ${hDN}mm (구배 1/${S.slope} 이상)<br>
-      ${isSemi?'· 반원형 빗물받이 : 폭 '+gDN+'mm × '+S.drains+'개소<br>':''}
-      · 관 재질 : ${mat} · 안전여유율 : +${S.safety}%<br>
+      ${isSemi?'· 반원형 빗물받이 : DN '+gDN+'mm × '+S.drains+'개소<br>':''}
+      · 관 재질 : ${mat} · 여유율(KDS 외) : +${S.safety}%<br>
       · 적용기준 : KDS 31 30 35 : 2021 / ${S.station} ${S.rainfall}mm/hr
     </div></div>`;
 }
@@ -2003,7 +1974,7 @@ function renderA4(){
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:12px;">
       <div style="font-size:12px;font-weight:800;color:#1a2744;flex:1;text-align:left;">${projName}</div>
       <div style="text-align:right;white-space:nowrap;flex-shrink:0;">
-        <div style="font-size:9px;color:#64748b;margin-bottom:2px;">KDS 31 30 35 : 2021 (국토교통부고시 제2021-203호) · MANMIN Ver-5.0</div>
+        <div style="font-size:9px;color:#64748b;margin-bottom:2px;">KDS 31 30 35 : 2021 (현행 국토교통부고시 제2026-92호) · MANMIN Ver-5.0</div>
         <div style="font-size:9px;color:#475569;margin-bottom:1px;">작성일: ${ds}</div>
         ${S.author?`<div style="font-size:9px;color:#475569;">작성자: ${S.author}${S.affiliation?' / '+S.affiliation:''}</div>`:''}
       </div>
@@ -2015,11 +1986,11 @@ function renderA4(){
     <table class="a4-cond-tbl">
       <tr>
         <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">적용 지역</div><div class="a4-iv">${S.sido} ${S.sigun}</div></div></td>
-        <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">관측지점 (기상청)</div><div class="a4-iv">${S.station} (No.${S.stationNo})</div></div></td>
+        <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">관측지점 (기상청 ASOS)</div><div class="a4-iv">${S.kmaStn||S.station} (No.${S.stationNo})</div></div></td>
       </tr>
       <tr>
         <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">시간최대강우량</div><div class="a4-iv">${S.rainfall} mm/hr</div></div></td>
-        <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">관측기간</div><div class="a4-iv">${S.period}</div></div></td>
+        <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">자료기간 · 최대 발생일</div><div class="a4-iv">${S.period} · ${S.rainDate||''}</div></div></td>
       </tr>
       <tr>
         <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">수평투영 지붕면적</div><div class="a4-iv">${fmtN(S.area,0)} m²</div></div></td>
@@ -2034,7 +2005,7 @@ function renderA4(){
         <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">수평관 기울기</div><div class="a4-iv">1 / ${S.slope} 이상</div></div></td>
       </tr>
       <tr>
-        <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">안전 여유율</div><div class="a4-iv">+${S.safety}% (×${R.SF.toFixed(2)})</div></div></td>
+        <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">여유율 (KDS 외)</div><div class="a4-iv">+${S.safety}% (×${R.SF.toFixed(2)})</div></div></td>
         <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">지붕 유형</div><div class="a4-iv">${roofNm}</div></div></td>
       </tr>
     </table>
@@ -2133,24 +2104,24 @@ function renderA4(){
   <div class="a4-section allow-break page-aware">
     <div class="a4-sub" style="break-after:avoid;page-break-after:avoid;">3. 계산 과정</div>
     <table class="a4-tbl"><thead style="display:table-header-group;"><tr><th>단계</th><th>계산식</th><th>결과</th></tr></thead><tbody>
-      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>① 수직벽 면적 보정</td><td>${S.wall} m² × 0.5</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">+${fmtN(R.wc,1)} m²</td></tr>
+      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>① 수직벽 면적 보정 (4.4.4)</td><td>${S.wall} m² × 0.5</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">+${fmtN(R.wc,1)} m²</td></tr>
       ${(()=>{
         if(S.rooftype==='slope'){
-          return '<tr style="background:#fff7ed;break-inside:avoid;"><td style="font-weight:800;color:#c2410c">② 경사지붕 면적 보정</td>'
-            +'<td>'+S.area+' m² × secθ('+R.thetaDeg+'°) = '+S.area+' × '+R.RF.toFixed(3)+'</td>'
-            +'<td style="text-align:right;font-family:\'JetBrains Mono\',monospace;font-weight:900;color:#c2410c">'+fmtN(S.area*R.RF,1)+' m²</td></tr>';
+          return '<tr style="background:#f0fdf4;break-inside:avoid;"><td style="font-weight:800;color:#15803d">② 경사지붕 면적</td>'
+            +'<td>수평투영 면적 그대로 적용 (KDS 4.4.2 · 경사 보정 없음)</td>'
+            +'<td style="text-align:right;font-family:\'JetBrains Mono\',monospace;font-weight:900;color:#15803d">'+fmtN(S.area,1)+' m²</td></tr>';
         } else if(S.rooftype==='valley'){
           return '<tr style="background:#fff7ed;break-inside:avoid;"><td style="font-weight:800;color:#c2410c">② 밸리형 집수집중 보정</td>'
-            +'<td>집수집중계수 VF = '+R.VF.toFixed(2)+' (환산면적에 적용)</td>'
+            +'<td>집수집중계수 VF = '+R.VF.toFixed(2)+' (KDS 외 · 설계자 선택)</td>'
             +'<td style="text-align:right;font-family:\'JetBrains Mono\',monospace;font-weight:900;color:#c2410c">×'+R.VF.toFixed(2)+'</td></tr>';
         }
         return '';
       })()}
-      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'②':'③'} 유효 지붕면적</td><td>${S.rooftype==='slope'?(fmtN(S.area*R.RF,1)):S.area} + ${R.wc.toFixed(1)}</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">${fmtN(R.ea,1)} m²</td></tr>
+      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'②':'③'} 유효 지붕면적</td><td>${S.area} + ${R.wc.toFixed(1)}</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">${fmtN(R.ea,1)} m²</td></tr>
       <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'③':'④'} 강우량 보정 환산면적</td><td>${R.ea.toFixed(1)} × (${S.rainfall} ÷ 100) × ${R.SF.toFixed(2)}${R.VF!==1.0?' × VF'+R.VF.toFixed(2):''}</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">${fmtN(R.ct,1)} m²</td></tr>
       <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'④':'⑤'} 드레인당 환산면적</td><td>${R.ct.toFixed(1)} ÷ ${S.drains}개</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">${fmtN(R.dc,1)} m²</td></tr>
       <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'⑤':'⑥'} 수직관 관경 선정</td><td>표 4.4-1 조회 (≥ ${R.dc.toFixed(1)} m²)</td><td style="text-align:right;font-weight:900;color:#1d4ed8">DN ${R.vp.dn}mm <span style="color:#6b7280;font-weight:600">(허용 ${R.vp.maxArea}m²)</span></td></tr>
-      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'⑥':'⑦'} 수평관 관경 선정</td><td>표 4.4-2 조회, 기울기 1/${S.slope} 보정</td><td style="text-align:right;font-weight:900;color:#1d4ed8">DN ${R.hp.dn}mm <span style="color:#6b7280;font-weight:600">(허용 ${R.hp.maxArea}m²)</span></td></tr>
+      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'⑥':'⑦'} 수평관 관경 선정</td><td>표 4.4-2 구배 1/${S.slope} 표 조회 (≥ ${R.dc_h.toFixed(1)} m²)</td><td style="text-align:right;font-weight:900;color:#1d4ed8">DN ${R.hp.dn}mm <span style="color:#6b7280;font-weight:600">(허용 ${R.hp.maxArea}m²)</span></td></tr>
     </tbody></table>
   </div>
 
@@ -2166,16 +2137,16 @@ function renderA4(){
   <div class="a4-section allow-break page-aware">
     <div class="a4-sub" style="break-after:avoid;page-break-after:avoid;">5. 적용 법적 근거</div>
     <table class="a4-tbl"><thead style="display:table-header-group;"><tr><th>기준</th><th>조항</th><th>내용</th></tr></thead><tbody>
-      <tr style="break-inside:avoid;"><td style="font-weight:800;color:#1e40af">KDS 31 30 35 : 2021</td><td style="text-align:center">4.4.2 ~ 4.4.4</td><td>수직관·수평관·반원형 빗물받이 관경 기준</td></tr>
+      <tr style="break-inside:avoid;"><td style="font-weight:800;color:#1e40af">KDS 31 30 35 : 2021</td><td style="text-align:center">4.4.2 ~ 4.4.5</td><td>수직관(표 4.4-1)·수평관(표 4.4-2)·수직벽 ½ 가산·반원형 빗물받이(표 4.4-3)</td></tr>
       <tr style="break-inside:avoid;"><td style="font-weight:800;color:#1e40af">KDS 31 30 35 : 2021</td><td style="text-align:center">4.4.1</td><td>시간최대강우량 기준 관 지름 결정</td></tr>
-      <tr style="break-inside:avoid;"><td style="font-weight:800;color:#1e40af">기상청 기후통계분석</td><td style="text-align:center">1991~2020 평년값</td><td>지점별 시간최대강우량 적용 (${S.station} : ${S.rainfall}mm/hr)</td></tr>
+      <tr style="break-inside:avoid;"><td style="font-weight:800;color:#1e40af">기상자료개방포털 조건별통계</td><td style="text-align:center">1시간 최다강수량 관측 최대 (${S.period})</td><td>${S.station} — ${S.kmaStn||S.station} 관측소 No.${S.stationNo} : ${S.rainfall}mm/hr (${S.rainDate||''})</td></tr>
     </tbody></table>
   </div>
 
   <div class="a4-footer" style="break-inside:avoid;page-break-inside:avoid;">
     <span style="display:flex;justify-content:space-between;width:100%;font-size:9px;color:#9ca3af;">
       <span>건축물 우수관경 산정 시스템 [MANMIN-Ver5.0]</span>
-      <span>KDS 31 30 35 : 2021 · 기상청 시간최대강우량 기준</span>
+      <span>KDS 31 30 35 : 2021 · 기상청 1시간 최다강수량 기준</span>
       <span>작성일: ${ds}</span>
     </span>
   </div>
@@ -2206,8 +2177,11 @@ function fmtN(n,dp){
 }
 /* ═══════ STANDARD TABLES ═══════ */
 function renderStdTables(){
-  const fill=(id,t)=>document.getElementById(id).innerHTML=t.map(r=>`<tr><td><strong>${r[0]}</strong></td>${r.slice(1).map(v=>`<td>${v}</td>`).join('')}</tr>`).join('');
-  fill('std-v-body',VT);fill('std-h-body',HT);fill('std-g-body',GT);
+  const rows=t=>t.map(r=>`<tr><td><strong>${r[0]}</strong></td>${r.slice(1).map(v=>`<td>${v}</td>`).join('')}</tr>`).join('');
+  const blocks=(o,keys,n)=>keys.map(k=>`<tr><td colspan="${n}" style="background:#eff6ff;font-weight:800;color:#1e40af;text-align:left">${k==200?'1/200 기울기':'1/'+k+(n===7&&o===HTS?' 구배':' 기울기')}</td></tr>`+rows(o[k])).join('');
+  document.getElementById('std-v-body').innerHTML=rows(VT);
+  document.getElementById('std-h-body').innerHTML=blocks(HTS,[100,50,25],7);
+  document.getElementById('std-g-body').innerHTML=blocks(GTS,[200,100,50,25],7);
 }
 
 /* ═══════ RAIN TABLE ═══════ */
@@ -2217,7 +2191,7 @@ function renderRainTable(q='',range=''){
   if(range){const[mn,mx]=range.split('-').map(Number);d=d.filter(r=>r[3]>=mn&&r[3]<mx);}
   document.getElementById('rain-table-body').innerHTML=d.map(r=>{
     const c=r[3]>=120?'#dc2626':r[3]>=100?'#c2410c':r[3]>=85?'#1d4ed8':'#1a2744';
-    return`<tr><td>${r[0]}</td><td><strong>${r[1]}</strong></td><td class="mono">${r[2]}</td><td style="font-weight:900;color:${c}" class="mono">${r[3]}</td><td>${r[4]}</td></tr>`;
+    return`<tr><td>${r[0]}</td><td><strong>${r[1]}</strong></td><td>${r[6]}</td><td class="mono">${r[2]}</td><td style="font-weight:900;color:${c}" class="mono">${r[3]}</td><td class="mono">${r[5]}</td><td>${r[4]}</td></tr>`;
   }).join('');
 }
 function filterRainTable(){renderRainTable(document.getElementById('rain-search').value,document.getElementById('rain-filter').value);}
@@ -2281,7 +2255,7 @@ function printA4(){
 function resetAll(){
   S={sido:'',sigun:'',rainfall:null,station:'',period:'',stationNo:0,area:0,wall:0,
     rooftype:'flat',slopeAngle:30,valleyFactor:1.20,
-    drains:1,drainMode:'manual',pipetype:'circular',material:'pvc',slope:100,safety:20,hasResult:false,result:null};
+    drains:1,drainMode:'manual',pipetype:'circular',material:'pvc',slope:100,safety:0,hasResult:false,result:null};
   document.getElementById('sel-sido').value='';
   document.getElementById('sel-sigun').innerHTML='<option value="">-- 선택 --</option>';
   document.getElementById('regionGrid').innerHTML='';
