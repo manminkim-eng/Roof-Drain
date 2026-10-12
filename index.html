@@ -707,8 +707,8 @@ input[type="number"]{-moz-appearance:textfield;}
     <div class="hdr-right-wrap">
       <div class="hdr-right">
         <strong>KDS 31 30 35</strong><br/>
-        건축물 빗물배수설비<br/>
-        <em>2021 제정</em>
+        우수설비<br/>
+        <em>2021.2 개정</em>
       </div>
       <div class="hdr-btns">
 <button id="pwa-hdr-btn" onclick="window.pwaTriggerInstall&&window.pwaTriggerInstall()">📲 <span class="pwa-hdr-txt">설치</span></button>
@@ -926,9 +926,9 @@ input[type="number"]{-moz-appearance:textfield;}
               <div class="crow"><span class="ck">적용 관경(수직관)</span><span class="cv" id="cv-result">—</span></div>
             </div>
             <div class="cbox" style="margin-top:6px">
-              <div class="cbox-tit">▶ 수평관 기울기 보정</div>
+              <div class="cbox-tit">▶ 수평관 구배 (표 4.4-2)</div>
               <div class="crow"><span class="ck">수평관 기울기 선택</span><span class="cv" id="cv-slope-h">—</span></div>
-              <div class="crow"><span class="ck" style="color:#1d4ed8;font-weight:800">수평관 보정 환산면적</span><span class="cv" id="cv-slope-h-dc" style="color:#1d4ed8">—</span></div>
+              <div class="crow"><span class="ck" style="color:#1d4ed8;font-weight:800">수평관 조회 환산면적</span><span class="cv" id="cv-slope-h-dc" style="color:#1d4ed8">—</span></div>
             </div>
           </div>
         </div>
@@ -3070,7 +3070,7 @@ document.addEventListener('DOMContentLoaded',function(){
 /* v5.0-HDR — 요약 스트립 갱신. 계산 함수는 건드리지 않고 doCalc/resetAll 을 감싸 S.result 를 읽기만 한다 */
 (function(){
   function setSum(){
-    var R=(window.S&&S.hasResult&&S.result)||null;
+    var R=(typeof S!=='undefined'&&S&&S.hasResult&&S.result)||null; /* v5.0.11 — S 는 let 전역이라 window.S 로는 읽히지 않는다 */
     var f=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
     if(!R){['sb-ea','sb-rain','sb-fl','sb-vp','sb-hp'].forEach(function(id){f(id,'—');});return;}
     f('sb-ea',fmtN(R.ea,1)+' m²'); f('sb-rain',S.rainfall+' mm/hr'); f('sb-fl',fmtN(R.fl,0)+' ℓ/min');
