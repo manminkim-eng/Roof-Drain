@@ -17,9 +17,9 @@ window.__setv=(id,v)=>{const e=document.getElementById(id);e.value=v;};
 window.__A=()=>{resetAll();__tab('calc');document.getElementById('sel-sido').value='전북특별자치도';filterCities();
   selectRegionData(RD.find(r=>r[1]==='익산'));__setv('inp-area',600);__setv('inp-wall',80);__setv('inp-drains',4);
   __setv('sel-pipetype','circular');__setv('sel-slope','100');__setv('sel-safety','0');liveCalc();window.scrollTo(0,0);};
-window.__B=()=>{__A();__setv('sel-pipetype','semi');__setv('sel-slope','50');liveCalc();window.scrollTo(0,0);};
+window.__B=()=>{__A();__setv('sel-pipetype','semi');__setv('sel-slope','50');__setv('sel-gslope','50');liveCalc();window.scrollTo(0,0);};
 window.__C=()=>{__A();setZoneMode('multi');zones=[{id:1,name:'A구간',area:400,wall:60,roof:'flat'},{id:2,name:'B구간',area:200,wall:20,roof:'flat'}];zoneCounter=2;renderZoneList();calcZoneTotal();liveCalc();window.scrollTo(0,0);};
-window.__ex=()=>{const R=S.result;return {sigun:S.sigun,stn:S.kmaStn,no:S.stationNo,rain:S.rainfall,period:S.period,date:S.rainDate,area:S.area,wall:S.wall,drains:S.drains,slope:S.slope,pipetype:S.pipetype,
+window.__ex=()=>{const R=S.result;return {sigun:S.sigun,stn:S.kmaStn,no:S.stationNo,rain:S.rainfall,period:S.period,date:S.rainDate,area:S.area,wall:S.wall,drains:S.drains,slope:S.slope,gslope:S.gslope,cont:S.cont,pipetype:S.pipetype,
   ea:+R.ea.toFixed(2),ct:+R.ct.toFixed(2),dc:+R.dc.toFixed(2),fl:+R.fl.toFixed(1),vp:R.vp.dn,vmax:R.vp.maxArea,hp:R.hp.dn,hmax:R.hp.maxArea,gp:R.gp.dn,gmax:R.gp.maxArea,
   hero:document.getElementById('res-main-dn').textContent,desc:document.getElementById('res-main-desc').textContent,sum:[...document.querySelectorAll('.sum-bar .sum-item')].map(e=>e.textContent.trim())};};`;
 const SHOTS=[
@@ -27,7 +27,7 @@ const SHOTS=[
  {id:'s02_tabs',clip:'.hdr-shell',m:[['#tab-calc','관경 산정'],['#tab-stdtable','관경 표준표'],['#tab-rain','지역 강우량'],['#tab-guide','설계 기준'],['#tab-a4','A4 미리보기'],['.hdr-right','근거 기준']]},
  {id:'s03_region',clip:'card:STEP 1',m:[['#sel-sido','광역시도'],['#sel-sigun','시군구'],['.rcard.sel','선택 지역 카드'],['#rain-info-box','관측소 · 강우량 · 자료기간']]},
  {id:'s04_roof',clip:'card:STEP 2',m:[['#mode-single-btn','단일 구간 / 구간별'],['#inp-area','수평투영 지붕면적'],['#inp-wall','수직벽 면적'],['#sel-rooftype','지붕 유형']]},
- {id:'s05_drain',clip:'card:STEP 3',m:[['#inp-drains','드레인 개수'],['#drain-unit-area','1개당 분담면적'],['#sel-pipetype','드레인 형태'],['#sel-slope','수평관 기울기'],['#sel-safety','여유율(KDS 외)']]},
+ {id:'s05_drain',clip:'card:STEP 3',m:[['#inp-drains','드레인 개수'],['#drain-unit-area','1개당 분담면적'],['#sel-pipetype','드레인 형태'],['#sel-slope','수평관 기울기'],['#sel-safety','여유율(KDS 외)'],['#inp-cont','연속 배출 유량(KDS 4.4.6)']]},
  {id:'s06_hero',clip:'.result-hero',union:'.stat-grid',m:[['#res-main-dn','추천 수직관 DN'],['#res-eff-area','유효면적'],['#res-rainfall','시간최대강우량'],['#res-flow','설계유량']]},
  {id:'s07_vert',clip:'card:우수 수직관 관경 산정',m:[['#vresults .pc-rec','추천 DN — 표 4.4-1'],['#cv-eff','유효면적 합계'],['#cv-conv','100mm/h 환산'],['#cv-zone','드레인당 환산면적'],['#cv-result','적용 관경'],['#cv-slope-h','수평관 구배 — 표 직접 조회']]},
  {id:'s08_horiz',clip:'card:우수 수평관 관경 산정',m:[['#hresults .pc-rec','추천 DN — 표 4.4-2']]},
@@ -43,6 +43,7 @@ const SHOTS=[
  {id:'s18_a4',pre:"__A();__tab('a4');scrollTo(0,0)",wait:1500,clip:'viewport',m:[['#btn-jpg','JPG 저장'],['.mm-btn-pdf','인쇄 · PDF'],['#a4-page','A4 산정 결과서']]},
  {id:'s19_a4page',clip:'#a4-page',m:[['a4sub:0','1. 적용 조건'],['a4sub:1','2. 산정 결과 요약'],['a4sub:2','3. 계산 과정'],['a4sub:3','4. 설계 수량'],['a4sub:4','5. 적용 법적 근거']]},
  {id:'s20_var_gutter',pre:"__B()",wait:700,clip:'#gutter-card',union:'card:우수 수평관 관경 산정',m:[['#hresults .pc-rec','수평관 — 1/50 구배'],['#gresults .pc-rec','반원형 빗물받이 — 표 4.4-3']]},
+ {id:'s25_var_gutter_a4',pre:"__B();__tab('a4');scrollTo(0,0)",wait:1500,clip:'#a4-page',post:"__A()",m:[['a4sub:2','3. 계산 과정 — 빗물받이 관경 선정'],['a4sub:3','4. 설계 수량 — 반원형 빗물받이']]},
  {id:'s21_var_zone',pre:"__C()",wait:700,clip:'card:STEP 2',m:[['#mode-multi-btn','구간별 설계'],['#zone-list','구간 입력'],['#zone-total-area','유효면적 합계']]},
 ];
 (async()=>{

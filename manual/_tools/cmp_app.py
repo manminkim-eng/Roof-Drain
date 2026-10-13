@@ -28,8 +28,8 @@ cell_g=all(T['GTS'][k.split('/')[1]]==[r for kk,r in g if kk==k] for k in ['1/20
 bad=0;ex=[]
 for c,o in zip(inp,out['cases']):
     vf=1.2 if c['roof']=='valley' else 1.0
-    a100=(c['A']+c['W']*0.5)*c['I']/100*vf/c['N']
-    e=[kfind(KV,a100),kfind(KH[c['slope']],a100),kfind(KG[c['slope']],a100)]
+    a100=((c['A']+c['W']*0.5)*c['I']/100*vf+c['Q']/0.017*9*25/100)/c['N']
+    e=[kfind(KV,a100),kfind(KH[c['slope']],a100),kfind(KG[c['gslope']],a100)]
     if [str(x) for x in e]!=[str(x) for x in o]: bad+=1; ex.append((c,e,o))
 # RD 대조
 K={}

@@ -869,7 +869,7 @@ input[type="number"]{-moz-appearance:textfield;}
             </div>
             <div id="drain-auto-group" style="display:none">
               <div class="frow" style="margin-bottom:7px">
-                <div class="fgrp"><label class="flbl">드레인 1개당 권장면적</label><select class="fselect" id="sel-drain-area" onchange="calcAutoDrains()"><option value="150">150 m² (소규모)</option><option value="200" selected>200 m² (일반)</option><option value="250">250 m² (대형)</option><option value="300">300 m² (최대)</option></select></div>
+                <div class="fgrp"><label class="flbl">드레인 1개당 권장면적 (실무 참고값 · KDS 외)</label><select class="fselect" id="sel-drain-area" onchange="calcAutoDrains()"><option value="150">150 m² (소규모)</option><option value="200" selected>200 m² (일반)</option><option value="250">250 m² (대형)</option><option value="300">300 m² (최대)</option></select></div>
                 <div class="fgrp"><label class="flbl">자동 산정 결과</label><div style="padding:7px 10px;background:#fff;border:2px solid #1d4ed8;border-radius:7px;font-size:15px;font-weight:900;color:#1d4ed8;text-align:center;" id="auto-drain-display">-</div></div>
               </div>
             </div>
@@ -883,6 +883,12 @@ input[type="number"]{-moz-appearance:textfield;}
             <div class="fgrp"><label class="flbl">수평관 기울기</label><select class="fselect" id="sel-slope" onchange="liveCalc()"><option value="100">1/100 (최소)</option><option value="50">1/50</option><option value="25">1/25</option></select></div>
             <div class="fgrp"><label class="flbl">여유율 (KDS 외 · 선택)</label><select class="fselect" id="sel-safety" onchange="liveCalc()"><option value="0" selected>0% (KDS 원문)</option><option value="10">+10%</option><option value="20">+20%</option><option value="30">+30%</option></select></div>
           </div>
+          <!-- v5.0.13 — D1 빗물받이 기울기(표 4.4-3) · D3 연속흐름(KDS 4.4.6) -->
+          <div class="frow" style="margin:9px 0 0">
+            <div class="fgrp" id="gslope-group" style="display:none"><label class="flbl">빗물받이 기울기 (표 4.4-3)</label><select class="fselect" id="sel-gslope" onchange="liveCalc()"><option value="200" selected>1/200</option><option value="100">1/100</option><option value="50">1/50</option><option value="25">1/25</option></select></div>
+            <div class="fgrp"><label class="flbl">연속 배출 유량 (KDS 4.4.6 · 선택)</label><div class="input-sfx"><input type="number" class="finput" id="inp-cont" placeholder="없으면 0" min="0" step="0.01" oninput="liveCalc()"><span class="sfx">L/s</span></div></div>
+          </div>
+          <div class="nb blue" style="margin-top:8px;margin-bottom:0"><div class="nb-tit">ℹ️ 연속 배출 (KDS 4.4.6)</div><div class="nb-txt">펌프 · 배출기 · 공조기기 등이 우수관에 연속 또는 반연속으로 배출하면, 강우량 25 mm/h 기준 0.017 L/s 당 지붕 면적 9 ㎡로 환산해 더합니다. 100 mm/h 환산으로 <b>1 L/s ≈ 132.4 ㎡</b> — 전체 환산면적에 더한 뒤 드레인 수로 나눕니다.</div></div>
         </div>
       </div>
     </div>
@@ -974,7 +980,7 @@ input[type="number"]{-moz-appearance:textfield;}
 <div class="tab-panel" id="panel-stdtable">
   <div class="card"><div class="card-head"><div class="card-ico">📋</div><span class="card-tit">표 4.4-1 원형 옥내외 우수 수직관 관 지름</span><span class="cbadge">KDS 31 30 35 : 2021</span></div><div class="card-body"><div class="nb blue" style="margin-bottom:9px"><div class="nb-tit">ℹ️ 조회 방법</div><div class="nb-txt">표는 강우량에 반비례합니다(면적 × 강우량 일정). 계산은 환산면적 = 실제면적 × (강우량 ÷ 100)을 100mm/h 열과 비교합니다. 주 1) 관 지름은 원형관의 관 지름이며, 단면적이 같은 다른 모양의 배관에도 적용할 수 있습니다.</div></div><div class="tbl-hint no-print"><span style="font-size:14px;">←</span><span>좌우로 스크롤하여 전체 항목 확인</span><span style="font-size:14px;">→</span></div><div class="twrap"><table class="rtbl"><thead><tr><th rowspan="2">DN</th><th colspan="12">강우량(mm/h)별 최대 수평투영 지붕면적 (m²)</th></tr><tr><th>25</th><th>50</th><th>75</th><th>100</th><th>125</th><th>150</th><th>175</th><th>200</th><th>225</th><th>250</th><th>275</th><th>300</th></tr></thead><tbody id="std-v-body"></tbody></table></div></div></div>
   <div class="card"><div class="card-head"><div class="card-ico">📋</div><span class="card-tit">표 4.4-2 우수수평관의 크기 (구배 1/100 · 1/50 · 1/25)</span><span class="cbadge">KDS 31 30 35 : 2021</span></div><div class="card-body"><div class="tbl-hint no-print"><span style="font-size:14px;">←</span><span>좌우로 스크롤하여 전체 항목 확인</span><span style="font-size:14px;">→</span></div><div class="twrap"><table class="rtbl"><thead><tr><th rowspan="2">DN</th><th colspan="6">강우량(mm/h)별 최대 수평투영 지붕면적 (m²)</th></tr><tr><th>25</th><th>50</th><th>75</th><th>100</th><th>125</th><th>150</th></tr></thead><tbody id="std-h-body"></tbody></table></div></div></div>
-  <div class="card"><div class="card-head"><div class="card-ico">📋</div><span class="card-tit">표 4.4-3 반원형 지붕빗물받이 (기울기 1/200 ~ 1/25)</span><span class="cbadge">KDS 31 30 35 : 2021</span></div><div class="card-body"><div class="nb org" style="margin-bottom:9px"><div class="nb-tit">⚠️ 원문 확인</div><div class="nb-txt">1/100 기울기 DN 100 · 75mm/h 칸은 원문에 「637」로 실려 있으나, 같은 행이 강우량에 반비례(188 · 94 · ? · 47)하므로 63의 오기로 보고 63을 적용했습니다. 계산은 STEP 3에서 고른 구배(1/100 · 1/50 · 1/25)의 표를 조회합니다.</div></div><div class="tbl-hint no-print"><span style="font-size:14px;">←</span><span>좌우로 스크롤하여 전체 항목 확인</span><span style="font-size:14px;">→</span></div><div class="twrap"><table class="rtbl"><thead><tr><th rowspan="2">DN</th><th colspan="6">강우량(mm/h)별 최대 수평투영 지붕면적 (m²)</th></tr><tr><th>25</th><th>50</th><th>75</th><th>100</th><th>125</th><th>150</th></tr></thead><tbody id="std-g-body"></tbody></table></div></div></div>
+  <div class="card"><div class="card-head"><div class="card-ico">📋</div><span class="card-tit">표 4.4-3 반원형 지붕빗물받이 (기울기 1/200 ~ 1/25)</span><span class="cbadge">KDS 31 30 35 : 2021</span></div><div class="card-body"><div class="nb org" style="margin-bottom:9px"><div class="nb-tit">⚠️ 원문 확인</div><div class="nb-txt">1/100 기울기 DN 100 · 75mm/h 칸은 원문에 「637」로 실려 있으나, 같은 행이 강우량에 반비례(188 · 94 · ? · 47)하므로 63의 오기로 보고 63을 적용했습니다. 계산은 STEP 3에서 고른 빗물받이 기울기(1/200 · 1/100 · 1/50 · 1/25)의 표를 조회합니다.</div></div><div class="tbl-hint no-print"><span style="font-size:14px;">←</span><span>좌우로 스크롤하여 전체 항목 확인</span><span style="font-size:14px;">→</span></div><div class="twrap"><table class="rtbl"><thead><tr><th rowspan="2">DN</th><th colspan="6">강우량(mm/h)별 최대 수평투영 지붕면적 (m²)</th></tr><tr><th>25</th><th>50</th><th>75</th><th>100</th><th>125</th><th>150</th></tr></thead><tbody id="std-g-body"></tbody></table></div></div></div>
 </div>
 
 <!-- ████ TAB: 지역 강우량 ████ -->
@@ -1190,6 +1196,7 @@ input[type="number"]{-moz-appearance:textfield;}
           <div class="nb blue" style="margin-bottom:7px;"><div class="nb-tit">4.4.4 수직 벽</div><div class="nb-txt">지붕으로 빗물이 흐르는 모든 수직 벽 면적의 <strong>1/2</strong>을 수평투영 지붕 면적에 더하여 수직관·수평관 크기를 정한다.</div></div>
           <div class="nb blue" style="margin-bottom:7px;"><div class="nb-tit">4.4.3 우수 수평관</div><div class="nb-txt"><strong>표 4.4-2</strong> — 수평 기울기 1/25 이하 우수배관에 적용(1/100·1/50·1/25 구배별 표). 별도 승인이 없으면 수평지관 기울기 1/100 이상.</div></div>
           <div class="nb blue"><div class="nb-tit">4.4.5 지붕 빗물받이의 크기</div><div class="nb-txt"><strong>표 4.4-3</strong> — 반원형 빗물받이 DN 80~250, 기울기 1/200·1/100·1/50·1/25별 최대 수평투영 지붕면적 기준.</div></div>
+          <div class="nb blue" style="margin-top:7px"><div class="nb-tit">4.4.6 연속흐름에 대한 값</div><div class="nb-txt">펌프 · 배출기 · 공조기기 등이 연속 또는 반연속 배출하면 시간당 강우량 25 mm 기준으로 배출량 <strong>0.017 L/s 당 상당 지붕 면적 9 ㎡</strong>로 계산한다 — STEP 3 「연속 배출 유량」.</div></div>
         </div>
       </div>
 
@@ -1390,8 +1397,8 @@ input[type="number"]{-moz-appearance:textfield;}
         <div style="font-size:10px;font-weight:700;color:#6b7a99;margin-bottom:10px">▶ 단계별 계산식 (지붕형태 보정 포함)</div>
         <div style="font-size:13px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;margin-bottom:3px">A_base = A_roof + A_wall × 0.5</div>
         <div style="font-size:10.5px;color:#64748b;margin-bottom:10px">A_roof : 수평투영 지붕면적 — 경사지붕도 같음(KDS 4.4.2, 경사 보정 없음)</div>
-        <div style="font-size:13px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;margin-bottom:3px">A_conv = A_base × (R ÷ 100) × SF × VF</div>
-        <div style="font-size:10.5px;color:#64748b;margin-bottom:10px">SF·VF : KDS 외 설계자 선택 계수 (기본 SF 1.00 · 밸리 VF 1.10~1.30)</div>
+        <div style="font-size:13px;font-weight:900;color:#1d4ed8;font-family:'JetBrains Mono',monospace;margin-bottom:3px">A_conv = A_base × (R ÷ 100) × SF × VF + A_Q</div>
+        <div style="font-size:10.5px;color:#64748b;margin-bottom:10px">SF·VF : KDS 외 설계자 선택 계수 (기본 SF 1.00 · 밸리 VF 1.10~1.30) · A_Q = Q ÷ 0.017 × 9 × 25 ÷ 100 — 연속 배출 Q(L/s), KDS 4.4.6</div>
         <div style="font-size:13px;font-weight:900;color:#f97316;font-family:'JetBrains Mono',monospace;margin-bottom:3px">A_drain = A_conv ÷ N</div>
         <div style="font-size:10.5px;color:#64748b">드레인당 분담 환산면적 → KDS 표 조회</div>
       </div>
@@ -1475,7 +1482,7 @@ let S={
   slopeAngle:30,   // 경사지붕: 경사각(도)
   valleyFactor:1.20, // 밸리형: 집수 집중계수
   drains:1,drainMode:'manual',
-  pipetype:'circular',material:'pvc',slope:100,safety:0,
+  pipetype:'circular',material:'pvc',slope:100,safety:0,gslope:200,cont:0,
   hasResult:false,result:null
 };
 
@@ -1759,6 +1766,9 @@ function liveCalc(){
   S.slopeAngle=parseFloat(document.getElementById('inp-slope-angle')?.value)||30;
   S.valleyFactor=parseFloat(document.getElementById('sel-valley-factor')?.value)||1.20;
   S.pipetype=document.getElementById('sel-pipetype').value;
+  S.gslope=parseInt(document.getElementById('sel-gslope').value)||200;
+  S.cont=Math.max(0,parseFloat(document.getElementById('inp-cont').value)||0);
+  document.getElementById('gslope-group').style.display=S.pipetype==='semi'?'block':'none';
   S.material=document.getElementById('sel-material').value;
   S.slope=parseInt(document.getElementById('sel-slope').value);
   S.safety=parseInt(document.getElementById('sel-safety').value);
@@ -1782,10 +1792,11 @@ function doCalc(){
   const wc  = S.wall * 0.5;                    // 수직벽 보정
   const ea  = S.area * RF + wc;                // 유효면적 (RF 반영)
   const SF  = 1 + S.safety / 100;             // KDS 외 여유율(기본 0%)
-  const ct  = ea * (S.rainfall / 100) * SF * VF; // 환산면적 (VF 반영)
+  const cq  = S.cont / 0.017 * 9 * 25 / 100;    // KDS 4.4.6 연속흐름 — 25mm/h 기준 0.017 L/s 당 9㎡ → 100mm/h 환산 (v5.0.13)
+  const ct  = ea * (S.rainfall / 100) * SF * VF + cq; // 환산면적 (VF · 연속흐름 반영)
   const dc  = ct / S.drains;
   const de  = ea / S.drains;
-  const fl  = ea * S.rainfall / 60;
+  const fl  = ea * S.rainfall / 60 + S.cont * 60; // ℓ/min (연속 배출 포함)
 
   /* ── 수평관 기울기 보정 ── */
   const slopeN      = S.slope;
@@ -1794,12 +1805,13 @@ function doCalc(){
 
   const vp = findPipe(VT, dc);
   const hp = findPipe(HTS[slopeN]||HTS[100], dc_h);
-  const gp = findPipe(GTS[slopeN]||GTS[100], dc);
+  const gs = S.gslope||200;  // v5.0.13 — 빗물받이는 자체 기울기(표 4.4-3 · 1/200 ~ 1/25)
+  const gp = findPipe(GTS[gs]||GTS[200], dc);
 
   S.hasResult = true;
   S.result = {
     ea, wc, ct, dc, dc_h, de, fl,
-    vp, hp, gp, SF, slopeN, slopeFactor,
+    vp, hp, gp, gs, cq, SF, slopeN, slopeFactor,
     RF, VF, thetaDeg: S.slopeAngle,
     zoneMode, zonesSnap: JSON.parse(JSON.stringify(zones))
   };
@@ -1838,6 +1850,7 @@ function doCalc(){
   document.getElementById('cv-conv').textContent =
     fmtN(ea,1)+'×('+S.rainfall+'/100)×'+SF.toFixed(2)
     +(VF!==1.0?'×VF'+VF.toFixed(2):'')
+    +(cq>0?' + 연속흐름 '+fmtN(cq,1):'')
     +' = '+fmtN(ct,1)+' m²';
   document.getElementById('cv-zone').textContent   = fmtN(ct,1)+'÷'+S.drains+' = '+fmtN(dc,1)+' m²';
   document.getElementById('cv-result').textContent = 'DN '+vp.dn+'mm (표 최대 '+vp.maxArea+' m²)';
@@ -1855,7 +1868,7 @@ function doCalc(){
   renderCandidates('hresults', HTS[slopeN]||HTS[100], dc_h);
   if(S.pipetype==='semi'){
     document.getElementById('gutter-card').style.display='block';
-    renderCandidates('gresults', GTS[slopeN]||GTS[100], dc);
+    renderCandidates('gresults', GTS[gs]||GTS[200], dc);
   } else {
     document.getElementById('gutter-card').style.display='none';
   }
@@ -1942,7 +1955,7 @@ function renderCountSummary(vDN,hDN,gDN){
       · 루프드레인(집수구) : <strong>${S.drains}개소</strong><br>
       · 우수 수직관 : DN ${vDN}mm × <strong>${S.drains}개소</strong><br>
       · 우수 수평관 : DN ${hDN}mm (구배 1/${S.slope} 이상)<br>
-      ${isSemi?'· 반원형 빗물받이 : DN '+gDN+'mm × '+S.drains+'개소<br>':''}
+      ${isSemi?'· 반원형 빗물받이 : DN '+gDN+'mm × '+S.drains+'개소 (기울기 1/'+(S.gslope||200)+')<br>':''}
       · 관 재질 : ${mat} · 여유율(KDS 외) : +${S.safety}%<br>
       · 적용기준 : KDS 31 30 35 : 2021 / ${S.station} ${S.rainfall}mm/hr
     </div></div>`;
@@ -2009,6 +2022,10 @@ function renderA4(){
       <tr>
         <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">여유율 (KDS 외)</div><div class="a4-iv">+${S.safety}% (×${R.SF.toFixed(2)})</div></div></td>
         <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">지붕 유형</div><div class="a4-iv">${roofNm}</div></div></td>
+      </tr>
+      <tr>
+        <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">드레인/수직관 형태</div><div class="a4-iv">${S.pipetype==='semi'?'반원형 빗물받이 (기울기 1/'+R.gs+')':'원형관 (루프드레인)'}</div></div></td>
+        <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">연속 배출 유량 (KDS 4.4.6)</div><div class="a4-iv">${S.cont>0?S.cont+' L/s (+'+fmtN(R.cq,1)+' m²)':'없음'}</div></div></td>
       </tr>
     </table>
   </div>
@@ -2120,10 +2137,11 @@ function renderA4(){
         return '';
       })()}
       <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'②':'③'} 유효 지붕면적</td><td>${S.area} + ${R.wc.toFixed(1)}</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">${fmtN(R.ea,1)} m²</td></tr>
-      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'③':'④'} 강우량 보정 환산면적</td><td>${R.ea.toFixed(1)} × (${S.rainfall} ÷ 100) × ${R.SF.toFixed(2)}${R.VF!==1.0?' × VF'+R.VF.toFixed(2):''}</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">${fmtN(R.ct,1)} m²</td></tr>
+      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'③':'④'} 강우량 보정 환산면적</td><td>${R.ea.toFixed(1)} × (${S.rainfall} ÷ 100) × ${R.SF.toFixed(2)}${R.VF!==1.0?' × VF'+R.VF.toFixed(2):''}${R.cq>0?' + 연속흐름 '+S.cont+' L/s → '+R.cq.toFixed(1)+' (4.4.6)':''}</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">${fmtN(R.ct,1)} m²</td></tr>
       <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'④':'⑤'} 드레인당 환산면적</td><td>${R.ct.toFixed(1)} ÷ ${S.drains}개</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">${fmtN(R.dc,1)} m²</td></tr>
       <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'⑤':'⑥'} 수직관 관경 선정</td><td>표 4.4-1 조회 (≥ ${R.dc.toFixed(1)} m²)</td><td style="text-align:right;font-weight:900;color:#1d4ed8">DN ${R.vp.dn}mm <span style="color:#6b7280;font-weight:600">(허용 ${R.vp.maxArea}m²)</span></td></tr>
       <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'⑥':'⑦'} 수평관 관경 선정</td><td>표 4.4-2 구배 1/${S.slope} 표 조회 (≥ ${R.dc_h.toFixed(1)} m²)</td><td style="text-align:right;font-weight:900;color:#1d4ed8">DN ${R.hp.dn}mm <span style="color:#6b7280;font-weight:600">(허용 ${R.hp.maxArea}m²)</span></td></tr>
+      ${S.pipetype==='semi'?`<tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'⑦':'⑧'} 빗물받이 관경 선정</td><td>표 4.4-3 기울기 1/${R.gs} 표 조회 (≥ ${R.dc.toFixed(1)} m²)</td><td style="text-align:right;font-weight:900;color:#1d4ed8">DN ${R.gp.dn}mm <span style="color:#6b7280;font-weight:600">(허용 ${R.gp.maxArea}m²)</span></td></tr>`:''}
     </tbody></table>
   </div>
 
@@ -2133,13 +2151,14 @@ function renderA4(){
       <tr style="break-inside:avoid;"><td>루프드레인 (집수구)</td><td>—</td><td style="text-align:center;font-weight:800">${S.drains} 개소</td><td>옥상 균등 배치</td></tr>
       <tr style="break-inside:avoid;"><td>우수 수직관</td><td style="font-weight:800;color:#1d4ed8">DN ${R.vp.dn}mm · ${mat}</td><td style="text-align:center;font-weight:800">${S.drains} 개소</td><td>KDS 표 4.4-1 기준</td></tr>
       <tr style="break-inside:avoid;"><td>우수 수평관</td><td style="font-weight:800;color:#1d4ed8">DN ${R.hp.dn}mm · ${mat}</td><td style="text-align:center;font-weight:800">1식</td><td>구배 1/${S.slope} 이상</td></tr>
+      ${S.pipetype==='semi'?`<tr style="break-inside:avoid;"><td>반원형 빗물받이</td><td style="font-weight:800;color:#1d4ed8">DN ${R.gp.dn}mm</td><td style="text-align:center;font-weight:800">${S.drains} 개소</td><td>KDS 표 4.4-3 · 기울기 1/${R.gs}</td></tr>`:''}
     </tbody></table>
   </div>
 
   <div class="a4-section allow-break page-aware">
     <div class="a4-sub" style="break-after:avoid;page-break-after:avoid;">5. 적용 법적 근거</div>
     <table class="a4-tbl"><thead style="display:table-header-group;"><tr><th>기준</th><th>조항</th><th>내용</th></tr></thead><tbody>
-      <tr style="break-inside:avoid;"><td style="font-weight:800;color:#1e40af">KDS 31 30 35 : 2021</td><td style="text-align:center">4.4.2 ~ 4.4.5</td><td>수직관(표 4.4-1)·수평관(표 4.4-2)·수직벽 ½ 가산·반원형 빗물받이(표 4.4-3)</td></tr>
+      <tr style="break-inside:avoid;"><td style="font-weight:800;color:#1e40af">KDS 31 30 35 : 2021</td><td style="text-align:center">4.4.2 ~ 4.4.6</td><td>수직관(표 4.4-1)·수평관(표 4.4-2)·수직벽 ½ 가산·반원형 빗물받이(표 4.4-3)·연속흐름 환산</td></tr>
       <tr style="break-inside:avoid;"><td style="font-weight:800;color:#1e40af">KDS 31 30 35 : 2021</td><td style="text-align:center">4.4.1</td><td>시간최대강우량 기준 관 지름 결정</td></tr>
       <tr style="break-inside:avoid;"><td style="font-weight:800;color:#1e40af">기상자료개방포털 조건별통계</td><td style="text-align:center">1시간 최다강수량 관측 최대 (${S.period})</td><td>${S.station} — ${S.kmaStn||S.station} 관측소 No.${S.stationNo} : ${S.rainfall}mm/hr (${S.rainDate||''})</td></tr>
     </tbody></table>
@@ -2257,7 +2276,7 @@ function printA4(){
 function resetAll(){
   S={sido:'',sigun:'',rainfall:null,station:'',period:'',stationNo:0,area:0,wall:0,
     rooftype:'flat',slopeAngle:30,valleyFactor:1.20,
-    drains:1,drainMode:'manual',pipetype:'circular',material:'pvc',slope:100,safety:0,hasResult:false,result:null};
+    drains:1,drainMode:'manual',pipetype:'circular',material:'pvc',slope:100,safety:0,gslope:200,cont:0,hasResult:false,result:null};
   document.getElementById('sel-sido').value='';
   document.getElementById('sel-sigun').innerHTML='<option value="">-- 선택 --</option>';
   document.getElementById('regionGrid').innerHTML='';
@@ -2285,6 +2304,9 @@ function resetAll(){
   if(document.getElementById('inp-slope-angle'))document.getElementById('inp-slope-angle').value='30';
   if(document.getElementById('slope-sec-display'))document.getElementById('slope-sec-display').textContent='1.000';
   if(document.getElementById('sel-valley-factor'))document.getElementById('sel-valley-factor').value='1.20';
+  if(document.getElementById('sel-gslope'))document.getElementById('sel-gslope').value='200';
+  if(document.getElementById('inp-cont'))document.getElementById('inp-cont').value='';
+  if(document.getElementById('gslope-group'))document.getElementById('gslope-group').style.display='none';
   document.getElementById('no-result-card').style.display='block';
   document.getElementById('result-area').style.display='none';
   // 구간 초기화

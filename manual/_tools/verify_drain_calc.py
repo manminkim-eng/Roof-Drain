@@ -25,8 +25,9 @@ def kfind(t,x):
     for dn,a in sorted(t.items()):
         if a>=x: return dn
     return '>'+str(max(t))
-def kds(area,wall,I,drains=1,slope=100,gslope=None):
-    a=(area+wall*0.5)/drains; a100=a*I/100
+def kds(area,wall,I,drains=1,slope=100,gslope=None,Q=0.0):
+    # KDS 4.4.6: 25mm/h 기준 0.017 L/s 당 9㎡ → 100mm/h 환산 면적 = Q/0.017*9*25/100
+    a100=((area+wall*0.5)*I/100+Q/0.017*9*25/100)/drains
     return kfind(KV,a100),kfind(KH[slope],a100),kfind(KG[gslope or (slope if slope in KG else 100)],a100)
 if __name__=='__main__':
     areas=list(range(10,3001,10)); rains=[x/2 for x in range(100,301)]  # 50.0~150.0 mm/h, 0.5 간격
