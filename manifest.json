@@ -1,16 +1,20 @@
 {
-  "name": "건축물 우수관경 산정 시스템 MANMIN Ver-5.0",
-  "short_name": "건물우수",
+  "name": "MANMIN 기계 · 건축물 우수관경 산정 시스템",
+  "short_name": "우수관경",
   "description": "건축물 옥상 우수관경 산정 — KDS 31 30 35 : 2021 / 기상청 시간최대강우량 기준",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#f0f4f9",
-  "theme_color": "#1d4ed8",
+  "theme_color": "#2d5186",
   "lang": "ko",
   "dir": "ltr",
-  "categories": ["utilities", "productivity", "engineering"],
+  "categories": [
+    "utilities",
+    "productivity",
+    "engineering"
+  ],
   "prefer_related_applications": false,
   "icons": [
     {
@@ -83,14 +87,24 @@
       "short_name": "산정",
       "description": "우수관경 바로 산정하기",
       "url": "./index.html#calc",
-      "icons": [{ "src": "icons/icon-96x96.png", "sizes": "96x96" }]
+      "icons": [
+        {
+          "src": "icons/icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
     },
     {
       "name": "지역 강우량",
       "short_name": "강우량",
       "description": "지역별 강우량 데이터 확인",
       "url": "./index.html#rain",
-      "icons": [{ "src": "icons/icon-96x96.png", "sizes": "96x96" }]
+      "icons": [
+        {
+          "src": "icons/icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
     }
   ],
   "screenshots": [
