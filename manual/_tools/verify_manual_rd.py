@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""매뉴얼 검사 — usage: python verify_manual_rd.py <repoDir>
+"""매뉴얼 검사 — usage: python verify_manual_rd.py <repoDir> [판 X.Y.Z]
    ① 그림 파일·표시점 ② 범례 수 = 표시점 수 ③ 예제 결과가 본문에 있음 ④ 내부 링크 ⑤ 앱 근거 표기(v5.0.12)"""
 import sys, os, re, json
 repo = sys.argv[1]; M = os.path.join(repo, 'manual'); ok = True
@@ -30,7 +30,11 @@ chk('앱 — 원문 표(DN100 427)', '[100,1708,854,570,427,' in app)
 chk('앱 — 옛 표기 없음', not re.search(r"1991~2020 평년|건축물 빗물배수설비|1/cos|\+20% \(권장\)|1/25 \(최소\)", app))
 chk('앱 — 매뉴얼 버튼', 'class="tb tb-manual"' in app and 'Roof-Drain/manual/' in app)
 sw = open(os.path.join(repo, 'sw.js'), encoding='utf-8').read()
-chk('sw — usu-v5.0.13', "'usu-v5.0.13'" in sw)
+# 2026-11-12 정밀검토 B7: 캐시명을 고정값으로 검사하지 않고 sw.js 에서 읽음 — 폴더 이름에 -vX.Y.Z 가 있으면 그 판과 대조, 셋째 인자로 판 지정 가능
+_m = re.search(r"'(usu-v(\d+\.\d+\.\d+))'", sw)
+_dv = re.search(r'-v(\d+\.\d+\.\d+)$', os.path.basename(os.path.abspath(repo)))
+_want = sys.argv[2] if len(sys.argv) > 2 else (_dv.group(1) if _dv else None)
+chk('sw — 캐시명 usu-vX.Y.Z' + (f' = {_want}' if _want else ' (판 대조 없음)'), _m and (_want is None or _m.group(2) == _want), _m.group(1) if _m else '캐시명 없음')
 chk('앱 — 빗물받이 기울기 · A4 빗물받이 · 4.4.6', 'id="sel-gslope"' in app and '빗물받이 관경 선정' in app and 'id="inp-cont"' in app and 'S.cont / 0.017 * 9 * 25 / 100' in app and '실무 참고값 · KDS 외' in app)
 chk('예제 B 빗물받이 기울기 1/50', ex['B']['gslope'] == 50)
 sys.exit(0 if ok else 1)
