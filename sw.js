@@ -1,4 +1,5 @@
 /* ══════════════════════════════════════════════════════
+   v6.1.0 (2026-11-12) — 건물개요 공통 원본 MM-PROJECT v1.1 → v1.2(불러오기 창 칸 줄바꿈 · 저장값 같음, 정밀검토 B5 · 작업지시서 §25-6-76) · 캐시명 v6.1.0 (종전 usu-v5.0.22)
    2026-10-13 — v5.0.13 빗물받이 기울기 · A4 빗물받이 행 · 4.4.6 연속흐름 · 권장면적 표기 동반 캐시명 v5.0.13
    2026-10-13 — v5.0.12 사용자 매뉴얼 버튼(탭 막대) 동반 캐시명 v5.0.12
    2026-10-13 — v5.0.11 요약 스트립 S 참조 · 헤더 근거 「우수설비 2021.2 개정」 동반 캐시명 v5.0.11
@@ -29,7 +30,7 @@ const mmMatch = (req, opt) => caches.keys()
   .then((ks) => ks.reduce((p, k) => p.then((r) => r || caches.open(k).then((c) => c.match(req, opt))), Promise.resolve(undefined)))
   .then((r) => (r && r.type === 'opaque' && req && req.mode === 'cors') ? undefined : r);
 
-const SW_VERSION   = 'usu-v5.0.22';
+const SW_VERSION   = 'usu-v6.1.0';
 /* 종전 접두어 잔재 — 한 번 지우고 나면 무해하다 */
 const ORPHAN       = ['manmin-v5.0.1-static','manmin-v5.0.1-fonts','manmin-v5.0.1-dynamic','manmin-v5.0.0-static','manmin-v5.0.0-fonts','manmin-v5.0.0-dynamic'];
 const CACHE_STATIC = `${SW_VERSION}-static`;
