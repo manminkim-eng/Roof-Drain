@@ -1,4 +1,5 @@
 /* ══════════════════════════════════════════════════════
+   v6.1.5 (2026-11-12) — html2canvas 1.4.1 머리 태그 SRI(integrity sha384 · crossorigin) · 공통 인쇄 원본 MM-PRINT v1.0 → v1.1(지연 로더도 SRI)(정밀검토 B8 · html2canvas SRI) — 화면 · 계산 · 인쇄 불변 · 작업지시서 §25-6-87 · 캐시명 v6.1.5 (종전 v6.1.4)
    v6.1.4 (2026-11-12) — Pretendard CSS SRI(integrity · crossorigin)(정밀검토 C2) — 화면 · 계산 · 인쇄 불변 · 작업지시서 §25-6-82 · 캐시명 v6.1.4 (종전 v6.1.3)
    v6.1.3 (2026-11-12) — KDS 31 30 35 : 2026 반영 — 표 4.4-1 수직관 · 표 4.4-2 수평관 2026 원문 값으로 교체(수직관 DN 250 · 300 · 380 추가 · 수평관 DN 380) · 4.4.6 연속흐름 식 A = 3600 Q / R(종전 0.017 L/s 당 9 ㎡) · 근거 표기 2021 → 2026 · 개정 메모 칸(정밀검토 B12) — 같은 입력이라도 관경이 달라질 수 있음 · 작업지시서 §25-6-81 · 판 6.1 · 캐시명 v6.1.3 (종전 v6.1.2)
    v6.1.2 (2026-11-12) — 건물개요 공통 원본 MM-PROJECT v1.2 → v1.3(불러오기 창 표 칸 모양 고정 — 도구 CSS 가 새지 않음 · 저장값 같음, 정밀검토 C10) · 쓰지 않는 Noto Sans KR 구글 글꼴 불러오기 제거(실측으로 글자 하나도 안 쓰임 — 글꼴 지정은 그대로, 정밀검토 C4) · 작업지시서 §25-6-80 · 판 6.1 · 캐시명 v6.1.2 (종전 v6.1.1)
@@ -34,7 +35,7 @@ const mmMatch = (req, opt) => caches.keys()
   .then((ks) => ks.reduce((p, k) => p.then((r) => r || caches.open(k).then((c) => c.match(req, opt))), Promise.resolve(undefined)))
   .then((r) => (r && r.type === 'opaque' && req && req.mode === 'cors') ? undefined : r);
 
-const SW_VERSION   = 'usu-v6.1.4';
+const SW_VERSION   = 'usu-v6.1.5';
 /* 종전 접두어 잔재 — 한 번 지우고 나면 무해하다 */
 const ORPHAN       = ['manmin-v5.0.1-static','manmin-v5.0.1-fonts','manmin-v5.0.1-dynamic','manmin-v5.0.0-static','manmin-v5.0.0-fonts','manmin-v5.0.0-dynamic'];
 const CACHE_STATIC = `${SW_VERSION}-static`;
