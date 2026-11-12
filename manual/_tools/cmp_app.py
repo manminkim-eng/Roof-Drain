@@ -9,7 +9,7 @@ ok_t.append(all(KV[r[0]]==r[4] for r in T['VT']) and [r[0] for r in T['VT']]==so
 ok_t.append(all(KH[int(k)][r[0]]==r[4] for k,v in T['HTS'].items() for r in v))
 ok_t.append(all(KG[int(k)][r[0]]==r[4] for k,v in T['GTS'].items() for r in v))
 # 원문 전체 셀 대조 (추출 md)
-md=open(os.path.join(H,'KDS_31_30_35_2021_표4.4_추출.md'),encoding='utf-8').read()
+md=open(os.path.join(H,'KDS_31_30_35_2026_표4.4_추출.md'),encoding='utf-8').read()
 def parse(sec):
     blk=md.split('## '+sec)[1].split('\n## ')[0]; rows=[]; cur=None
     for l in blk.splitlines():
@@ -28,7 +28,7 @@ cell_g=all(T['GTS'][k.split('/')[1]]==[r for kk,r in g if kk==k] for k in ['1/20
 bad=0;ex=[]
 for c,o in zip(inp,out['cases']):
     vf=1.2 if c['roof']=='valley' else 1.0
-    a100=((c['A']+c['W']*0.5)*c['I']/100*vf+c['Q']/0.017*9*25/100)/c['N']
+    a100=((c['A']+c['W']*0.5)*c['I']/100*vf+c['Q']*3600/100)/c['N']
     e=[kfind(KV,a100),kfind(KH[c['slope']],a100),kfind(KG[c['gslope']],a100)]
     if [str(x) for x in e]!=[str(x) for x in o]: bad+=1; ex.append((c,e,o))
 # RD 대조
