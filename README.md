@@ -1,5 +1,10 @@
 # 🌧️ 건축물 우수관경 산정 시스템 — MANMIN **Ver 5.0**
 
+## v6.1.4 (2026-11-12) — CDN 판 통일 · SRI(정밀검토 C2)
+
+- Pretendard CSS SRI(integrity · crossorigin)(정밀검토 C2) — 화면 · 계산 · 인쇄 불변 · 작업지시서 §25-6-82.
+- sw 캐시명 v6.1.4 · MM-PRINT · MM-PROJECT 구간 · 사용자 매뉴얼 변경 없음.
+
 ## 사용자 매뉴얼 Ver-6.1 (2026-11-12) — 전체 다시 만듦(정밀검토 B12)
 
 - 매뉴얼 Ver-5.0 → Ver-6.1: KDS 31 30 35 : 2026 기준으로 글 · 표 · 예제 결과(예제 A 수평관 DN 125 → DN 100) 고침 · 4-11 「v6.1.3 KDS 2026 개정 반영」 추가 · 그림 27장 이 PC에서 다시 캡처 · 검증기(verify_drain_calc · cmp_app · verify_manual_rd)를 2026 표 · 식으로 · 원문 추출본 KDS_31_30_35_2026_표4.4_추출.md 추가 · PDF RD_사용자매뉴얼_Ver-6.1.pdf(Ver-5.0 PDF 삭제) · 작업지시서 §25-6-81.
