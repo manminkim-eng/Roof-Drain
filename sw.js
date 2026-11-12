@@ -1,4 +1,5 @@
 /* ══════════════════════════════════════════════════════
+   v6.1.2 (2026-11-12) — 건물개요 공통 원본 MM-PROJECT v1.2 → v1.3(불러오기 창 표 칸 모양 고정 — 도구 CSS 가 새지 않음 · 저장값 같음, 정밀검토 C10) · 쓰지 않는 Noto Sans KR 구글 글꼴 불러오기 제거(실측으로 글자 하나도 안 쓰임 — 글꼴 지정은 그대로, 정밀검토 C4) · 작업지시서 §25-6-80 · 판 6.1 · 캐시명 v6.1.2 (종전 v6.1.1)
    v6.1.1 (2026-11-12) — 입력값 경고 표시: 드레인 개수 빈 값 · 0 → 1 · 소수 · 음수 · 수직벽 · 연속 유량 · 구간 면적 음수 — 계산 값 불변 · 계산서 끝 「입력 확인」 줄(정밀검토 B10 · 작업지시서 §25-6-79) · 판 6.1 · 캐시명 v6.1.1 (종전 usu-v6.1.0)
    v6.1.0 (2026-11-12) — 건물개요 공통 원본 MM-PROJECT v1.1 → v1.2(불러오기 창 칸 줄바꿈 · 저장값 같음, 정밀검토 B5 · 작업지시서 §25-6-76) · 캐시명 v6.1.0 (종전 usu-v5.0.22)
    2026-10-13 — v5.0.13 빗물받이 기울기 · A4 빗물받이 행 · 4.4.6 연속흐름 · 권장면적 표기 동반 캐시명 v5.0.13
@@ -31,7 +32,7 @@ const mmMatch = (req, opt) => caches.keys()
   .then((ks) => ks.reduce((p, k) => p.then((r) => r || caches.open(k).then((c) => c.match(req, opt))), Promise.resolve(undefined)))
   .then((r) => (r && r.type === 'opaque' && req && req.mode === 'cors') ? undefined : r);
 
-const SW_VERSION   = 'usu-v6.1.1';
+const SW_VERSION   = 'usu-v6.1.2';
 /* 종전 접두어 잔재 — 한 번 지우고 나면 무해하다 */
 const ORPHAN       = ['manmin-v5.0.1-static','manmin-v5.0.1-fonts','manmin-v5.0.1-dynamic','manmin-v5.0.0-static','manmin-v5.0.0-fonts','manmin-v5.0.0-dynamic'];
 const CACHE_STATIC = `${SW_VERSION}-static`;
