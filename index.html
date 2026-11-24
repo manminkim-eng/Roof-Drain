@@ -887,6 +887,16 @@ footer.mm-foot{position:relative;z-index:1;border-top:1px solid #e4e9f0;backgrou
               <button class="zone-add-btn" onclick="addZone()">+ 구간 추가</button>
             </div>
             <div id="zone-list"></div>
+            <!-- v6.1.6 — 밸리형 구간이 있을 때만 표시 · 단일 구간의 집중계수 칸과 같은 값(교차검증 P6) -->
+            <div id="zone-vf-group" style="display:none;margin-top:7px;">
+              <div class="fgrp"><label class="flbl">밸리형 구간 집수 집중계수 (KDS 외 · 선택)</label>
+                <select class="fselect" id="sel-zone-vf" onchange="onZoneVFChange(this.value)">
+                  <option value="1.10">1.10 — 완만한 밸리 (경사 낮음)</option>
+                  <option value="1.20" selected>1.20 — 일반 밸리 (표준)</option>
+                  <option value="1.30">1.30 — 급경사 밸리</option>
+                </select>
+              </div>
+            </div>
             <div style="margin-top:7px;padding:7px 10px;background:#eff5fd;border:1px solid #c2d9f7;border-radius:7px;display:flex;justify-content:space-between;align-items:center;">
               <span style="font-size:11px;font-weight:700;color:#475569;">전체 유효면적 합계</span>
               <span style="font-size:14px;font-weight:900;color:#2d5186;font-family:'JetBrains Mono',monospace" id="zone-total-area">— m²</span>
@@ -984,7 +994,7 @@ footer.mm-foot{position:relative;z-index:1;border-top:1px solid #e4e9f0;backgrou
 
         <!-- 수평관 -->
         <div class="card">
-          <div class="card-head"><div class="card-ico">➡️</div><span class="card-tit">우수 수평관 관경 산정</span><span class="cbadge">KDS 표 4.4-2</span></div>
+          <div class="card-head"><div class="card-ico">➡️</div><span class="card-tit">우수 수평 지관 관경 산정 (드레인별)</span><span class="cbadge">KDS 표 4.4-2</span></div>
           <div class="card-body"><div id="hresults"></div></div>
         </div>
 
@@ -1257,9 +1267,9 @@ footer.mm-foot{position:relative;z-index:1;border-top:1px solid #e4e9f0;backgrou
                 </tr>
               </thead>
               <tbody>
-                <tr><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-weight:900;color:#2d5186;font-family:'JetBrains Mono',monospace;">1/100</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">76 m²</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">167 m²</td></tr>
-                <tr style="background:#f8fafd;"><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-weight:900;color:#2d5186;font-family:'JetBrains Mono',monospace;">1/50</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">108 m²</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">246 m²</td></tr>
-                <tr><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-weight:900;color:#2d5186;font-family:'JetBrains Mono',monospace;">1/25</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">153 m²</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">349 m²</td></tr>
+                <tr><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-weight:900;color:#2d5186;font-family:'JetBrains Mono',monospace;">1/100</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">125 m²</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">261 m²</td></tr>
+                <tr style="background:#f8fafd;"><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-weight:900;color:#2d5186;font-family:'JetBrains Mono',monospace;">1/50</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">179 m²</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">370 m²</td></tr>
+                <tr><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-weight:900;color:#2d5186;font-family:'JetBrains Mono',monospace;">1/25</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">252 m²</td><td style="padding:6px 10px;text-align:center;border:1px solid #e2e8f0;font-family:'JetBrains Mono',monospace;">525 m²</td></tr>
               </tbody>
             </table>
           </div>
@@ -1453,7 +1463,7 @@ footer.mm-foot{position:relative;z-index:1;border-top:1px solid #e4e9f0;backgrou
         <strong>VF</strong> : 밸리형 집수 집중계수 — KDS 외 선택 (1.10/1.20/1.30)<br>
         <strong>N</strong> : 우수 드레인 설치 개수</div></div>
       <div class="nb grn" style="margin-bottom:10px"><div class="nb-tit">📋 KDS 표 조회 방법</div><div class="nb-txt">A_drain 값을 KDS 31 30 35 : 2026 <strong>표 4.4-1</strong> (100mm/hr 열)에서 해당 값 이상인 최소 관경(DN)을 선택합니다.<br>수평관은 선택 구배의 <strong>표 4.4-2</strong>, 반원형 빗물받이는 <strong>표 4.4-3</strong> 동일 적용.</div></div>
-      <div class="nb org"><div class="nb-tit">💡 적용 예시</div><div class="nb-txt">지역: 서울 (118.6mm/hr) / 면적: 500m² / 드레인: 4개 / 여유율: 0% → A_eff = 500m² → A_conv = 500 × (118.6÷100) × 1.00 = 593m² → A_drain = 593 ÷ 4 = 148.25m² → 표 4.4-1 (100mm/h 열) → DN80 (204m²) 선정 ✓</div></div>
+      <div class="nb org"><div class="nb-tit">💡 적용 예시</div><div class="nb-txt">지역: 서울 (118.6mm/hr) / 면적: 500m² / 드레인: 4개 / 여유율: 0% → A_eff = 500m² → A_conv = 500 × (118.6÷100) × 1.00 = 593m² → A_drain = 593 ÷ 4 = 148.25m² → 표 4.4-1 (100mm/h 열) → DN80 (198m²) 선정 ✓</div></div>
     </div>
   </div>
 </div>
@@ -1756,7 +1766,18 @@ function renderZoneList(){
   calcZoneTotal();
 }
 
+function syncZoneVF(){ /* v6.1.6 — 밸리형 구간이 있으면 집중계수 칸 표시(교차검증 P6) */
+  const g=document.getElementById('zone-vf-group'),z=document.getElementById('sel-zone-vf'),m=document.getElementById('sel-valley-factor');
+  if(!g||!z)return;
+  g.style.display=zones.some(q=>q.roof==='valley')?'block':'none';
+  if(m&&z.value!==m.value)z.value=m.value;
+}
+function onZoneVFChange(v){
+  const m=document.getElementById('sel-valley-factor');if(m)m.value=v;
+  liveCalc();
+}
 function calcZoneTotal(){
+  syncZoneVF();
   const total=zones.reduce((s,z)=>s+z.area+z.wall*0.5,0);
   const el=document.getElementById('zone-total-area');
   if(el)el.textContent=total>0?total.toFixed(1)+' m²':'— m²';
@@ -1815,9 +1836,19 @@ function liveCalc(){
   S.material=document.getElementById('sel-material').value;
   S.slope=parseInt(document.getElementById('sel-slope').value);
   S.safety=parseInt(document.getElementById('sel-safety').value);
-  if(S.drainMode==='manual')S.drains=parseInt(document.getElementById('inp-drains').value)||1;
+  if(S.drainMode==='manual')S.drains=Math.max(1,parseInt(document.getElementById('inp-drains').value)||1); // v6.1.6 — 음수 → 1개(교차검증 P5)
   updDrainPreview();updateSteps();
-  if(S.rainfall&&S.area>0)doCalc();
+  if(S.rainfall&&S.area>0&&S.area+S.wall*0.5>0)doCalc();
+  else if(S.hasResult)clearResult(); // v6.1.6 — 면적 0 · 음수면 이전 결과를 지움(교차검증 P4)
+}
+
+/* v6.1.6 — 유효면적 0 이하: 결과 · A4 무효화(교차검증 P4) */
+function clearResult(){
+  S.hasResult=false;S.result=null;
+  document.getElementById('no-result-card').style.display='block';
+  document.getElementById('result-area').style.display='none';
+  updateSteps();
+  if(document.getElementById('panel-a4').classList.contains('active'))renderA4();
 }
 
 /* ═══════ CORE CALC ═══════ */
@@ -1836,7 +1867,11 @@ function doCalc(){
   const ea  = S.area * RF + wc;                // 유효면적 (RF 반영)
   const SF  = 1 + S.safety / 100;             // KDS 외 여유율(기본 0%)
   const cq  = S.cont * 3600 / 100;              // KDS 31 30 35 : 2026 4.4.6 연속흐름 A = 3600 Q / R → 100mm/h 환산면적 A × R/100 = 36 Q (v6.1.3 · 종전 2021 「0.017 L/s 당 9㎡(25mm/h)」 = 132.4 Q)
-  const ct  = ea * (S.rainfall / 100) * SF * VF + cq; // 환산면적 (VF · 연속흐름 반영)
+  // v6.1.6 — 구간별 설계: 밸리형 구간의 유효면적에만 VF 적용(교차검증 P6). 단일 구간은 종전 식 그대로
+  const multiZ = zoneMode==='multi' && zones.length>0;
+  const zVal  = multiZ && zones.some(z=>z.roof==='valley');
+  const eaVF  = multiZ ? zones.reduce((s,z)=>s+(z.area+z.wall*0.5)*(z.roof==='valley'?S.valleyFactor:1),0) : ea*VF;
+  const ct  = zVal ? eaVF * (S.rainfall / 100) * SF + cq : ea * (S.rainfall / 100) * SF * VF + cq; // 환산면적 (VF · 연속흐름 반영)
   const dc  = ct / S.drains;
   const de  = ea / S.drains;
   const fl  = ea * S.rainfall / 60 + S.cont * 60; // ℓ/min (연속 배출 포함)
@@ -1855,7 +1890,7 @@ function doCalc(){
   S.result = {
     ea, wc, ct, dc, dc_h, de, fl,
     vp, hp, gp, gs, cq, SF, slopeN, slopeFactor,
-    RF, VF, thetaDeg: S.slopeAngle,
+    RF, VF, thetaDeg: S.slopeAngle, zVal, eaVF, zVF: S.valleyFactor,
     zoneMode, zonesSnap: JSON.parse(JSON.stringify(zones))
   };
 
@@ -1891,12 +1926,12 @@ function doCalc(){
   document.getElementById('cv-eff').textContent  = fmtN(ea,1)+' m²';
   document.getElementById('cv-rain').textContent = S.rainfall+' mm/hr';
   document.getElementById('cv-conv').textContent =
-    fmtN(ea,1)+'×('+S.rainfall+'/100)×'+SF.toFixed(2)
+    (zVal?fmtN(eaVF,1)+'[밸리 구간×VF'+S.valleyFactor.toFixed(2)+']':fmtN(ea,1))+'×('+S.rainfall+'/100)×'+SF.toFixed(2)
     +(VF!==1.0?'×VF'+VF.toFixed(2):'')
     +(cq>0?' + 연속흐름 '+fmtN(cq,1):'')
     +' = '+fmtN(ct,1)+' m²';
   document.getElementById('cv-zone').textContent   = fmtN(ct,1)+'÷'+S.drains+' = '+fmtN(dc,1)+' m²';
-  document.getElementById('cv-result').textContent = 'DN '+vp.dn+'mm (표 최대 '+vp.maxArea+' m²)';
+  document.getElementById('cv-result').textContent = 'DN '+vp.dn+'mm (표 최대 '+vp.maxArea+' m²)'+(vp.over?' — ⚠ 표 최대 초과':'');
 
   const slopeEl   = document.getElementById('cv-slope-h');
   const slopeElDc = document.getElementById('cv-slope-h-dc');
@@ -1933,7 +1968,7 @@ function renderCandidates(id,t,target){
   const found=findPipe(t,target);
   const rows=t.map(row=>{
     const dn=row[0],m100=row[C100],isRec=dn===found.dn,ok=m100>=target;
-    const tag=isRec?`<span class="pc-tag-inline">✅ 추천</span>`:'';
+    const tag=isRec?(found.over?`<span class="pc-tag-inline" style="background:#dc2626;color:#fff">⚠ 초과</span>`:`<span class="pc-tag-inline">✅ 추천</span>`):'';
     const margin=ok?(m100-target>0?'+':'')+(m100-target).toFixed(0):''+(m100-target).toFixed(0);
     const cls=isRec?'pc-rec':(!ok?'pc-dim':'');
     return`<tr class="${cls}">
@@ -1951,7 +1986,7 @@ function renderCandidates(id,t,target){
         <thead><tr><th>관경 DN</th><th>표기준(m²)</th><th>필요(m²)</th><th>여유(m²)</th><th>적합</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
-    </div>`;
+    </div>${found.over?`<div class="nb org" style="margin:7px 0 0"><div class="nb-tit">⚠ 표 최대 초과</div><div class="nb-txt">필요 ${fmtN(target,1)} m² &gt; 표 최대 DN ${found.dn} 허용 ${fmtN(found.maxArea,0)} m² — 드레인 추가 또는 별도 검토가 필요합니다(표 범위 밖).</div></div>`:''}`;
 }
 
 /* ═══════ DRAIN DETAIL ═══════ */
@@ -1965,7 +2000,7 @@ function renderDrainDetail(de,dc,vp,hp,gp,ct,ea){
   if(zoneMode==='multi'&&zones.length>1){
     const zgRows=zones.map(z=>{
       const zEff=z.area+z.wall*0.5;
-      const zConv=zEff*(S.rainfall/100)*(1+S.safety/100);
+      const zConv=zEff*(S.rainfall/100)*(1+S.safety/100)*(z.roof==='valley'?S.valleyFactor:1); // v6.1.6 구간 VF(P6)
       const zRec=Math.max(1,Math.ceil(zConv/vp.maxArea));
       return`<tr><td style="font-weight:800;color:#2d5186">${z.name}</td><td>${zEff.toFixed(1)}</td><td>${zConv.toFixed(1)}</td><td style="font-weight:900;color:#2d5186">${zRec}개</td><td>DN${vp.dn}</td></tr>`;
     }).join('');
@@ -1991,17 +2026,28 @@ function renderCountSummary(vDN,hDN,gDN){
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:11px">
       <div class="sbox"><div class="sico">💧</div><div class="sval" style="font-size:16px">${S.drains}개</div><div class="slbl">드레인 수량</div></div>
       <div class="sbox"><div class="sico">⬆️</div><div class="sval" style="font-size:16px">DN${vDN}</div><div class="slbl">수직관 관경</div></div>
-      <div class="sbox"><div class="sico">➡️</div><div class="sval" style="font-size:16px">DN${hDN}</div><div class="slbl">수평관 관경</div></div>
+      <div class="sbox"><div class="sico">➡️</div><div class="sval" style="font-size:16px">DN${hDN}</div><div class="slbl">수평 지관 관경</div></div>
       <div class="sbox"><div class="sico">📐</div><div class="sval" style="font-size:16px">${fmtN(S.area+S.wall*0.5,0)}</div><div class="slbl">유효면적(m²)</div></div>
     </div>
     <div class="nb grn"><div class="nb-tit">📋 설계 적용 수량 (최종)</div><div class="nb-txt">
       · 루프드레인(집수구) : <strong>${S.drains}개소</strong><br>
       · 우수 수직관 : DN ${vDN}mm × <strong>${S.drains}개소</strong><br>
-      · 우수 수평관 : DN ${hDN}mm (구배 1/${S.slope} 이상)<br>
+      · 드레인별 우수 수평 지관 : DN ${hDN}mm (구배 1/${S.slope} 이상)<br>
       ${isSemi?'· 반원형 빗물받이 : DN '+gDN+'mm × '+S.drains+'개소 (기울기 1/'+(S.gslope||200)+')<br>':''}
       · 관 재질 : ${mat} · 여유율(KDS 외) : +${S.safety}%<br>
       · 적용기준 : KDS 31 30 35 : 2026 / ${S.station} ${S.rainfall}mm/hr
-    </div></div>`;
+    </div></div>${overNote(S.result)?`<div class="nb org" style="margin-top:8px"><div class="nb-tit">⚠ 표 최대 초과</div><div class="nb-txt">${overNote(S.result)} — 드레인 추가 또는 별도 검토</div></div>`:''}
+    <div class="nb blue" style="margin-top:8px;margin-bottom:0"><div class="nb-tit">ℹ️ 수평관 산정 범위</div><div class="nb-txt">수평관은 드레인 1개가 담당하는 환산면적으로 고른 <b>드레인별 수평 지관</b>입니다. 여러 드레인이 합류하는 수평 주관은 합류 지점까지의 누적 환산면적(전체를 한 주관으로 모으면 ${S.result?fmtN(S.result.ct,1):'—'} m²)으로 표 4.4-2에서 따로 산정하십시오(KDS 4.4.3).</div></div>`;
+}
+
+/* v6.1.6 — 표 최대 초과 항목 문구(교차검증 P3) */
+function overNote(R){
+  if(!R)return '';
+  const a=[];
+  if(R.vp&&R.vp.over)a.push('수직관(표 4.4-1 최대 DN '+R.vp.dn+' · '+fmtN(R.vp.maxArea,0)+' m²)');
+  if(R.hp&&R.hp.over)a.push('수평 지관(표 4.4-2 최대 DN '+R.hp.dn+' · '+fmtN(R.hp.maxArea,0)+' m²)');
+  if(S.pipetype==='semi'&&R.gp&&R.gp.over)a.push('빗물받이(표 4.4-3 최대 DN '+R.gp.dn+' · '+fmtN(R.gp.maxArea,0)+' m²)');
+  return a.length?'드레인당 환산면적 '+fmtN(R.dc,1)+' m²가 '+a.join(' · ')+'를 넘음':'';
 }
 
 /* ═══════ A4 RENDER ═══════ */
@@ -2077,7 +2123,7 @@ function renderA4(){
     if(R.zoneMode!=='multi'||!R.zonesSnap||R.zonesSnap.length<=1)return'';
     const zRows=R.zonesSnap.map(z=>{
       const eff=z.area+z.wall*0.5;
-      const rn=({flat:'평지붕',slope:'경사지붕',valley:'밸리형'})[z.roof]||z.roof;
+      const rn=(({flat:'평지붕',slope:'경사지붕',valley:'밸리형'})[z.roof]||z.roof)+(z.roof==='valley'?' (VF '+(R.zVF||1.2).toFixed(2)+')':'');
       return '<tr><td style="font-weight:800">'+z.name+'</td><td>'+z.area.toFixed(1)+'</td><td>'+z.wall.toFixed(1)+'</td><td>+'+(z.wall*0.5).toFixed(1)+'</td><td style="font-weight:800">'+eff.toFixed(1)+'</td><td>'+rn+'</td></tr>';
     }).join('');
     const sumA=R.zonesSnap.reduce((s,z)=>s+z.area,0);
@@ -2108,7 +2154,7 @@ function renderA4(){
             <div style="width:1px;background:rgba(255,255,255,.25);align-self:stretch;flex-shrink:0;"></div>
             <!-- 수평관 -->
             <div style="text-align:center;flex:1;">
-              <div style="font-size:9px;opacity:.8;font-weight:700;margin-bottom:1px;">수평관 관경 (DN)</div>
+              <div style="font-size:9px;opacity:.8;font-weight:700;margin-bottom:1px;">수평 지관 관경 (DN)</div>
               <div style="font-size:28px;font-weight:900;color:#9cc3f5;font-family:'JetBrains Mono',monospace;line-height:1;">${R.hp.dn}</div>
               <div style="font-size:10px;opacity:.8;font-weight:700;">mm</div>
             </div>
@@ -2161,6 +2207,7 @@ function renderA4(){
         </td>
       </tr>
     </table>
+    ${overNote(R)?'<div style="margin-top:4px;padding:5px 8px;border:1px solid #d32f2f;border-radius:3px;color:#b71c1c;background:#fff5f5;font-size:9pt;line-height:1.5;">⚠ 표 최대 초과 — '+overNote(R)+'. 드레인 추가 또는 별도 검토가 필요합니다(표 범위 밖 · 아래 관경은 표 최대값).</div>':''}
   </div>
 
   <div class="a4-section allow-break page-aware">
@@ -2180,11 +2227,11 @@ function renderA4(){
         return '';
       })()}
       <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'②':'③'} 유효 지붕면적</td><td>${S.area} + ${R.wc.toFixed(1)}</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">${fmtN(R.ea,1)} m²</td></tr>
-      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'③':'④'} 강우량 보정 환산면적</td><td>${R.ea.toFixed(1)} × (${S.rainfall} ÷ 100) × ${R.SF.toFixed(2)}${R.VF!==1.0?' × VF'+R.VF.toFixed(2):''}${R.cq>0?' + 연속흐름 '+S.cont+' L/s → '+R.cq.toFixed(1)+' (4.4.6)':''}</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">${fmtN(R.ct,1)} m²</td></tr>
+      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'③':'④'} 강우량 보정 환산면적</td><td>${R.zVal?R.eaVF.toFixed(1)+' [밸리 구간 × VF'+R.zVF.toFixed(2)+']':R.ea.toFixed(1)} × (${S.rainfall} ÷ 100) × ${R.SF.toFixed(2)}${R.VF!==1.0?' × VF'+R.VF.toFixed(2):''}${R.cq>0?' + 연속흐름 '+S.cont+' L/s → '+R.cq.toFixed(1)+' (4.4.6)':''}</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">${fmtN(R.ct,1)} m²</td></tr>
       <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'④':'⑤'} 드레인당 환산면적</td><td>${R.ct.toFixed(1)} ÷ ${S.drains}개</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">${fmtN(R.dc,1)} m²</td></tr>
-      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'⑤':'⑥'} 수직관 관경 선정</td><td>표 4.4-1 조회 (≥ ${R.dc.toFixed(1)} m²)</td><td style="text-align:right;font-weight:900;color:#2d5186">DN ${R.vp.dn}mm <span style="color:#6b7280;font-weight:600">(허용 ${R.vp.maxArea}m²)</span></td></tr>
-      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'⑥':'⑦'} 수평관 관경 선정</td><td>표 4.4-2 구배 1/${S.slope} 표 조회 (≥ ${R.dc_h.toFixed(1)} m²)</td><td style="text-align:right;font-weight:900;color:#2d5186">DN ${R.hp.dn}mm <span style="color:#6b7280;font-weight:600">(허용 ${R.hp.maxArea}m²)</span></td></tr>
-      ${S.pipetype==='semi'?`<tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'⑦':'⑧'} 빗물받이 관경 선정</td><td>표 4.4-3 기울기 1/${R.gs} 표 조회 (≥ ${R.dc.toFixed(1)} m²)</td><td style="text-align:right;font-weight:900;color:#2d5186">DN ${R.gp.dn}mm <span style="color:#6b7280;font-weight:600">(허용 ${R.gp.maxArea}m²)</span></td></tr>`:''}
+      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'⑤':'⑥'} 수직관 관경 선정</td><td>표 4.4-1 조회 (≥ ${R.dc.toFixed(1)} m²)</td><td style="text-align:right;font-weight:900;color:#2d5186">DN ${R.vp.dn}mm <span style="color:#6b7280;font-weight:600">(허용 ${R.vp.maxArea}m²)</span>${R.vp.over?' <span style="color:#dc2626;font-weight:800">⚠ 표 최대 초과</span>':''}</td></tr>
+      <tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'⑥':'⑦'} 수평 지관(드레인별) 관경 선정</td><td>표 4.4-2 구배 1/${S.slope} 표 조회 (≥ ${R.dc_h.toFixed(1)} m²)</td><td style="text-align:right;font-weight:900;color:#2d5186">DN ${R.hp.dn}mm <span style="color:#6b7280;font-weight:600">(허용 ${R.hp.maxArea}m²)</span>${R.hp.over?' <span style="color:#dc2626;font-weight:800">⚠ 표 최대 초과</span>':''}</td></tr>
+      ${S.pipetype==='semi'?`<tr style="break-inside:avoid;page-break-inside:avoid;"><td>${S.rooftype==='flat'?'⑦':'⑧'} 빗물받이 관경 선정</td><td>표 4.4-3 기울기 1/${R.gs} 표 조회 (≥ ${R.dc.toFixed(1)} m²)</td><td style="text-align:right;font-weight:900;color:#2d5186">DN ${R.gp.dn}mm <span style="color:#6b7280;font-weight:600">(허용 ${R.gp.maxArea}m²)</span>${R.gp.over?' <span style="color:#dc2626;font-weight:800">⚠ 표 최대 초과</span>':''}</td></tr>`:''}
     </tbody></table>
   </div>
 
@@ -2192,10 +2239,11 @@ function renderA4(){
     <div class="a4-sub" style="break-after:avoid;page-break-after:avoid;">4. 설계 수량 적용 요약</div>
     <table class="a4-tbl"><thead style="display:table-header-group;"><tr><th>항목</th><th>규격</th><th>수량</th><th>비고</th></tr></thead><tbody>
       <tr style="break-inside:avoid;"><td>루프드레인 (집수구)</td><td>—</td><td style="text-align:center;font-weight:800">${S.drains} 개소</td><td>옥상 균등 배치</td></tr>
-      <tr style="break-inside:avoid;"><td>우수 수직관</td><td style="font-weight:800;color:#2d5186">DN ${R.vp.dn}mm · ${mat}</td><td style="text-align:center;font-weight:800">${S.drains} 개소</td><td>KDS 표 4.4-1 기준</td></tr>
-      <tr style="break-inside:avoid;"><td>우수 수평관</td><td style="font-weight:800;color:#2d5186">DN ${R.hp.dn}mm · ${mat}</td><td style="text-align:center;font-weight:800">1식</td><td>구배 1/${S.slope} 이상</td></tr>
-      ${S.pipetype==='semi'?`<tr style="break-inside:avoid;"><td>반원형 빗물받이</td><td style="font-weight:800;color:#2d5186">DN ${R.gp.dn}mm</td><td style="text-align:center;font-weight:800">${S.drains} 개소</td><td>KDS 표 4.4-3 · 기울기 1/${R.gs}</td></tr>`:''}
+      <tr style="break-inside:avoid;"><td>우수 수직관</td><td style="font-weight:800;color:#2d5186">DN ${R.vp.dn}mm · ${mat}</td><td style="text-align:center;font-weight:800">${S.drains} 개소</td><td>KDS 표 4.4-1 기준${R.vp.over?' · 표 최대 초과 — 별도 검토':''}</td></tr>
+      <tr style="break-inside:avoid;"><td>드레인별 우수 수평 지관</td><td style="font-weight:800;color:#2d5186">DN ${R.hp.dn}mm · ${mat}</td><td style="text-align:center;font-weight:800">1식</td><td>구배 1/${S.slope} 이상${R.hp.over?' · 표 최대 초과 — 별도 검토':''}</td></tr>
+      ${S.pipetype==='semi'?`<tr style="break-inside:avoid;"><td>반원형 빗물받이</td><td style="font-weight:800;color:#2d5186">DN ${R.gp.dn}mm</td><td style="text-align:center;font-weight:800">${S.drains} 개소</td><td>KDS 표 4.4-3 · 기울기 1/${R.gs}${R.gp.over?' · 표 최대 초과 — 별도 검토':''}</td></tr>`:''}
     </tbody></table>
+    <div style="margin-top:4px;font-size:9px;color:#475569;line-height:1.5;">※ 수평 지관은 드레인 1개가 담당하는 환산면적(${fmtN(R.dc,1)} m²)으로 고른 관경입니다. 여러 드레인이 합류하는 수평 주관은 합류 지점까지의 누적 환산면적(전체를 한 주관으로 모으면 ${fmtN(R.ct,1)} m²)으로 표 4.4-2에서 따로 산정하십시오(KDS 4.4.3).</div>
   </div>
 
   <div class="a4-section allow-break page-aware">
@@ -2203,6 +2251,7 @@ function renderA4(){
     <table class="a4-tbl"><thead style="display:table-header-group;"><tr><th>기준</th><th>조항</th><th>내용</th></tr></thead><tbody>
       <tr style="break-inside:avoid;"><td style="font-weight:800;color:#244168">KDS 31 30 35 : 2026</td><td style="text-align:center">4.4.2 ~ 4.4.6</td><td>수직관(표 4.4-1)·수평관(표 4.4-2)·수직벽 ½ 가산·반원형 빗물받이(표 4.4-3)·연속흐름 환산</td></tr>
       <tr style="break-inside:avoid;"><td style="font-weight:800;color:#244168">KDS 31 30 35 : 2026</td><td style="text-align:center">4.4.1</td><td>시간최대강우량 기준 관 지름 결정</td></tr>
+      <tr style="break-inside:avoid;"><td style="font-weight:800;color:#244168">건축물의 설비기준 등에 관한 규칙</td><td style="text-align:center">제17조 제2항 제1호 · 제5호</td><td>빗물 양에 맞는 용량 · 경사 · 우수관과 오수관 분리 배관</td></tr>
       <tr style="break-inside:avoid;"><td style="font-weight:800;color:#244168">기상자료개방포털 조건별통계</td><td style="text-align:center">1시간 최다강수량 관측 최대 (${S.period})</td><td>${S.station} — ${S.kmaStn||S.station} 관측소 No.${S.stationNo} : ${S.rainfall}mm/hr (${S.rainDate||''})</td></tr>
     </tbody></table>
   </div>
@@ -2215,6 +2264,7 @@ function renderA4(){
     </span>
   </div>
   <div class="dev-stamp">MANMIN · Ver-6.1</div>`;
+  if(window.MMWarn)try{MMWarn.run();}catch(e){} // v6.1.6 — 숨은 탭에서도 「⚠ 입력 확인」 줄을 계산서 · 인쇄 · JPG에(교차검증 P1)
   // ★ double rAF: innerHTML 반영 후 DOM 안정화 완료 → scaleA4Preview 호출
   requestAnimationFrame(function(){
     requestAnimationFrame(function(){
@@ -3306,9 +3356,12 @@ input[data-mm-warn]{outline:2px solid #d32f2f!important;outline-offset:1px;backg
 .mm-warn-note{-webkit-print-color-adjust:exact;print-color-adjust:exact;break-inside:avoid;}}
 </style>
 <script id="mm-warn-cfg">
-window.MM_WARN_CFG={report:'#a4-content',rules:[
- {sel:'#inp-drains',empty:'1개',zero:'1개',neg:true,int:'개'},{sel:'#inp-wall',neg:true},{sel:'#inp-cont',neg:'음수 → 0 적용'},
- {sel:'#zone-list input[type=number]',name:'구간 표 면적',neg:true}]};
+/* v6.1.6 — all:true(숨은 탭 칸도 판정 → A4 탭 · 인쇄 · JPG에 「⚠ 입력 확인」 줄) · cond 로 쓰지 않는 칸 제외 · 드레인 음수 → 1개 · 지붕면적 0 · 음수(교차검증 P1 · P4 · P5) */
+window.MM_WARN_CFG={report:'#a4-content',all:true,rules:[
+ {sel:'#inp-drains',empty:'1개',zero:'1개',neg:'음수 → 1개 적용',int:'개',cond:function(){var m=document.getElementById('sel-drain-mode');return !m||m.value==='manual';}},
+ {sel:'#inp-area',neg:'음수 — 산정 안 함',extra:function(el,n){return n===0?'0 — 산정 안 함':null;},cond:function(){return typeof zoneMode==='undefined'||zoneMode==='single';}},
+ {sel:'#inp-wall',neg:true,cond:function(){return typeof zoneMode==='undefined'||zoneMode==='single';}},{sel:'#inp-cont',neg:'음수 → 0 적용'},
+ {sel:'#zone-list input[type=number]',name:'구간 표 면적',neg:true,cond:function(){return typeof zoneMode!=='undefined'&&zoneMode==='multi';}}]};
 </script>
 <script id="mm-warn-js">
 (function(){

@@ -1,4 +1,5 @@
 /* ══════════════════════════════════════════════════════
+   v6.1.6 (2026-11-24) — 기계 1차 교차검증 반영: A4 「⚠ 입력 확인」 줄(숨은 탭 판정) · 설계 기준 탭 표 4.4-2 요약 2026 값 · 표 최대 초과 표시 · 면적 0 · 음수 결과 지움 · 드레인 음수 → 1개 · 구간별 밸리 VF 반영 · 수평 지관(드레인별) 표기 · 계산식 예시 DN80 198 ㎡ · A4 근거 설비기준규칙 제17조 ② 1 · 5호 · 캐시명 v6.1.6 (종전 v6.1.5)
    v6.1.5 (2026-11-12) — html2canvas 1.4.1 머리 태그 SRI(integrity sha384 · crossorigin) · 공통 인쇄 원본 MM-PRINT v1.0 → v1.1(지연 로더도 SRI)(정밀검토 B8 · html2canvas SRI) — 화면 · 계산 · 인쇄 불변 · 작업지시서 §25-6-87 · 캐시명 v6.1.5 (종전 v6.1.4)
    v6.1.4 (2026-11-12) — Pretendard CSS SRI(integrity · crossorigin)(정밀검토 C2) — 화면 · 계산 · 인쇄 불변 · 작업지시서 §25-6-82 · 캐시명 v6.1.4 (종전 v6.1.3)
    v6.1.3 (2026-11-12) — KDS 31 30 35 : 2026 반영 — 표 4.4-1 수직관 · 표 4.4-2 수평관 2026 원문 값으로 교체(수직관 DN 250 · 300 · 380 추가 · 수평관 DN 380) · 4.4.6 연속흐름 식 A = 3600 Q / R(종전 0.017 L/s 당 9 ㎡) · 근거 표기 2021 → 2026 · 개정 메모 칸(정밀검토 B12) — 같은 입력이라도 관경이 달라질 수 있음 · 작업지시서 §25-6-81 · 판 6.1 · 캐시명 v6.1.3 (종전 v6.1.2)
@@ -17,7 +18,7 @@
    S2 회차 2026-09-04 — index 소급(R1·R21·R26 등) 동반 캐시명 v5.0.4
    R25 회차 2026-09-04 — 자기 접두어 캐시 조회 · cors 프리캐시 · opaque 가드 · 캐시명 v5.0.3 (S10)
    건축물 우수관경 산정 시스템 — Service Worker v3.0
-   MANMIN Architecture · KDS 31 30 35 : 2021
+   MANMIN Architecture · KDS 31 30 35 : 2026
    ══════════════════════════════════════════════════════ */
 
 /* §17-1 — 도구 고유 접두어. 'manmin-' 공통 접두어는 같은 origin 의 01~07·46 캐시까지 지운다 */
@@ -35,7 +36,7 @@ const mmMatch = (req, opt) => caches.keys()
   .then((ks) => ks.reduce((p, k) => p.then((r) => r || caches.open(k).then((c) => c.match(req, opt))), Promise.resolve(undefined)))
   .then((r) => (r && r.type === 'opaque' && req && req.mode === 'cors') ? undefined : r);
 
-const SW_VERSION   = 'usu-v6.1.5';
+const SW_VERSION   = 'usu-v6.1.6';
 /* 종전 접두어 잔재 — 한 번 지우고 나면 무해하다 */
 const ORPHAN       = ['manmin-v5.0.1-static','manmin-v5.0.1-fonts','manmin-v5.0.1-dynamic','manmin-v5.0.0-static','manmin-v5.0.0-fonts','manmin-v5.0.0-dynamic'];
 const CACHE_STATIC = `${SW_VERSION}-static`;
