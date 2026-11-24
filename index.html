@@ -1018,7 +1018,7 @@ footer.mm-foot{position:relative;z-index:1;border-top:1px solid #e4e9f0;backgrou
 
         <div class="ref-box">
           <div class="ref-tit">📌 산정 근거</div>
-          <div class="ref-item">KDS 31 30 35 : 2026 우수설비 (국토교통부고시 제2026-92호, 2026.3.1 시행 · 종전 2021판 제2021-203호)</div>
+          <div class="ref-item">KDS 31 30 35 : 2026 우수설비 (현행 국토교통부고시 제2026-92호, 2026.3.1 시행 · 종전 KDS 2021판)</div>
           <div class="nb blue mm-law-memo" style="margin-top:8px"><div class="nb-tit">📝 개정 메모 (2026. 11. 12. 확인)</div><div class="nb-txt">KDS 31 30 35 우수설비가 국토교통부고시 제2026-92호로 개정되어 2026. 3. 1.부터 시행 중입니다. 국가건설기준센터 원문과 대조해 v6.1.3에서 반영했습니다 — ① 표 4.4-1 수직관 · 표 4.4-2 수평관 허용 지붕면적 전면 개정(예: 100mm/h · DN 100 수직관 427 → 409 ㎡, 1/100 수평관 167 → 261 ㎡), 수직관 DN 250 · 300 · 380 추가, 수평관 DN 375 → 380 ② 4.4.6 연속흐름 식 A = 3600 Q / R(종전 0.017 L/s 당 9 ㎡ — 약 3.7배 크게 잡혔음) ③ 표 4.4-3 빗물받이는 그대로. 같은 입력이라도 v6.1.2 이전 결과와 관경이 달라질 수 있습니다.</div></div>
           <div class="ref-item">기상자료개방포털 조건별통계 — ASOS 1시간 최다강수량 관측 최대값(~2025)</div>
           <div class="ref-item">환산면적 = 유효면적 × (강우량 ÷ 100) × 여유율(KDS 외·기본 1.00) ÷ 드레인수</div>
@@ -2093,7 +2093,7 @@ function renderA4(){
         <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">관측지점 (기상청 ASOS)</div><div class="a4-iv">${S.kmaStn||S.station} (No.${S.stationNo})</div></div></td>
       </tr>
       <tr>
-        <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">시간최대강우량</div><div class="a4-iv">${S.rainfall} mm/hr</div></div></td>
+        <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">시간최대강우량 (설계자 선정값)</div><div class="a4-iv">${S.rainfall} mm/hr</div></div></td>
         <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">자료기간 · 최대 발생일</div><div class="a4-iv">${S.period} · ${S.rainDate||''}</div></div></td>
       </tr>
       <tr>
@@ -2117,6 +2117,8 @@ function renderA4(){
         <td class="a4-ic-cell"><div class="a4-ic-inner"><div class="a4-ik">연속 배출 유량 (KDS 4.4.6)</div><div class="a4-iv">${S.cont>0?S.cont+' L/s (+'+fmtN(R.cq,1)+' m²)':'없음'}</div></div></td>
       </tr>
     </table>
+    <!-- v6.1.7 — 강우량 선정 사유(판단 항목 J1, 2026-11-24 결정) -->
+    <div style="margin-top:4px;font-size:9px;color:#475569;line-height:1.5;">※ 강우량 선정 사유 : KDS 31 30 35 4.4.1은 재현기간을 정하지 않으므로, 기상청 ASOS 연 1시간 최다강수량의 관측 최대값(${S.period})을 설계자 선정값으로 적용 — ${/\(인근\)/.test(S.kmaStn||'')?`${S.sigun}에는 관측소가 없어 인근 ${String(S.kmaStn).replace(/\s*\(인근\)/,'')} 관측소(No.${S.stationNo}) 값으로 대체`:`${S.sigun} 관측소(${S.kmaStn||S.station}, No.${S.stationNo}) 값 그대로(대체 없음)`}.</div>
   </div>
 
   ${(()=>{

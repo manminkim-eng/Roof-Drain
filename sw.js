@@ -1,4 +1,5 @@
 /* ══════════════════════════════════════════════════════
+   v6.1.7 (2026-11-24) — 기계 판단 항목 결정 반영: A4 시간최대강우량 「설계자 선정값」 표기 · 강우량 선정 사유 줄(관측소 · 인근 대체 여부)(J1) · 고시 표기 「현행 제2026-92호 · 종전 KDS 2021판」으로 축약(J3) — 계산값 불변 · 캐시명 v6.1.7 (종전 v6.1.6)
    v6.1.6 (2026-11-24) — 기계 1차 교차검증 반영: A4 「⚠ 입력 확인」 줄(숨은 탭 판정) · 설계 기준 탭 표 4.4-2 요약 2026 값 · 표 최대 초과 표시 · 면적 0 · 음수 결과 지움 · 드레인 음수 → 1개 · 구간별 밸리 VF 반영 · 수평 지관(드레인별) 표기 · 계산식 예시 DN80 198 ㎡ · A4 근거 설비기준규칙 제17조 ② 1 · 5호 · 캐시명 v6.1.6 (종전 v6.1.5)
    v6.1.5 (2026-11-12) — html2canvas 1.4.1 머리 태그 SRI(integrity sha384 · crossorigin) · 공통 인쇄 원본 MM-PRINT v1.0 → v1.1(지연 로더도 SRI)(정밀검토 B8 · html2canvas SRI) — 화면 · 계산 · 인쇄 불변 · 작업지시서 §25-6-87 · 캐시명 v6.1.5 (종전 v6.1.4)
    v6.1.4 (2026-11-12) — Pretendard CSS SRI(integrity · crossorigin)(정밀검토 C2) — 화면 · 계산 · 인쇄 불변 · 작업지시서 §25-6-82 · 캐시명 v6.1.4 (종전 v6.1.3)
@@ -36,7 +37,7 @@ const mmMatch = (req, opt) => caches.keys()
   .then((ks) => ks.reduce((p, k) => p.then((r) => r || caches.open(k).then((c) => c.match(req, opt))), Promise.resolve(undefined)))
   .then((r) => (r && r.type === 'opaque' && req && req.mode === 'cors') ? undefined : r);
 
-const SW_VERSION   = 'usu-v6.1.6';
+const SW_VERSION   = 'usu-v6.1.7';
 /* 종전 접두어 잔재 — 한 번 지우고 나면 무해하다 */
 const ORPHAN       = ['manmin-v5.0.1-static','manmin-v5.0.1-fonts','manmin-v5.0.1-dynamic','manmin-v5.0.0-static','manmin-v5.0.0-fonts','manmin-v5.0.0-dynamic'];
 const CACHE_STATIC = `${SW_VERSION}-static`;
