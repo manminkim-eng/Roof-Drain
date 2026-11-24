@@ -1,8 +1,8 @@
 import sys,json
 import os
-H=os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0,H); from verify_drain_calc import KV,KH,KG,kfind
+H=os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0,H); from verify_drain_calc import KV,KH,KG,kfind,kds_zones
 import re
-inp=json.load(open(os.path.join(H,'ref_in.json')))['cases']; out=json.load(open(sys.argv[1] if len(sys.argv)>1 else 'app_out.json'))
+_ref=json.load(open(os.path.join(H,'ref_in.json'))); inp=_ref['cases']; out=json.load(open(sys.argv[1] if len(sys.argv)>1 else 'app_out.json'))
 # 표 대조
 T=out['tables']; ok_t=[]
 ok_t.append(all(KV[r[0]]==r[4] for r in T['VT']) and [r[0] for r in T['VT']]==sorted(KV))
@@ -31,11 +31,17 @@ for c,o in zip(inp,out['cases']):
     a100=((c['A']+c['W']*0.5)*c['I']/100*vf+c['Q']*3600/100)/c['N']
     e=[kfind(KV,a100),kfind(KH[c['slope']],a100),kfind(KG[c['gslope']],a100)]
     if [str(x) for x in e]!=[str(x) for x in o]: bad+=1; ex.append((c,e,o))
+# v6.1.6 구간별 설계(밸리형 구간 VF) 대조
+zbad=0
+for c,o in zip(_ref.get('zcases',[]),out.get('zcases',[])):
+    e=kds_zones(c['zones'],c['I'],c['N'],c['slope'],c['gslope'],c['Q'])
+    if [str(x) for x in e]!=[str(x) for x in o]: zbad+=1; ex.append((c,e,o))
+zn=len(out.get('zcases',[]))
 # RD 대조
 K={}
 for l in open(os.path.join(H,'KMA_ASOS_1시간최다강수량_지점요약_1904-2025.txt'),encoding='utf-8'):
     if l[0]!='#' and l.strip(): a=l.split('|'); K[int(a[0])]=a
 rd_bad=[r for r in out['RD'] if float(K[r[2]][4])!=r[3] or K[r[2]][5]!=r[5]]
-print(json.dumps(dict(tbl_dn100=ok_t,cell_v=cell_v,cell_h=cell_h,cell_g=cell_g,calc_n=len(inp),calc_bad=bad,rd_n=len(out['RD']),rd_bad=len(rd_bad),dup_no=len(out['RD'])-len({r[2] for r in out['RD']}),errs=out['errs']),ensure_ascii=False))
+print(json.dumps(dict(tbl_dn100=ok_t,cell_v=cell_v,cell_h=cell_h,cell_g=cell_g,calc_n=len(inp),calc_bad=bad,zone_n=zn,zone_bad=zbad,rd_n=len(out['RD']),rd_bad=len(rd_bad),dup_no=len(out['RD'])-len({r[2] for r in out['RD']}),errs=out['errs']),ensure_ascii=False))
 print(ex[:3])
-ok=all([*json.loads(json.dumps(ok_t)),cell_v,cell_h,cell_g,bad==0,not rd_bad,not out['errs']]); sys.exit(0 if ok else 1)
+ok=all([*json.loads(json.dumps(ok_t)),cell_v,cell_h,cell_g,bad==0,zbad==0,zn==len(_ref.get('zcases',[])),not rd_bad,not out['errs']]); sys.exit(0 if ok else 1)

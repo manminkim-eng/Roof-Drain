@@ -20,7 +20,7 @@ window.__A=()=>{resetAll();__tab('calc');document.getElementById('sel-sido').val
 window.__B=()=>{__A();__setv('sel-pipetype','semi');__setv('sel-slope','50');__setv('sel-gslope','50');liveCalc();window.scrollTo(0,0);};
 window.__C=()=>{__A();setZoneMode('multi');zones=[{id:1,name:'A구간',area:400,wall:60,roof:'flat'},{id:2,name:'B구간',area:200,wall:20,roof:'flat'}];zoneCounter=2;renderZoneList();calcZoneTotal();liveCalc();window.scrollTo(0,0);};
 window.__ex=()=>{const R=S.result;return {sigun:S.sigun,stn:S.kmaStn,no:S.stationNo,rain:S.rainfall,period:S.period,date:S.rainDate,area:S.area,wall:S.wall,drains:S.drains,slope:S.slope,gslope:S.gslope,cont:S.cont,pipetype:S.pipetype,
-  ea:+R.ea.toFixed(2),ct:+R.ct.toFixed(2),dc:+R.dc.toFixed(2),fl:+R.fl.toFixed(1),vp:R.vp.dn,vmax:R.vp.maxArea,hp:R.hp.dn,hmax:R.hp.maxArea,gp:R.gp.dn,gmax:R.gp.maxArea,
+  ea:+R.ea.toFixed(2),ct:+R.ct.toFixed(2),dc:+R.dc.toFixed(2),fl:+R.fl.toFixed(2),vp:R.vp.dn,vmax:R.vp.maxArea,hp:R.hp.dn,hmax:R.hp.maxArea,gp:R.gp.dn,gmax:R.gp.maxArea,
   hero:document.getElementById('res-main-dn').textContent,desc:document.getElementById('res-main-desc').textContent,sum:[...document.querySelectorAll('.sum-bar .sum-item')].map(e=>e.textContent.trim())};};`;
 const SHOTS=[
  {id:'s01_overview',pre:"__A()",clip:'viewport',m:[['.tab-bar-inner','작업 탭'],['.sum-bar','요약 스트립'],['#panel-calc .step-bar','진행 단계'],['card:STEP 1','지역 선택'],['.result-hero','결과 — 추천 수직관'],['.fab-wrap','초기화 · 계산식 안내']]},
@@ -30,7 +30,7 @@ const SHOTS=[
  {id:'s05_drain',clip:'card:STEP 3',m:[['#inp-drains','드레인 개수'],['#drain-unit-area','1개당 분담면적'],['#sel-pipetype','드레인 형태'],['#sel-slope','수평관 기울기'],['#sel-safety','여유율(KDS 외)'],['#inp-cont','연속 배출 유량(KDS 4.4.6 · A = 3600Q/R)']]},
  {id:'s06_hero',clip:'.result-hero',union:'.stat-grid',m:[['#res-main-dn','추천 수직관 DN'],['#res-eff-area','유효면적'],['#res-rainfall','시간최대강우량'],['#res-flow','설계유량']]},
  {id:'s07_vert',clip:'card:우수 수직관 관경 산정',m:[['#vresults .pc-rec','추천 DN — 표 4.4-1'],['#cv-eff','유효면적 합계'],['#cv-conv','100mm/h 환산'],['#cv-zone','드레인당 환산면적'],['#cv-result','적용 관경'],['#cv-slope-h','수평관 구배 — 표 직접 조회']]},
- {id:'s08_horiz',clip:'card:우수 수평관 관경 산정',m:[['#hresults .pc-rec','추천 DN — 표 4.4-2']]},
+ {id:'s08_horiz',clip:'card:우수 수평 지관 관경 산정',m:[['#hresults .pc-rec','추천 DN — 표 4.4-2']]},
  {id:'s09_detail',clip:'card:드레인별 분담면적',union:'card:설계 수량 종합',m:[['#drain-detail','드레인별 상세'],['#count-summary','설계 수량 종합']]},
  {id:'s10_std',pre:"__tab('stdtable');scrollTo(0,0)",wait:700,clip:'card:표 4.4-1',m:[['#std-v-body tr:nth-child(3)','DN 100 — 100mm/h 409㎡']]},
  {id:'s11_std_h',clip:'card:표 4.4-2',m:[['#std-h-body tr:nth-child(1)','1/100 구배'],['#std-h-body tr:nth-child(10)','1/50 구배'],['#std-h-body tr:nth-child(19)','1/25 구배']]},
@@ -42,7 +42,7 @@ const SHOTS=[
  {id:'s17_modal',pre:"__tab('calc');openCalcGuide()",wait:800,fixed:true,post:"closeCalcGuide()",clip:'#calcModal .modal-box',m:[]},
  {id:'s18_a4',pre:"__A();__tab('a4');scrollTo(0,0)",wait:1500,clip:'viewport',m:[['#btn-jpg','JPG 저장'],['.mm-btn-pdf','인쇄 · PDF'],['#a4-page','A4 산정 결과서']]},
  {id:'s19_a4page',clip:'#a4-page',m:[['a4sub:0','1. 적용 조건'],['a4sub:1','2. 산정 결과 요약'],['a4sub:2','3. 계산 과정'],['a4sub:3','4. 설계 수량'],['a4sub:4','5. 적용 법적 근거']]},
- {id:'s20_var_gutter',pre:"__B()",wait:700,clip:'#gutter-card',union:'card:우수 수평관 관경 산정',m:[['#hresults .pc-rec','수평관 — 1/50 구배'],['#gresults .pc-rec','반원형 빗물받이 — 표 4.4-3']]},
+ {id:'s20_var_gutter',pre:"__B()",wait:700,clip:'#gutter-card',union:'card:우수 수평 지관 관경 산정',m:[['#hresults .pc-rec','수평관 — 1/50 구배'],['#gresults .pc-rec','반원형 빗물받이 — 표 4.4-3']]},
  {id:'s25_var_gutter_a4',pre:"__B();__tab('a4');scrollTo(0,0)",wait:1500,clip:'#a4-page',post:"__A()",m:[['a4sub:2','3. 계산 과정 — 빗물받이 관경 선정'],['a4sub:3','4. 설계 수량 — 반원형 빗물받이']]},
  {id:'s21_var_zone',pre:"__C()",wait:700,clip:'card:STEP 2',m:[['#mode-multi-btn','구간별 설계'],['#zone-list','구간 입력'],['#zone-total-area','유효면적 합계']]},
  {id:"s26_proj_menu",pre:"__tab('calc');localStorage.setItem('MANMIN_PROJECT_V1',JSON.stringify({\"사업명\": \"만민 건축사 신사옥 신축공사 설계용역\", \"작성자\": \"김만민 건축사\", \"연면적\": \"12500\", \"지상층\": \"15\", \"지하층\": \"2\", \"updated\": \"2026-11-08 10:00\", \"from\": \"부하계산(RTS)\"}));window.scrollTo(0,0);document.querySelector('.mm-proj-btn').click()",wait:700,clip:'viewport',post:"document.querySelectorAll('.mm-proj-menu').forEach(e=>e.remove())",m:[[".mm-proj-btn", "「🏢 건물개요」 단추(오른쪽 아래)"], [".mm-proj-menu button[data-a=\"save\"]", "저장 — 지금 값 담기"], [".mm-proj-menu button[data-a=\"load\"]", "불러오기"], [".mm-proj-menu button[data-a=\"exp\"]", "파일로 내보내기(.json)"], [".mm-proj-menu button[data-a=\"imp\"]", "파일 가져오기"]]},

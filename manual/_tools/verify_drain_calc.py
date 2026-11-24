@@ -30,6 +30,10 @@ def kds(area,wall,I,drains=1,slope=100,gslope=None,Q=0.0):
     # KDS 31 30 35 : 2026 4.4.6: A = 3600 Q / R → 100mm/h 환산 면적 = A × R/100 = 36 Q (종전 2021 「0.017 L/s 당 9㎡(25mm/h)」)
     a100=((area+wall*0.5)*I/100+Q*3600/100)/drains
     return kfind(KV,a100),kfind(KH[slope],a100),kfind(KG[gslope or (slope if slope in KG else 100)],a100)
+def kds_zones(zones,I,drains=1,slope=100,gslope=200,Q=0.0,vf=1.2):
+    # v6.1.6 구간별 설계: 밸리형 구간의 유효면적에만 집중계수 VF(KDS 외 선택) — 평지붕 · 경사지붕 구간은 1.0
+    a100=(sum((z['A']+z['W']*0.5)*(vf if z['roof']=='valley' else 1.0) for z in zones)*I/100+Q*3600/100)/drains
+    return kfind(KV,a100),kfind(KH[slope],a100),kfind(KG[gslope],a100)
 if __name__=='__main__':
     areas=list(range(10,3001,10)); rains=[x/2 for x in range(100,301)]  # 50.0~150.0 mm/h, 0.5 간격
     res={}

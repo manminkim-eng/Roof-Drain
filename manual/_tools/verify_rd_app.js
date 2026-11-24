@@ -7,5 +7,11 @@ await pg.goto('http://127.0.0.1:8765/index.html');await pg.waitForTimeout(800);
 const out=await pg.evaluate(ref=>{const res={tables:{VT,HTS,GTS},RD,cases:[]};
  for(const c of ref.cases){S.rainfall=c.I;S.area=c.A;S.wall=c.W;S.drains=c.N;S.slope=c.slope;S.safety=0;S.rooftype=c.roof;S.valleyFactor=1.2;S.pipetype='semi';S.gslope=c.gslope;S.cont=c.Q;doCalc();
   const R=S.result;res.cases.push([R.vp.over?'>'+R.vp.dn:R.vp.dn,R.hp.over?'>'+R.hp.dn:R.hp.dn,R.gp.over?'>'+R.gp.dn:R.gp.dn]);}
+ /* v6.1.6 — 구간별 설계(밸리형 구간 VF) */
+ res.zcases=[];zoneMode='multi';
+ for(const c of (ref.zcases||[])){zones=c.zones.map((z,i)=>({id:i+1,name:'Z'+(i+1),area:z.A,wall:z.W,roof:z.roof}));
+  S.rainfall=c.I;S.area=c.zones.reduce((s,z)=>s+z.A,0);S.wall=c.zones.reduce((s,z)=>s+z.W,0);S.drains=c.N;S.slope=c.slope;S.safety=0;S.rooftype='flat';S.valleyFactor=1.2;S.pipetype='semi';S.gslope=c.gslope;S.cont=c.Q;doCalc();
+  const R=S.result;res.zcases.push([R.vp.over?'>'+R.vp.dn:R.vp.dn,R.hp.over?'>'+R.hp.dn:R.hp.dn,R.gp.over?'>'+R.gp.dn:R.gp.dn]);}
+ zoneMode='single';
  return res;},REF);
 out.errs=errs;fs.writeFileSync(process.argv[4],JSON.stringify(out));await b.close();srv.close();console.log('cases',out.cases.length,'errs',errs.length);})();
